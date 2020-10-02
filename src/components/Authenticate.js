@@ -22,12 +22,15 @@ function Authenticate() {
             params: {
                 userName: username,
                 password: password,
-                authType: 'STANDARD'
+                authType: 'native'
             }
-        }).then(res => setToken(res.data))
+        }).then(res => {
+            if (res.status == 200) { setToken(res.data) };
+        })
     }
 
-    async function handleZoneReport(){
+    async function handleZoneReport() {
+        console.log(token);
         const zoneResult = await axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
@@ -38,18 +41,35 @@ function Authenticate() {
         }).then(res => console.log(res))
     }
 
+    async function handleList() {
+        console.log(token);
+        const listResult = await axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/list',
+            params: {
+                'path': '/tempZone/home/rods',
+                'stat': 'False',
+                'permissions': 'False',
+                'offset': '0',
+                'limit': '100'
+            },
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `${token}`
+            }
+        }).then(res => console.log(res))
+    }
+
     return (
-        <div className="login">
-            <div>
-                Username: <input onChange={handleUsername}></input>
+        <div>
+            <div className="login">
+                <b>iRODS Administrator Dashboard</b>
+                <hr/>
+                <p>Username: <input onChange={handleUsername}></input></p>
+                <p>Password: <input onChange={handlePassword}></input></p>
+                <br />
+                <button className="login-button" onClick={handleAuthenticate}>Login</button>
             </div>
-            <br />
-            <div>
-                Password: <input onChange={handlePassword}></input>
-            </div>
-            <br />
-            <button className="login-button" onClick={handleAuthenticate}>Login</button>
-            <button className="login-button" onClick={handleZoneReport}>ZoneReport</button>
         </div>
     );
 }

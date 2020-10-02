@@ -1,6 +1,9 @@
 .login {
+  margin: 100px auto;
   text-align: center;
   padding: 70px 0;
+  border-style: solid;
+  width: 30%;
 }
 
 .login-button{
