@@ -6,6 +6,7 @@ function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
+    const [logged, setLoggin] = useState(false);
 
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -13,6 +14,11 @@ function Authenticate() {
 
     const handlePassword = event => {
         setPassword(event.target.value);
+    }
+
+    function logOut(){
+        setToken('');
+        setLoggin(false);
     }
 
     async function handleAuthenticate() {
@@ -25,7 +31,10 @@ function Authenticate() {
                 authType: 'native'
             }
         }).then(res => {
-            if (res.status == 200) { setToken(res.data) };
+            if (res.status == 200) {
+                setLoggin(true);
+                setToken(res.data)
+            };
         })
     }
 
@@ -62,14 +71,14 @@ function Authenticate() {
 
     return (
         <div>
-            <div className="login">
+            {logged ? <div><p>You are logged in</p><button>log out</button></div> : <div className="login">
                 <b>iRODS Administrator Dashboard</b>
-                <hr/>
+                <hr />
                 <p>Username: <input onChange={handleUsername}></input></p>
                 <p>Password: <input onChange={handlePassword}></input></p>
                 <br />
                 <button className="login-button" onClick={handleAuthenticate}>Login</button>
-            </div>
+            </div>}
         </div>
     );
 }
