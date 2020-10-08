@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+
+import Cookies from 'js-cookie';
+
 import axios from 'axios';
 import '../App.css';
 
@@ -16,11 +19,6 @@ function Authenticate() {
         setPassword(event.target.value);
     }
 
-    function logOut(){
-        setToken('');
-        setLoggin(false);
-    }
-
     async function handleAuthenticate() {
         const authResult = await axios({
             method: 'POST',
@@ -32,22 +30,11 @@ function Authenticate() {
             }
         }).then(res => {
             if (res.status == 200) {
-                setLoggin(true);
+                Cookies.set('token', res.data);
                 setToken(res.data)
-            };
-        })
-    }
-
-    async function handleZoneReport() {
-        console.log(token);
-        const zoneResult = await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `${token}`
+                window.location.replace(window.location.href + 'home');
             }
-        }).then(res => console.log(res))
+        })
     }
 
     async function handleList() {
@@ -66,19 +53,22 @@ function Authenticate() {
                 'Accept': 'application/json',
                 'Authorization': `${token}`
             }
-        }).then(res => console.log(res))
+        }).then(res => {
+            console.log(res);
+            console.log(Cookies.get('token'));
+        })
     }
 
     return (
         <div>
-            {logged ? <div><p>You are logged in</p><button>log out</button></div> : <div className="login">
+            <div className="login">
                 <b>iRODS Administrator Dashboard</b>
                 <hr />
                 <p>Username: <input onChange={handleUsername}></input></p>
                 <p>Password: <input onChange={handlePassword}></input></p>
                 <br />
                 <button className="login-button" onClick={handleAuthenticate}>Login</button>
-            </div>}
+            </div>
         </div>
     );
 }
