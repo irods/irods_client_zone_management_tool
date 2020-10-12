@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
     "axios": "^0.20.0",
     "cors": "^2.8.5",
     "js-cookie": "^2.2.1",

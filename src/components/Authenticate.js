@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 
 import axios from 'axios';
+
+import TextField from '@material-ui/core/TextField';
 import '../App.css';
 
 function Authenticate() {
@@ -30,7 +32,8 @@ function Authenticate() {
             }
         }).then(res => {
             if (res.status == 200) {
-                Cookies.set('token', res.data, {expires: new Date().getTime() + 60*60*1000});
+                console.log(token)
+                Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
                 setToken(res.data)
                 window.location.replace(window.location.href + 'home');
             }
@@ -64,10 +67,20 @@ function Authenticate() {
             <div className="login">
                 <b>iRODS Administrator Dashboard</b>
                 <hr />
-                <p>Username: <input onChange={handleUsername}></input></p>
-                <p>Password: <input onChange={handlePassword}></input></p>
-                <br />
-                <button className="login-button" onClick={handleAuthenticate}>Login</button>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        label="Username"
+                        required
+                        onChange={handleUsername} />
+                    <br />
+                    <TextField
+                        label="Password"
+                        type="password"
+                        required
+                        onChange={handlePassword} />
+                    <br />
+                    <button className="login-button" onClick={handleAuthenticate}>Login</button>
             </div>
         </div>
     );
