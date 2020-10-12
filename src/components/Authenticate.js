@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 
 import axios from 'axios';
 
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import '../App.css';
 
@@ -67,20 +68,25 @@ function Authenticate() {
             <div className="login">
                 <b>iRODS Administrator Dashboard</b>
                 <hr />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        label="Username"
-                        required
-                        onChange={handleUsername} />
-                    <br />
-                    <TextField
-                        label="Password"
-                        type="password"
-                        required
-                        onChange={handlePassword} />
-                    <br />
-                    <button className="login-button" onClick={handleAuthenticate}>Login</button>
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    label="Username"
+                    required
+                    onChange={handleUsername} />
+                <br />
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    label="Password"
+                    type="password"
+                    required
+                    onChange={handlePassword} />
+                <br />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAuthenticate}>Login</Button>
             </div>
         </div>
     );
