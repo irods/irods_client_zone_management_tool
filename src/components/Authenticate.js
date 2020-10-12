@@ -6,6 +6,7 @@ import axios from 'axios';
 
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import '../App.css';
 
 function Authenticate() {
@@ -66,7 +67,7 @@ function Authenticate() {
     return (
         <div>
             <div className="login">
-                <b>iRODS Administrator Dashboard</b>
+                <Typography component="h1" variant="h5">iRODS Administrator Dashboard</Typography>
                 <hr />
                 <TextField
                     variant="outlined"
