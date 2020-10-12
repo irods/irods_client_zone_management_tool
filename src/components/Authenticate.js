@@ -24,9 +24,9 @@ function Authenticate() {
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/auth',
             params: {
-                userName: username,
+                user_name: username,
                 password: password,
-                authType: 'native'
+                auth_type: 'native'
             }
         }).then(res => {
             if (res.status == 200) {

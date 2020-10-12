@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 function Home() {
     const [zone_report, getReport] = useState();
     const token = Cookies.get('token');
+    const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
         axios({
@@ -17,14 +18,14 @@ function Home() {
         }).then(res => {
             getReport(res);
             console.log(res);
-        })}, []);
-    
+        })
+    }, []);
+
     return (
         <div>
-            You are authenticated!
-            <div>
-                
-            </div>
+            {isAuthenticated == true ? <div>
+                You are authenticated!
+        </div> : <div>Please login to use the administration dashboard.</div>}
         </div>
     );
 }
