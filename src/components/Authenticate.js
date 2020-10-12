@@ -30,7 +30,7 @@ function Authenticate() {
             }
         }).then(res => {
             if (res.status == 200) {
-                Cookies.set('token', res.data, {expires: new Date().getTime() + 60*60*1000});
+                Cookies.set('token', res.data {expires: new Date().getTime() + 60*60*1000});
                 setToken(res.data)
                 window.location.replace(window.location.href + 'home');
             }
