@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 import Avatar from '@material-ui/core/Avatar';
-import Box from '@material'
+import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
@@ -19,11 +19,11 @@ import '../App.css';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
-        marginTop: theme.spacing(12),
+        marginTop: theme.spacing(15),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        
+
     }
 }))
 
@@ -88,7 +88,7 @@ function Authenticate() {
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
                 <img src={logo}></img>
-                <br/>
+                <br />
                 <Typography component="h1" variant="h4">Administrator Dashboard</Typography>
                 <TextField
                     variant="outlined"
@@ -112,7 +112,7 @@ function Authenticate() {
                     size="large"
                     fullWidth
                     onClick={handleAuthenticate}>Login</Button>
-                <br/>
+                <br />
                 <Grid container>
                     <Grid item xs>
                         <Link href="#" variant="body2">
@@ -125,8 +125,11 @@ function Authenticate() {
                         </Link>
                     </Grid>
                 </Grid>
+                <br/>
+                <Box mt={8}>
+                    Copyright © iRODS Consortium 2020
+            </Box>
             </div>
-
         </Container>
     );
 }
