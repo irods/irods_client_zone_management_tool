@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
 
+    },
+    logo: {
+        marginBottom: theme.spacing(6)
     }
 }))
 
@@ -87,7 +90,7 @@ function Authenticate() {
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
-                <img src={logo}></img>
+                <img className={classes.logo} src={logo}></img>
                 <br />
                 <Typography component="h1" variant="h4">Administrator Dashboard</Typography>
                 <TextField
