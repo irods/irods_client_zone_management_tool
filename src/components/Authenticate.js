@@ -4,8 +4,12 @@ import Cookies from 'js-cookie';
 
 import axios from 'axios';
 
+import Avatar from '@material-ui/core/Avatar';
+import Box from '@material'
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,7 +19,7 @@ import '../App.css';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
-        marginTop: theme.spacing(8),
+        marginTop: theme.spacing(12),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -84,7 +88,8 @@ function Authenticate() {
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
                 <img src={logo}></img>
-                <Typography component="h1" variant="h5">iRODS Administrator Dashboard</Typography>
+                <br/>
+                <Typography component="h1" variant="h4">Administrator Dashboard</Typography>
                 <TextField
                     variant="outlined"
                     margin="normal"
@@ -107,7 +112,21 @@ function Authenticate() {
                     size="large"
                     fullWidth
                     onClick={handleAuthenticate}>Login</Button>
+                <br/>
+                <Grid container>
+                    <Grid item xs>
+                        <Link href="#" variant="body2">
+                            Forgot password?
+                        </Link>
+                    </Grid>
+                    <Grid item>
+                        <Link href="#" variant="body2">
+                            {"Don't have an account? Sign Up"}
+                        </Link>
+                    </Grid>
+                </Grid>
             </div>
+
         </Container>
     );
 }
