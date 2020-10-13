@@ -5,15 +5,31 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+
+import logo from '../iRODS-logo.png';
 import '../App.css';
+
+const useStyles = makeStyles((theme) => ({
+    mainForm: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        
+    }
+}))
 
 function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
     const [logged, setLoggin] = useState(false);
+
+    const classes = useStyles();
 
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -65,14 +81,15 @@ function Authenticate() {
     }
 
     return (
-        <div>
-            <div className="login">
+        <Container component="main" maxWidth="xs">
+            <div className={classes.mainForm}>
+                <img src={logo}></img>
                 <Typography component="h1" variant="h5">iRODS Administrator Dashboard</Typography>
                 <TextField
                     variant="outlined"
                     margin="normal"
                     label="Username"
-                    full
+                    fullWidth
                     required
                     onChange={handleUsername} />
                 <TextField
@@ -80,16 +97,18 @@ function Authenticate() {
                     margin="normal"
                     label="Password"
                     type="password"
+                    fullWidth
                     required
                     onChange={handlePassword} />
                 <br />
                 <Button
                     variant="contained"
                     color="primary"
-                    full
+                    size="large"
+                    fullWidth
                     onClick={handleAuthenticate}>Login</Button>
             </div>
-        </div>
+        </Container>
     );
 }
 
