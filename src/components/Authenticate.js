@@ -59,31 +59,10 @@ function Authenticate() {
             if (res.status == 200) {
                 console.log(token)
                 Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
+                Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
                 setToken(res.data)
                 window.location.replace(window.location.href + 'home');
             }
-        })
-    }
-
-    async function handleList() {
-        console.log(token);
-        const listResult = await axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/list',
-            params: {
-                'path': '/tempZone/home/rods',
-                'stat': 'False',
-                'permissions': 'False',
-                'offset': '0',
-                'limit': '100'
-            },
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `${token}`
-            }
-        }).then(res => {
-            console.log(res);
-            console.log(Cookies.get('token'));
         })
     }
 
