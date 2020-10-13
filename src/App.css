@@ -1,9 +1,8 @@
 .login {
-  margin: 100px auto;
-  text-align: center;
-  padding: 70px 0;
-  border-style: solid;
-  width: 30%;
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+  margin-top: 50px;
 }
 
 .login-button{

@@ -68,14 +68,13 @@ function Authenticate() {
         <div>
             <div className="login">
                 <Typography component="h1" variant="h5">iRODS Administrator Dashboard</Typography>
-                <hr />
                 <TextField
                     variant="outlined"
                     margin="normal"
                     label="Username"
+                    full
                     required
                     onChange={handleUsername} />
-                <br />
                 <TextField
                     variant="outlined"
                     margin="normal"
@@ -87,6 +86,7 @@ function Authenticate() {
                 <Button
                     variant="contained"
                     color="primary"
+                    full
                     onClick={handleAuthenticate}>Login</Button>
             </div>
         </div>
