@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import logo from '../iRODS-logo.png';
 import '../App.css';
+import { red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
@@ -27,6 +28,11 @@ const useStyles = makeStyles((theme) => ({
     },
     logo: {
         marginBottom: theme.spacing(6)
+    },
+    error: {
+        color: 'red',
+        fontSize: 15,
+        padding: '10px 10px',
     }
 }))
 
@@ -34,8 +40,7 @@ function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [token, setToken] = useState('');
-    const [logged, setLoggin] = useState(false);
-
+    const [incorrect, setIncorrect] = useState(false);
     const classes = useStyles();
 
     const handleUsername = event => {
@@ -47,23 +52,27 @@ function Authenticate() {
     }
 
     async function handleAuthenticate() {
-        const authResult = await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/auth',
-            params: {
-                user_name: username,
-                password: password,
-                auth_type: 'native'
-            }
-        }).then(res => {
-            if (res.status == 200) {
-                console.log(token)
-                Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
-                Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
-                setToken(res.data)
-                window.location.replace(window.location.href + 'home');
-            }
-        })
+        try {
+            const authResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/auth',
+                params: {
+                    user_name: username,
+                    password: password,
+                    auth_type: 'native'
+                }
+            }).then(res => {
+                if (res.status == 200) {
+                    console.log(token)
+                    Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
+                    Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
+                    setToken(res.data)
+                    window.location.replace(window.location.href + 'home');
+                }
+            })
+        } catch (err) {
+            setIncorrect(true);
+        }
     }
 
     return (
@@ -87,7 +96,7 @@ function Authenticate() {
                     fullWidth
                     required
                     onChange={handlePassword} />
-                <br />
+                {incorrect == false ? <br /> : <Typography className={classes.error}>Incorrect username or password. Please try again.</Typography>}
                 <Button
                     variant="contained"
                     color="primary"
@@ -107,7 +116,7 @@ function Authenticate() {
                         </Link>
                     </Grid>
                 </Grid>
-                <br/>
+                <br />
                 <Box mt={8}>
                     Copyright © iRODS Consortium 2020
             </Box>
