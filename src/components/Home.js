@@ -5,6 +5,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import BlockIcon from '@material-ui/icons/Block'
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
@@ -18,6 +19,13 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
+    },
+    logout:{
+        display: 'flex',
+        flexDirection: 'column',
+        marginTop: theme.spacing(12),
+        alignItems: 'center',
+        fontSize: 25,
     },
     appBar: {
         width: `calc(100% - ${drawerWidth}px)`,
@@ -117,7 +125,7 @@ function Home() {
                         {main}
                     </div>
                 </main>
-            </div> : <div>Please login to use the administration dashboard.</div>}
+            </div> : <div className={classes.logout}><BlockIcon /><br/><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
         </div>
     );
 }
