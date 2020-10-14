@@ -45,6 +45,9 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing(3),
     },
+    main :{
+        whiteSpace: "pre-wrap"
+    }
 }));
 
 function Home() {
@@ -82,7 +85,8 @@ function Home() {
             }
         }).then(res => {
             setReport(res);
-            setMain(`Schema Version: ${res.data.schema_version}`);
+            console.log(res);
+            setMain(`Schema Version: ${res.data.schema_version} \n`+`Zone Report: ${res.data.zones[0]}`);
         })
     }
 
@@ -121,7 +125,7 @@ function Home() {
                 </Drawer>
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
-                    <div>
+                    <div className={classes.main}>
                         {main}
                     </div>
                 </main>
