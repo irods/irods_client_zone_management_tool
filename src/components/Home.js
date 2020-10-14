@@ -59,7 +59,9 @@ function Home() {
     )
 
     const logout = () => {
-        
+        Cookies.remove('token');
+        Cookies.remove('username');
+        window.location.reload();
     }
 
     async function get_zone_report() {
@@ -104,11 +106,9 @@ function Home() {
                     </List>
                     <Divider />
                     <List>
-                        {['Current Session', 'Logout'].map((text, index) => (
-                            <ListItem button key={text}>
-                                <ListItemText primary={text} />
-                            </ListItem>
-                        ))}
+                        <ListItem button key='logout' onClick={logout}>
+                            <ListItemText primary='Logout' />
+                        </ListItem>
                     </List>
                 </Drawer>
                 <main className={classes.content}>
