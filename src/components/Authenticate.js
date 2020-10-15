@@ -27,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
 
     },
     logo: {
-        marginBottom: theme.spacing(6)
+        maxWidth: theme.spacing(35),
+        marginBottom: theme.spacing(5)
     },
     error: {
         color: 'red',
