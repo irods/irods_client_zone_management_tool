@@ -46,13 +46,14 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(3),
     },
     main :{
-        whiteSpace: "pre-wrap"
+        whiteSpace: "pre-wrap",
+        fontSize:20
     }
 }));
 
 function Home() {
     const token = Cookies.get('token');
-    const [main, setMain] = useState('Welcome!')
+    const [main, setMain] = useState(`Welcome, ${Cookies.get('username')}!`);
     const [zone_report, setReport] = useState();
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
@@ -114,6 +115,18 @@ function Home() {
                     <List>
                         <ListItem button key='zone_report' onClick={get_zone_report}>
                             <ListItemText primary='Zone Report' />
+                        </ListItem>
+                        <ListItem button key='query'>
+                            <ListItemText primary='Query' />
+                        </ListItem>
+                        <ListItem button key='admin'>
+                            <ListItemText primary='User Administration' />
+                        </ListItem>
+                    </List>
+                    <Divider />
+                    <List>
+                        <ListItem button key='current_session'>
+                            <ListItemText primary='Current Session' />
                         </ListItem>
                     </List>
                     <Divider />
