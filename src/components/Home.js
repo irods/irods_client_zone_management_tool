@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
     const token = Cookies.get('token');
     const [main, setMain] = useState(`Welcome, ${Cookies.get('username')}!`);
-    const [zone_report, setReport] = useState();
+    const [zone_report, setReport] = useState([]);
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const theme = useTheme();
@@ -85,9 +85,18 @@ function Home() {
                 'Authorization': `${token}`
             }
         }).then(res => {
-            setReport(res);
+            let zones = res.data.zones;
+            let tem_main = '';
+            setReport(res.data.zones);
             console.log(res);
-            setMain(`Schema Version: ${res.data.schema_version} \n`+`Zone Report: ${res.data.zones[0]}`);
+            zones.forEach(zone => {
+                tem_main+=(`Hostname: ${zone['icat_server']['host_system_information']['hostname']}\n`);
+                tem_main+=(`OS Distribution Name: ${zone['icat_server']['host_system_information']['os_distribution_name']}\n`);
+                tem_main+=(`OS Distribution Version: ${zone['icat_server']['host_system_information']['os_distribution_version']}\n`);
+                tem_main+=(`Service Account Group Name: ${zone['icat_server']['host_system_information']['service_account_group_name']}\n`);
+                tem_main+=(`Service Account User Name: ${zone['icat_server']['host_system_information']['service_account_user_name']}\n`);
+            })
+            setMain(tem_main);
         })
     }
 

@@ -105,19 +105,6 @@ function Authenticate() {
                     fullWidth
                     onClick={handleAuthenticate}>Login</Button>
                 <br />
-                <Grid container>
-                    <Grid item xs>
-                        <Link href="#" variant="body2">
-                            Forgot password?
-                        </Link>
-                    </Grid>
-                    <Grid item>
-                        <Link href="#" variant="body2">
-                            {"Don't have an account? Sign Up"}
-                        </Link>
-                    </Grid>
-                </Grid>
-                <br />
                 <Box mt={8}>
                     Copyright © iRODS Consortium 2020
             </Box>
