@@ -8,15 +8,42 @@ import ServerIcon from '../img/servers-logo.png';
 import BlockIcon from '@material-ui/icons/Block'
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'flex',
+    },
+    toolbar: theme.mixins.toolbar,
+    content: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+        padding: theme.spacing(3),
+    },
+    main: {
+        whiteSpace: "pre-wrap",
+        fontSize: 20
+    }
 }));
 
 function Home() {
     const token = Cookies.get('token');
     const [main, setMain] = useState(`Welcome, ${Cookies.get('username')}!`);
     const [zone_reports, setReport] = useState([]);
+    const [test,setTest] = useState(0);
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
-    const theme = useTheme();
+
+    useEffect(() => {
+        const result = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `${token}`
+            }
+        }).then(res => {
+            setReport(res.data.zones);
+            setTest(1);
+            console.log(res.data.zones)
+        })}, []);
 
     async function get_zone_report() {
         const result = await axios({
@@ -45,18 +72,20 @@ function Home() {
 
     return (
         <div>
-            {isAuthenticated == true ? <div><Sidebar/>
-                <main className={classes.content}>
+            {isAuthenticated == true ? <div className={classes.root}><Sidebar /><div className={classes.content}><div className={classes.toolbar} />
+                    <div className={classes.main}>2</div></div>
+                {/* <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
+                        <div>{test}</div>
                         {zone_reports.map(zone_report => {
                             <div>
-                            <img src={ServerIcon}></img>
-                            <div>Hostname: {zone_report[0]['icat_server']['host_system_information']['hostname']}</div></div>
+                                <img src={ServerIcon}></img>
+                                <div>Hostname: {zone_report['icat_server']['host_system_information']['hostname']}</div></div>
                         })}
                     </div>
-                </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br/><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+                </main> */}
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
         </div>
     );
 }
