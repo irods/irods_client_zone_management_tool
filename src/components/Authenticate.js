@@ -14,7 +14,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import logo from '../iRODS-logo.png';
+import logo from '../img/iRODS-logo.png';
 import '../App.css';
 import { red } from '@material-ui/core/colors';
 
