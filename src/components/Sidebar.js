@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -52,9 +52,60 @@ const useStyles = makeStyles((theme) => ({
 
 function Sidebar() {
     const token = Cookies.get('token');
+    const isAuthenticated = token != null ? true : false;
+    const classes = useStyles();
+    const theme = useTheme();
+    const logout = () => {
+        Cookies.remove('token');
+        Cookies.remove('username');
+        window.location.reload();
+    }
 
     return (
-
+        <div className={classes.root}>
+            <CssBaseline />
+            <AppBar position="fixed" className={classes.appBar}>
+                <Toolbar>
+                    <Typography variant="h6" noWrap>
+                        iRODS Administrator Dashboard
+          </Typography>
+                </Toolbar>
+            </AppBar>
+            <Drawer
+                className={classes.drawer}
+                variant="permanent"
+                classes={{
+                    paper: classes.drawerPaper,
+                }}
+                anchor="left"
+            >
+                <div className={classes.toolbar} />
+                <Divider />
+                <List>
+                    <ListItem button key='zone_report'>
+                        <ListItemText primary='Zone Report' />
+                    </ListItem>
+                    <ListItem button key='query'>
+                        <ListItemText primary='Query' />
+                    </ListItem>
+                    <ListItem button key='admin'>
+                        <ListItemText primary='User Administration' />
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    <ListItem button key='current_session'>
+                        <ListItemText primary='Current Session' />
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    <ListItem button key='logout' onClick={logout}>
+                        <ListItemText primary='Logout' />
+                    </ListItem>
+                </List>
+            </Drawer>
+        </div>
     );
 }
 
