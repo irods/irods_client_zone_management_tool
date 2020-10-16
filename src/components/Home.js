@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
+import Appbar from './Appbar';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import ServerIcon from '../img/servers-logo.png';
 import BlockIcon from '@material-ui/icons/Block'
+import { CssBaseline } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -30,6 +32,7 @@ function Home() {
     const [test,setTest] = useState(0);
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
+    const theme = useTheme();
 
     useEffect(() => {
         const result = axios({
@@ -72,8 +75,8 @@ function Home() {
 
     return (
         <div>
-            {isAuthenticated == true ? <div className={classes.root}><Sidebar /><div className={classes.content}><div className={classes.toolbar} />
-                    <div className={classes.main}>2</div></div>
+            {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
+                    <div className={classes.main}>2</div></main>
                 {/* <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
