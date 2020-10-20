@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
     main: {
         whiteSpace: "pre-wrap",
         fontSize: 20
+    },
+    server: {
+        width: theme.spacing(5)
     }
 }));
 
@@ -44,9 +47,9 @@ function Home() {
             }
         }).then(res => {
             setReport(res.data.zones);
-            console.log(res.data.zones);
             setTest(1);
-        })}, [isAuthenticated]);
+        })
+    }, [isAuthenticated]);
 
     async function get_zone_report() {
         const result = await axios({
@@ -76,7 +79,12 @@ function Home() {
     return (
         <div>
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
-                    <div className={classes.main}>{test}</div></main>
+                <div className={classes.main}>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
+                    <div>
+                        <img className={classes.server} src={ServerIcon}></img>
+                        <p>Hostname: {zone_report['icat_server']['host_system_information']['hostname']}</p>
+                    </div>
+                ) : <div>Loading...</div>}</div></main>
                 {/* <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
