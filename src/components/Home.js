@@ -29,7 +29,7 @@ function Home() {
     const token = Cookies.get('token');
     const [main, setMain] = useState(`Welcome, ${Cookies.get('username')}!`);
     const [zone_reports, setReport] = useState([]);
-    const [test,setTest] = useState(0);
+    const [test, setTest] = useState(0);
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const theme = useTheme();
@@ -44,9 +44,9 @@ function Home() {
             }
         }).then(res => {
             setReport(res.data.zones);
+            console.log(res.data.zones);
             setTest(1);
-            console.log(res.data.zones)
-        })}, []);
+        })}, [isAuthenticated]);
 
     async function get_zone_report() {
         const result = await axios({
@@ -76,7 +76,7 @@ function Home() {
     return (
         <div>
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
-                    <div className={classes.main}>2</div></main>
+                    <div className={classes.main}>{test}</div></main>
                 {/* <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
@@ -92,5 +92,7 @@ function Home() {
         </div>
     );
 }
+
+// 50 iRODS/ 25 helx UI/ 25 robokop UI 
 
 export default Home;
