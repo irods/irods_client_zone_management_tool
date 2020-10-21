@@ -29,7 +29,11 @@ const useStyles = makeStyles((theme) => ({
     server_box:{
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center'
+    },
+    divider: {
+        marginTop: theme.spacing(20)
     }
 }));
 
@@ -81,9 +85,9 @@ function Home() {
                 <div className={classes.main}>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
                     <div className={classes.server_box}>
                         <img className={classes.server} id={zone_id++} src={ServerIcon} onMouseEnter={handleMouseIn} onMouseLeave={handleMouseOut}></img>
-                        <p>iCAT Server</p>
+                <p>iCAT Server #{zone_id}</p>
                     </div>
-                ) : <div>Loading...</div>}</div><hr />{mouseIn == true ? <div><p>Hostname: {currentZone['hostname']}</p><p>OS Distribution Name: {currentZone['os_distribution_version']}</p><p>OS Distribution Version: {currentZone['os_distribution_version']}</p></div> : <div>Number of Server Running: {zone_reports.length}</div>}</main>
+                ) : <div>Loading...</div>}</div><hr className={classes.divider}/>{mouseIn == true ? <div><p>Hostname: {currentZone['hostname']}</p><p>OS Distribution Name: {currentZone['os_distribution_version']}</p><p>OS Distribution Version: {currentZone['os_distribution_version']}</p></div> : <div>Number of Server Running: {zone_reports.length}</div>}</main>
 
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
         </div>
