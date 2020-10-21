@@ -33,6 +33,8 @@ function Home() {
     const [main, setMain] = useState(`Welcome, ${Cookies.get('username')}!`);
     const [zone_reports, setReport] = useState([]);
     const [result, setResult] = useState();
+    const [mouseIn, setMouseIn] = useState(false);
+    const [hostname, setHostname] = useState('');
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const theme = useTheme();
@@ -53,7 +55,8 @@ function Home() {
     }, [isAuthenticated]);
 
 
-    const mouseIn = event => {
+    const handleMouseIn = event => {
+        setMouseIn(true);
         const current_zone = event.target.id;
         let tem_result = '';
         tem_result += (`Hostname: ${zone_reports[current_zone]['icat_server']['host_system_information']['hostname']}\n`);
@@ -62,6 +65,11 @@ function Home() {
         tem_result += (`Service Account Group Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['service_account_group_name']}\n`);
         tem_result += (`Service Account User Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['service_account_user_name']}\n`);
         setResult(tem_result);
+        setHostname(zone_reports[current_zone]['icat_server']['host_system_information']['hostname']);
+    }
+
+    const handleMouseOut = event => {
+        setMouseIn(false);
     }
 
     return (
@@ -69,10 +77,10 @@ function Home() {
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
                     <div>
-                        <img className={classes.server} id={zone_id++} src={ServerIcon} onMouseEnter={mouseIn}></img>
+                        <img className={classes.server} id={zone_id++} src={ServerIcon} onMouseEnter={handleMouseIn} onMouseLeave={handleMouseOut}></img>
                         <p>iCAT Server</p>
                     </div>
-                ) : <div>Loading...</div>}</div><hr />{zone_reports.length > 0 ? <div>{result}</div> : <br />}</main>
+                ) : <div>Loading...</div>}</div><hr />{mouseIn == true ? <div><p>Hostname: {hostname}</p></div> : <div>Number of Server Running: {zone_reports.length}</div>}</main>
 
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
         </div>
