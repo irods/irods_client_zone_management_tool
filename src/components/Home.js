@@ -9,6 +9,7 @@ import ServerIcon from '../img/servers-logo.png';
 import BlockIcon from '@material-ui/icons/Block';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import Pagination from '@material-ui/lab/Pagination';
 import { CssBaseline, Typography, CircularProgress } from '@material-ui/core';
 import { Avatar, Card, CardHeader, CardActions, CardContent, Collapse } from '@material-ui/core';
 
@@ -38,6 +39,13 @@ const useStyles = makeStyles((theme) => ({
     status_box: {
         display: 'flex',
         fontSize: theme.spacing(3),
+    },
+    logout: {
+        marginTop: theme.spacing(20),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        fontSize: theme.spacing(3)
     }
 }));
 
@@ -63,26 +71,10 @@ function Home() {
                 'Authorization': `${token}`
             }
         }).then(res => {
-            console.log(res.data);
             setReport(res.data.zones);
             setResult(`Number of Server Running: ${res.data.zones.length}`);
         })
     }, [isAuthenticated]);
-
-
-    const handleMouseIn = event => {
-        setMouseIn(true);
-        setCurrentZone(zone_reports[event.target.id]['icat_server']['host_system_information']);
-        // tem_result += (`Hostname: ${zone_reports[current_zone]['icat_server']['host_system_information']['hostname']}\n`);
-        // tem_result += (`OS Distribution Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['os_distribution_name']}\n`);
-        // tem_result += (`OS Distribution Version: ${zone_reports[current_zone]['icat_server']['host_system_information']['os_distribution_version']}\n`);
-        // tem_result += (`Service Account Group Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['service_account_group_name']}\n`);
-        // tem_result += (`Service Account User Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['service_account_user_name']}\n`);
-    }
-
-    const handleMouseOut = event => {
-        setMouseIn(!mouseIn);
-    }
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -91,11 +83,11 @@ function Home() {
     return (
         <div>
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
-                <div className={classes.main}>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
+    <div className={classes.main}><Typography>Number of Server Running: {zone_reports.length}</Typography><br/><Pagination count={1} /><br/>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
                     <Card className={classes.server_card}>
                         <CardHeader
                             avatar={
-                                <img className={classes.server} id={zone_id} src={ServerIcon} onMouseEnter={handleMouseIn} onMouseLeave={handleMouseOut}></img>
+                                <img className={classes.server} id={zone_id} src={ServerIcon}></img>
                             }
                             title="Server"
                             subheader="iCAT Server"

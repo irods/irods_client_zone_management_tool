@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -53,11 +54,11 @@ function Sidebar() {
                 <div className={classes.toolbar} />
                 <Divider />
                 <List>
-                    <ListItem button key='zone_report'>
-                        <ListItemText primary='Zone Report' />
+                    <ListItem button component={Link} to="/home" key='home'>
+                        <ListItemText primary='Home' />
                     </ListItem>
-                    <ListItem button key='query'>
-                        <ListItemText primary='Query' />
+                    <ListItem button component={Link} to="/access" key='access'>
+                        <ListItemText primary='Access' />
                     </ListItem>
                     <ListItem button key='admin'>
                         <ListItemText primary='User Administration' />
