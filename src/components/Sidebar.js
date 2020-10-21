@@ -60,7 +60,7 @@ function Sidebar() {
                     <ListItem button component={Link} to="/access" key='access'>
                         <ListItemText primary='Access & Stream' />
                     </ListItem>
-                    <ListItem button key='current_session'>
+                    <ListItem button component={Link} to="/session" key='current_session'>
                         <ListItemText primary='Current Session' />
                     </ListItem>
                 </List>

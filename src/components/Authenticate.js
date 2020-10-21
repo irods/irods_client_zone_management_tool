@@ -66,7 +66,7 @@ function Authenticate() {
                 if (res.status == 200) {
                     console.log(token)
                     Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
-                    Cookies.set('last login', new Date().getTime());
+                    Cookies.set('last_login', new Date().toString());
                     Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     setToken(res.data)
                     window.location.replace(window.location.href + 'home');
