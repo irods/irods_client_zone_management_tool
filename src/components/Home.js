@@ -24,7 +24,12 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 20
     },
     server: {
-        width: theme.spacing(5)
+        width: theme.spacing(10)
+    },
+    server_box:{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center'
     }
 }));
 
@@ -74,7 +79,7 @@ function Home() {
         <div>
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>{zone_reports.length > 0 ? zone_reports.map(zone_report =>
-                    <div>
+                    <div className={classes.server_box}>
                         <img className={classes.server} id={zone_id++} src={ServerIcon} onMouseEnter={handleMouseIn} onMouseLeave={handleMouseOut}></img>
                         <p>iCAT Server</p>
                     </div>
