@@ -35,6 +35,7 @@ function Home() {
     const [result, setResult] = useState();
     const [mouseIn, setMouseIn] = useState(false);
     const [hostname, setHostname] = useState('');
+    cosnt [currentZone, setCurrentZone] = useState({});
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const theme = useTheme();
@@ -57,7 +58,7 @@ function Home() {
 
     const handleMouseIn = event => {
         setMouseIn(true);
-        const current_zone = event.target.id;
+        setCurrentZone(zone_reports[event.target.id]['icat_server']['host_system_information']);
         let tem_result = '';
         tem_result += (`Hostname: ${zone_reports[current_zone]['icat_server']['host_system_information']['hostname']}\n`);
         tem_result += (`OS Distribution Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['os_distribution_name']}\n`);
@@ -66,6 +67,7 @@ function Home() {
         tem_result += (`Service Account User Name: ${zone_reports[current_zone]['icat_server']['host_system_information']['service_account_user_name']}\n`);
         setResult(tem_result);
         setHostname(zone_reports[current_zone]['icat_server']['host_system_information']['hostname']);
+        setOS_dis_name(zone_reports[current_zone]['icat_server']['host_system_information']['os_distribution_name']);
     }
 
     const handleMouseOut = event => {
@@ -80,7 +82,7 @@ function Home() {
                         <img className={classes.server} id={zone_id++} src={ServerIcon} onMouseEnter={handleMouseIn} onMouseLeave={handleMouseOut}></img>
                         <p>iCAT Server</p>
                     </div>
-                ) : <div>Loading...</div>}</div><hr />{mouseIn == true ? <div><p>Hostname: {hostname}</p></div> : <div>Number of Server Running: {zone_reports.length}</div>}</main>
+                ) : <div>Loading...</div>}</div><hr />{mouseIn == true ? <div><p>Hostname: {currentZone['hostname']}</p></div> : <div>Number of Server Running: {zone_reports.length}</div>}</main>
 
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
         </div>
