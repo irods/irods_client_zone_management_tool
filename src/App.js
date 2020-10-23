@@ -13,7 +13,7 @@ class App extends Component {
         <div>
           <Switch>
             <Route path="/session" component={Session} />
-            <Route path="/access" component={Access} />
+            <Route path="/user" component={user} />
             <Route path="/home" component={Home} />
             <Route path="/" component={Authenticate} />
           </Switch>
