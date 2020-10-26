@@ -71,6 +71,7 @@ function Home() {
                 'Authorization': `${token}`
             }
         }).then(res => {
+            console.log(res);
             setReport(res.data.zones);
             setResult(`Number of Server Running: ${res.data.zones.length}`);
         })

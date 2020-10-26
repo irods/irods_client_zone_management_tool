@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import axios from 'axios';
+
 import BlockIcon from '@material-ui/icons/Block';
 
 import Appbar from './Appbar';
@@ -47,14 +49,41 @@ function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
     const [open, setOpen] = useState(false);
+    const [name, setName] = useState();
     const [user_type, setUserType] = useState();
+    const [zone_name, setZoneName] = useState();
     const isAuthenticated = token != null ? true : false;
 
     async function addUser() {
+        const result = await axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                action: 'add',
+                target: 'user',
+                arg2: name,
+                arg3: user_type,
+                arg4: zone_name,
+                arg5:'',
+            }
+        }).then(res => {
+            console.log(res);
+        })
     }
 
     const handleUserType = event => {
         setUserType(event.target.value);
+    }
+
+    const handleUserName = event => {
+        setName(event.target.value);
+    }
+
+    const handleZoneName = event => {
+        setZoneName(event.target.value);
     }
 
     const handleOpen = () => {
@@ -88,6 +117,15 @@ function User() {
                                             native
                                             id="name"
                                             label="Username"
+                                            onChange={handleUserName}
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="zone"
+                                            label="Zone Name"
+                                            onChange={handleZoneName}
                                         />
                                     </FormControl>
                                     <FormControl className={classes.formControl}>
