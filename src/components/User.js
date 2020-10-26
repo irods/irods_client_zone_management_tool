@@ -39,6 +39,12 @@ function User() {
     const isAuthenticated = token != null ? true : false;
 
     async function addUser() {
+        handleOpen;
+
+    }
+
+
+    const handleOpen = () => {
         setOpen(true);
     }
 
@@ -57,8 +63,13 @@ function User() {
                         <Button variant="outlined" color="primary" onClick={addUser}>
                             Add New User
                         </Button>
-                        <Dialog open={open} >
-
+                        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                            <DialogTitle>Add New User</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    You can add a new user there.
+                                </DialogContentText>
+                            </DialogContent>
                         </Dialog>
                     </div>
                 </main>
