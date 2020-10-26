@@ -7,6 +7,8 @@ import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -36,13 +38,16 @@ function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
     const [open, setOpen] = useState(false);
+    const [user_type, setUserType] = useState();
     const isAuthenticated = token != null ? true : false;
 
     async function addUser() {
-        handleOpen;
-
+        handleOpen();
     }
 
+    const handleUserType = event => {
+        setUserType(event.target.value);
+    }
 
     const handleOpen = () => {
         setOpen(true);
@@ -69,6 +74,21 @@ function User() {
                                 <DialogContentText>
                                     You can add a new user there.
                                 </DialogContentText>
+                                <TextField
+                                    autoFocus
+                                    id="name"
+                                    label="Username"
+                                />
+                                <Select
+                                    native
+                                    value={user_type}
+                                    onChange={handleUserType}
+                                >
+                                    <option aria-label="None" value="" />
+                                    <option value="rodsadmin">rodsadmin</option>
+                                    <option value="groupadmin">groupadmin</option>
+                                    <option value="rodsuser">rodsuser</option>
+                                </Select>
                             </DialogContent>
                         </Dialog>
                     </div>
