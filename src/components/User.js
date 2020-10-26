@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
+import { FormControl, InputLabel } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -31,6 +32,14 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         fontSize: theme.spacing(3)
+    },
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120
     }
 }));
 
@@ -42,7 +51,6 @@ function User() {
     const isAuthenticated = token != null ? true : false;
 
     async function addUser() {
-        handleOpen();
     }
 
     const handleUserType = event => {
@@ -65,7 +73,7 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={addUser}>
+                        <Button variant="outlined" color="primary" onClick={handleOpen}>
                             Add New User
                         </Button>
                         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
@@ -74,22 +82,34 @@ function User() {
                                 <DialogContentText>
                                     You can add a new user there.
                                 </DialogContentText>
-                                <TextField
-                                    autoFocus
-                                    id="name"
-                                    label="Username"
-                                />
-                                <Select
-                                    native
-                                    value={user_type}
-                                    onChange={handleUserType}
-                                >
-                                    <option aria-label="None" value="" />
-                                    <option value="rodsadmin">rodsadmin</option>
-                                    <option value="groupadmin">groupadmin</option>
-                                    <option value="rodsuser">rodsuser</option>
-                                </Select>
+                                <form className={classes.container}>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="name"
+                                            label="Username"
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
+                                        <Select
+                                            native
+                                            id="user-type-select"
+                                            value={user_type}
+                                            onChange={handleUserType}
+                                        >
+                                            <option aria-label="None" value="" />
+                                            <option value="rodsadmin">rodsadmin</option>
+                                            <option value="groupadmin">groupadmin</option>
+                                            <option value="rodsuser">rodsuser</option>
+                                        </Select>
+                                    </FormControl>
+                                </form>
                             </DialogContent>
+                            <DialogActions>
+                                <Button onClick={addUser} color="primary">Save</Button>
+                                <Button onClick={handleClose} color="primary">Cancel</Button>
+                            </DialogActions>
                         </Dialog>
                     </div>
                 </main>
