@@ -57,8 +57,8 @@ function Sidebar() {
                     <ListItem button component={Link} to="/home" key='home'>
                         <ListItemText primary='Home' />
                     </ListItem>
-                    <ListItem button component={Link} to="/access" key='access'>
-                        <ListItemText primary='Access & Stream' />
+                    <ListItem button component={Link} to="/user" key='user'>
+                        <ListItemText primary='User' />
                     </ListItem>
                     <ListItem button component={Link} to="/session" key='current_session'>
                         <ListItemText primary='Current Session' />
