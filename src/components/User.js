@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState([]);
     const [open, setOpen] = useState(false);
     const [name, setName] = useState();
     const [user_type, setUserType] = useState();
@@ -63,10 +63,10 @@ function User() {
         axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers:{
+            headers: {
                 'Authorization': token
             },
-            params:{
+            params: {
                 query_string: 'SELECT USER_NAME, USER_TYPE, USER_ZONE',
                 query_limit: 100,
                 row_offset: 0,
@@ -76,7 +76,7 @@ function User() {
             console.log(res.data);
             setUsers(res.data['_embedded']);
         })
-    },[])
+    }, [isAuthenticated])
 
     async function addUser() {
         await axios({
@@ -91,7 +91,7 @@ function User() {
                 arg2: name,
                 arg3: user_type,
                 arg4: zone_name,
-                arg5:'',
+                arg5: '',
             }
         }).then(res => {
             console.log(res);
@@ -126,15 +126,27 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Table className={classes.table} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Username</TableCell>
-                                    <TableCell>Type</TableCell>
-                                    <TableCell>Zone</TableCell>
-                                </TableRow>
-                            </TableHead>
-                        </Table>
+                        {users.length > 0 ?
+                            <TableContainer component={Paper}>
+                                <Table className={classes.table} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Username</TableCell>
+                                            <TableCell>Type</TableCell>
+                                            <TableCell>Zone</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {users['_embedded'].map(user => {
+                                            <TableRow key={user[0]}>
+                                                <TableCell component="th" scope="row">{user[0]}</TableCell>
+                                                <TableCell>{user[1]}</TableCell>
+                                                <TableCell>{user[2]}</TableCell>
+                                            </TableRow>
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer> : <br />}
                         <Button variant="outlined" color="primary" onClick={handleOpen}>
                             Add New User
                         </Button>
