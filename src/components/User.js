@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
 
@@ -48,11 +48,30 @@ const useStyles = makeStyles((theme) => ({
 function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
+    const [users, setUsers] = useState();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState();
     const [user_type, setUserType] = useState();
     const [zone_name, setZoneName] = useState();
     const isAuthenticated = token != null ? true : false;
+
+    useEffect(() => {
+        const existing_users = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers:{
+                'Authorization': token
+            },
+            params:{
+                query_string: 'SELECT USER_NAME, USER_TYPE, USER_ZONE',
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            console.log(res);
+        })
+    },[])
 
     async function addUser() {
         const result = await axios({

@@ -113,8 +113,8 @@ function Home() {
                                 <Typography paragraph>Hostname: {zone_report['icat_server']['host_system_information']['hostname']}</Typography>
                                 <Typography paragraph>OS Distribution Name: {zone_report['icat_server']['host_system_information']['os_distribution_name']}</Typography>
                                 <Typography paragraph>OS Distribution Version: {zone_report['icat_server']['host_system_information']['os_distribution_version']}</Typography>
+                                <Button onClick={viewDetails} color="primary">Details</Button>
                             </CardContent>
-                            <Button onClick={viewDetails}>Details</Button>
                             {details == true ? <Dialog open={details} onClose={closeDetails}>
                                 <DialogTitle>Server Details</DialogTitle>
                                 <DialogContent>
