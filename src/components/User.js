@@ -13,6 +13,7 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, InputLabel } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,6 +43,9 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120
+    },
+    table: {
+        minWidth: 650
     }
 }));
 
@@ -56,7 +60,7 @@ function User() {
     const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
-        const existing_users = axios({
+        axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
             headers:{
@@ -69,12 +73,13 @@ function User() {
                 query_type: 'general'
             }
         }).then(res => {
-            console.log(res);
+            console.log(res.data);
+            setUsers(res.data['_embedded']);
         })
     },[])
 
     async function addUser() {
-        const result = await axios({
+        await axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
             headers: {
@@ -121,6 +126,15 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
+                        <Table className={classes.table} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Username</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Zone</TableCell>
+                                </TableRow>
+                            </TableHead>
+                        </Table>
                         <Button variant="outlined" color="primary" onClick={handleOpen}>
                             Add New User
                         </Button>
