@@ -60,7 +60,7 @@ function User() {
     const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
-        axios({
+        const result = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
             headers: {
@@ -73,7 +73,7 @@ function User() {
                 query_type: 'general'
             }
         }).then(res => {
-            console.log(res.data);
+            console.log(res.data['_embedded']);
             setUsers(res.data['_embedded']);
         })
     }, [isAuthenticated])
@@ -132,16 +132,21 @@ function User() {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell>Username</TableCell>
-                                            <TableCell>Type</TableCell>
-                                            <TableCell>Zone</TableCell>
+                                            <TableCell align="right">Type</TableCell>
+                                            <TableCell align="right">Zone</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {users['_embedded'].map(user => {
+                                        <TableRow key='test'>
+                                            <TableCell component="th" scope="row">Test</TableCell>
+                                            <TableCell align="right">Test</TableCell>
+                                            <TableCell align="right">Test</TableCell>
+                                        </TableRow>
+                                        {users.map(user => {
                                             <TableRow key={user[0]}>
                                                 <TableCell component="th" scope="row">{user[0]}</TableCell>
-                                                <TableCell>{user[1]}</TableCell>
-                                                <TableCell>{user[2]}</TableCell>
+                                                <TableCell align="right">{user[1]}</TableCell>
+                                                <TableCell align="right">{user[2]}</TableCell>
                                             </TableRow>
                                         })}
                                     </TableBody>
