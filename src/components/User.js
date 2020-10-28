@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     tableContainer: {
         marginTop: 20
     },
-    errorMsg:{
+    errorMsg: {
         color: 'red'
     }
 }));
@@ -107,22 +107,43 @@ function User() {
                 console.log(res);
                 window.location.reload();
             })
-        }catch(e){
+        } catch (e) {
             setAddError("Error when adding new user. Please check the input.")
         }
     }
 
-    async function editUser(){
+    async function editUser() {
 
     }
 
-    const handleCurrentUser = event =>{
-        console.log(event.target.key);
+    async function removeUser() {
+        try {
+            await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                headers: {
+                    'Authorization': token
+                },
+                params: {
+                    action: 'rm',
+                    target: 'user',
+                    arg2: currUser[0],
+                    arg3: currUser[2]
+                }
+            }).then(res => {
+                window.location.reload();
+            })
+        } catch (e) {
+
+        }
     }
-    
-    const removeUser = event =>{
-        console.log(event.target);
+
+    const handleCurrentUser = event => {
+        if (event.target.id !== '') {
+            setCurrUser(users[event.target.id])
+        };
     }
+
 
     const handleUserType = event => {
         setUserType(event.target.value);
@@ -167,11 +188,11 @@ function User() {
                                 </TableHead>
                                 <TableBody>
                                     {users.map(this_user =>
-                                        <TableRow key={user_id} onMouseOver={removeUser}>
+                                        <TableRow key={user_id}>
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"><Button color="primary">Edit</Button><Button color="secondary" value={user_id++} onClick={removeUser}>Remove</Button></TableCell>
+                                            <TableCell align="right"><Button color="primary">Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
