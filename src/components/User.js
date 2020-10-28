@@ -60,7 +60,8 @@ function User() {
     const token = Cookies.get('token');
     const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
-    const [open, setOpen] = useState(false);
+    const [addFormOpen, setAddFormOpen] = useState(false);
+    const [editFormOpen, setEditFormOpen] = useState(false);
     const [addErrorMessage, setAddError] = useState();
     const [name, setName] = useState();
     const [user_type, setUserType] = useState();
@@ -157,12 +158,20 @@ function User() {
         setZoneName(event.target.value);
     }
 
-    const handleOpen = () => {
-        setOpen(true);
+    const handleEditFormOpen = () => {
+        setEditFormOpen(true);
     }
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleEditFormClose = () => {
+        setEditFormOpen(false);
+    }
+
+    const handleAddFormOpen = () => {
+        setAddFormOpen(true);
+    }
+
+    const handleAddFormClose = () => {
+        setAddFormOpen(false);
     }
 
     return (
@@ -173,7 +182,7 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={handleOpen}>
+                        <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>
                             Add New User
                         </Button>
                         <TableContainer className={classes.tableContainer} component={Paper}>
@@ -192,13 +201,13 @@ function User() {
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"><Button color="primary">Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
+                                            <TableCell align="right"><Button color="primary" onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New User</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
@@ -240,8 +249,10 @@ function User() {
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={addUser} color="primary">Save</Button>
-                                <Button onClick={handleClose} color="primary">Cancel</Button>
+                                <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
+                        </Dialog>
+                        <Dialog open={editFormOpen} onClose={handleEditFormClose} aria-labelledby="form-dialog-title">
                         </Dialog>
                     </div>
                 </main>
