@@ -63,9 +63,13 @@ function User() {
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [editFormOpen, setEditFormOpen] = useState(false);
     const [addErrorMessage, setAddError] = useState();
-    const [name, setName] = useState();
-    const [user_type, setUserType] = useState();
-    const [zone_name, setZoneName] = useState();
+    const [editErrorMessage, setEditError] = useState();
+    const [addName, setAddName] = useState();
+    const [addUser_type, setAddUserType] = useState();
+    const [addZone_name, setAddZoneName] = useState();
+    const [editName, setEditName] = useState();
+    const [editUser_type, setEditUserType] = useState();
+    const [editZone_name, setEditZoneName] = useState();
     const isAuthenticated = token != null ? true : false;
     let user_id = 0;
 
@@ -89,6 +93,9 @@ function User() {
     }, [isAuthenticated])
 
     async function addUser() {
+        console.log(addUser_type);
+        console.log(addZone_name);
+        console.log(addName);
         try {
             await axios({
                 method: 'POST',
@@ -99,9 +106,9 @@ function User() {
                 params: {
                     action: 'add',
                     target: 'user',
-                    arg2: name,
-                    arg3: user_type,
-                    arg4: zone_name,
+                    arg2: addName,
+                    arg3: addUser_type,
+                    arg4: addZone_name,
                     arg5: '',
                 }
             }).then(res => {
@@ -114,7 +121,30 @@ function User() {
     }
 
     async function editUser() {
-
+        await removeUser()
+            .then(res => {
+                try {
+                    axios({
+                        method: 'POST',
+                        url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                        headers: {
+                            'Authorization': token
+                        },
+                        params: {
+                            action: 'add',
+                            target: 'user',
+                            arg2: editName,
+                            arg3: editUser_type == undefined ? currUser[1] : editUser_type,
+                            arg4: editZone_name == undefined ? currUser[2] : editZone_name,
+                            arg5: '',
+                        }
+                    }).then(res => {
+                        window.location.reload();
+                    })
+                } catch (e) {
+                    setEditError("Cannot edit this user, please create user again.")
+                }
+            })
     }
 
     async function removeUser() {
@@ -140,22 +170,35 @@ function User() {
     }
 
     const handleCurrentUser = event => {
+
         if (event.target.id !== '') {
             setCurrUser(users[event.target.id])
         };
     }
 
 
-    const handleUserType = event => {
-        setUserType(event.target.value);
+    const handleAddUserType = event => {
+        setAddUserType(event.target.value);
     }
 
-    const handleUserName = event => {
-        setName(event.target.value);
+    const handleAddUserName = event => {
+        setAddName(event.target.value);
     }
 
-    const handleZoneName = event => {
-        setZoneName(event.target.value);
+    const handleAddZoneName = event => {
+        setAddZoneName(event.target.value);
+    }
+
+    const handleEditUserType = event => {
+        setEditUserType(event.target.value);
+    }
+
+    const handleEditUserName = event => {
+        setEditName(event.target.value);
+    }
+
+    const handleEditZoneName = event => {
+        setEditZoneName(event.target.value);
     }
 
     const handleEditFormOpen = () => {
@@ -201,7 +244,7 @@ function User() {
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"><Button color="primary" onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
+                                            <TableCell align="right"><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -219,7 +262,7 @@ function User() {
                                             native
                                             id="name"
                                             label="Username"
-                                            onChange={handleUserName}
+                                            onChange={handleAddUserName}
                                         />
                                     </FormControl>
                                     <FormControl className={classes.formControl}>
@@ -227,7 +270,7 @@ function User() {
                                             native
                                             id="zone"
                                             label="Zone Name"
-                                            onChange={handleZoneName}
+                                            onChange={handleAddZoneName}
                                         />
                                     </FormControl>
                                     <FormControl className={classes.formControl}>
@@ -235,13 +278,14 @@ function User() {
                                         <Select
                                             native
                                             id="user-type-select"
-                                            value={user_type}
-                                            onChange={handleUserType}
+                                            value={addUser_type}
+                                            onChange={handleAddUserType}
                                         >
                                             <option aria-label="None" value="" />
                                             <option value="rodsadmin">rodsadmin</option>
                                             <option value="groupadmin">groupadmin</option>
                                             <option value="rodsuser">rodsuser</option>
+                                            <option value="rodsgroup">rodsgroup</option>
                                         </Select>
                                     </FormControl>
                                 </form>
@@ -253,6 +297,49 @@ function User() {
                             </DialogActions>
                         </Dialog>
                         <Dialog open={editFormOpen} onClose={handleEditFormClose} aria-labelledby="form-dialog-title">
+                            <DialogTitle>Edit User</DialogTitle>
+                            <DialogContent>
+                                <form className={classes.container}>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="name"
+                                            label="Username"
+                                            defaultValue={currUser[0]}
+                                            onChange={handleEditUserName}
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="zone"
+                                            label="Zone Name"
+                                            defaultValue={currUser[2]}
+                                            onChange={handleEditZoneName}
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
+                                        <Select
+                                            native
+                                            id="user-type-select"
+                                            defaultValue={currUser[1]}
+                                            onChange={handleEditUserType}
+                                        >
+                                            <option aria-label="None" value="" />
+                                            <option value="rodsadmin">rodsadmin</option>
+                                            <option value="groupadmin">groupadmin</option>
+                                            <option value="rodsuser">rodsuser</option>
+                                            <option value="rodsgroup">rodsgroup</option>
+                                        </Select>
+                                    </FormControl>
+                                </form>
+                                <p className={classes.errorMsg}>{editErrorMessage}</p>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={editUser} color="primary">Save</Button>
+                                <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
+                            </DialogActions>
                         </Dialog>
                     </div>
                 </main>
