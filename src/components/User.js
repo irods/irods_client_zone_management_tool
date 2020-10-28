@@ -46,6 +46,12 @@ const useStyles = makeStyles((theme) => ({
     },
     table: {
         minWidth: 650
+    },
+    tableContainer: {
+        marginTop: 20
+    },
+    errorMsg:{
+        color: 'red'
     }
 }));
 
@@ -54,6 +60,7 @@ function User() {
     const token = Cookies.get('token');
     const [users, setUsers] = useState([]);
     const [open, setOpen] = useState(false);
+    const [addErrorMessage, setAddError] = useState();
     const [name, setName] = useState();
     const [user_type, setUserType] = useState();
     const [zone_name, setZoneName] = useState();
@@ -79,23 +86,28 @@ function User() {
     }, [isAuthenticated])
 
     async function addUser() {
-        await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                action: 'add',
-                target: 'user',
-                arg2: name,
-                arg3: user_type,
-                arg4: zone_name,
-                arg5: '',
-            }
-        }).then(res => {
-            console.log(res);
-        })
+        try {
+            await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                headers: {
+                    'Authorization': token
+                },
+                params: {
+                    action: 'add',
+                    target: 'user',
+                    arg2: name,
+                    arg3: user_type,
+                    arg4: zone_name,
+                    arg5: '',
+                }
+            }).then(res => {
+                console.log(res);
+                window.location.reload();
+            })
+        }catch(e){
+            setAddError("Error when adding new user. Please check the input.")
+        }
     }
 
     const handleUserType = event => {
@@ -126,35 +138,31 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        {users.length > 0 ?
-                            <TableContainer component={Paper}>
-                                <Table className={classes.table} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Username</TableCell>
-                                            <TableCell align="right">Type</TableCell>
-                                            <TableCell align="right">Zone</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow key='test'>
-                                            <TableCell component="th" scope="row">Test</TableCell>
-                                            <TableCell align="right">Test</TableCell>
-                                            <TableCell align="right">Test</TableCell>
-                                        </TableRow>
-                                        {users.map(user => {
-                                            <TableRow key={user[0]}>
-                                                <TableCell component="th" scope="row">{user[0]}</TableCell>
-                                                <TableCell align="right">{user[1]}</TableCell>
-                                                <TableCell align="right">{user[2]}</TableCell>
-                                            </TableRow>
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer> : <br />}
                         <Button variant="outlined" color="primary" onClick={handleOpen}>
                             Add New User
                         </Button>
+                        <TableContainer className={classes.tableContainer} component={Paper}>
+                            <Table className={classes.table} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell><b>Username</b></TableCell>
+                                        <TableCell align="right"><b>Type</b></TableCell>
+                                        <TableCell align="right"><b>Zone</b></TableCell>
+                                        <TableCell align="right"><b>Action</b></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {users.map(this_user =>
+                                        <TableRow key={this_user[0]}>
+                                            <TableCell component="th" scope="row">{this_user[0]}</TableCell>
+                                            <TableCell align="right">{this_user[1]}</TableCell>
+                                            <TableCell align="right">{this_user[2]}</TableCell>
+                                            <TableCell align="right"><Button>Edit</Button></TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                         <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New User</DialogTitle>
                             <DialogContent>
@@ -193,6 +201,7 @@ function User() {
                                         </Select>
                                     </FormControl>
                                 </form>
+                                <p className={classes.errorMsg}>{addErrorMessage}</p>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={addUser} color="primary">Save</Button>
