@@ -59,12 +59,14 @@ function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
     const [users, setUsers] = useState([]);
+    const [currUser, setCurrUser] = useState([]);
     const [open, setOpen] = useState(false);
     const [addErrorMessage, setAddError] = useState();
     const [name, setName] = useState();
     const [user_type, setUserType] = useState();
     const [zone_name, setZoneName] = useState();
     const isAuthenticated = token != null ? true : false;
+    let user_id = 0;
 
     useEffect(() => {
         const result = axios({
@@ -110,6 +112,18 @@ function User() {
         }
     }
 
+    async function editUser(){
+
+    }
+
+    const handleCurrentUser = event =>{
+        console.log(event.target.key);
+    }
+    
+    const removeUser = event =>{
+        console.log(event.target);
+    }
+
     const handleUserType = event => {
         setUserType(event.target.value);
     }
@@ -153,11 +167,11 @@ function User() {
                                 </TableHead>
                                 <TableBody>
                                     {users.map(this_user =>
-                                        <TableRow key={this_user[0]}>
+                                        <TableRow key={user_id} onMouseOver={removeUser}>
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"><Button>Edit</Button></TableCell>
+                                            <TableCell align="right"><Button color="primary">Edit</Button><Button color="secondary" value={user_id++} onClick={removeUser}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
