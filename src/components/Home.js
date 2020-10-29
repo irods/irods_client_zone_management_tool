@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import Sidebar from './Sidebar';
 import Appbar from './Appbar';
 import axios from 'axios';
@@ -13,6 +14,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import { CssBaseline, Typography, CircularProgress } from '@material-ui/core';
 import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { Box, Tab, Tabs } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -57,6 +59,7 @@ function Home() {
     const [details, setDetails] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const isAuthenticated = token != null ? true : false;
+    const [tabValue, setTab] = useState(0);
     const classes = useStyles();
     const theme = useTheme();
     let zone_id = 0;
@@ -80,6 +83,10 @@ function Home() {
         setExpanded(!expanded);
     }
 
+    const handleTabChange = (event, newValue) => {
+        setTab(newValue);
+    }
+
     const viewDetails = event => {
         setCurrZone(zone_reports[document.getElementsByClassName(classes.server_card)[0].id]['icat_server']);
         console.log(curr_zone);
@@ -88,6 +95,39 @@ function Home() {
 
     const closeDetails = event => {
         setDetails(false);
+    }
+
+    function TabPanel(props) {
+        const { children, value, index, ...other } = props;
+
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`simple-tabpanel-${index}`}
+                aria-labelledby={`simple-tab-${index}`}
+                {...other}
+            >
+                {value === index && (
+                    <Box p={4}>
+                        <Typography>{children}</Typography>
+                    </Box>
+                )}
+            </div>
+        );
+    }
+
+    TabPanel.propTypes = {
+        children: PropTypes.node,
+        index: PropTypes.any.isRequired,
+        value: PropTypes.any.isRequired,
+    };
+
+    function a11yProps(index) {
+        return {
+            id: `simple-tab-${index}`,
+            'aria-controls': `simple-tabpanel-${index}`,
+        };
     }
 
     return (
@@ -118,8 +158,32 @@ function Home() {
                             {details == true ? <Dialog open={details} onClose={closeDetails}>
                                 <DialogTitle>Server Details</DialogTitle>
                                 <DialogContent>
-                                    <Typography>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
-                                    <Typography>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
+                                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
+                                        <Tab label="Version" {...a11yProps(0)} />
+                                        <Tab label="Service Account Environment" {...a11yProps(1)} />
+                                        <Tab label="Plugin" {...a11yProps(2)} />
+                                        <Tab label="Service Config" {...a11yProps(3)} />
+                                    </Tabs>
+                                    <TabPanel value={tabValue} index={0}>
+                                        <Typography>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
+                                        <Typography>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
+                                        <Typography>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
+                                        <Typography>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
+                                        <Typography>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
+                                        <Typography>Installation Time: {curr_zone['version']['installation_time']}</Typography>
+                                    </TabPanel>
+                                    <TabPanel value={tabValue} index={1}>
+                                        <Typography>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
+                                        <Typography>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
+                                    </TabPanel>
+                                    <TabPanel value={tabValue} index={2}>
+                                        <Typography>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
+                                        <Typography>{curr_zone['plugins']['0']['name']}</Typography>
+                                    </TabPanel>
+                                    <TabPanel value={tabValue} index={3}>
+                                        <Typography>Default dir mode: {curr_zone['server_config']['default_dir_mode']}</Typography>
+                                        <Typography>Default File Mode{curr_zone['server_config']['default_dir_mode']}</Typography>
+                                    </TabPanel>
                                 </DialogContent>
                             </Dialog> : <span />}
                         </Collapse>
