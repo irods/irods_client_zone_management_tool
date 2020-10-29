@@ -139,7 +139,7 @@ function User() {
                             arg5: '',
                         }
                     }).then(res => {
-                        window.location.reload();
+                        //window.location.reload();
                     })
                 } catch (e) {
                     setEditError("Cannot edit this user, please create user again.")
@@ -244,7 +244,7 @@ function User() {
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></TableCell>
+                                    <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p>: <span><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
