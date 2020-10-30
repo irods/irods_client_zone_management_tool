@@ -140,7 +140,7 @@ function User() {
                 window.location.reload();
             })
         } catch (e) {
-            setEditError("Cannot edit this user, please create user again.")
+            setEditError("Invalid User Type.")
         }
 }
 
@@ -167,8 +167,8 @@ async function removeUser() {
 }
 
 const handleCurrentUser = event => {
-
     if (event.target.id !== '') {
+        console.log(users[event.target.id]);
         setCurrUser(users[event.target.id])
     };
 }
@@ -241,7 +241,7 @@ return (
                                         <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                         <TableCell align="right">{this_user[1]}</TableCell>
                                         <TableCell align="right">{this_user[2]}</TableCell>
-                                        <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
+                                        <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p id={user_id++}></p> : <span><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
