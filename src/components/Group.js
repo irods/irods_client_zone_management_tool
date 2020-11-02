@@ -59,6 +59,7 @@ function Group() {
     const [addGroupName, setAddGroupName] = useState();
     const [addGroupZoneName, setAddGroupZoneName] = useState();
     const [groups, setGroup] = useState([]);
+    const [users,setUsers] = useState([]);
     let group_id = 0;
     const isAuthenticated = token != null ? true : false;
 
@@ -77,11 +78,16 @@ function Group() {
             }
         }).then(res => {
             let groupArray = [];
+            let userArray = [];
             res.data['_embedded'].forEach(group => {
                 if (group[1] == 'rodsgroup') {
                     groupArray.push([group[0], group[2]]);
                 }
+                else{
+                    userArray.push([group[0], group[1], group[2]])
+                }
             })
+            setUsers(userArray);
             setGroup(groupArray);
         })
     }, [isAuthenticated])
