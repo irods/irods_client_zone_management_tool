@@ -67,6 +67,7 @@ function Group() {
     const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
     const [users, setUsers] = useState([]);
+    const [currGroup, setCurrGroup] = useState();
     let group_id = 0;
     let user_id = 0;
     const isAuthenticated = token != null ? true : false;
@@ -119,11 +120,62 @@ function Group() {
                 }
             }).then(res => {
                 console.log(res);
-                window.location.reload();
+            }).then(res => {
+                if (addGroupUsers.length > 0) {
+                    addGroupUsers.forEach(user => {
+                        const addUserResult = axios({
+                            method: 'POST',
+                            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                            params: {
+                                action: 'modify',
+                                target: 'group',
+                                arg2: addGroupName,
+                                arg3: 'add',
+                                arg4: user[0],
+                                arg5: user[2]
+                            },
+                            headers: {
+                                'Authorization': token,
+                                'Accept': 'application/json'
+                            }
+                        })
+                    }).then(res => {
+                        console.log(res);
+                    })
+                }
             })
-        }catch(e){
+        }
+        catch (e) {
             console.log(e);
         }
+    }
+
+    async function removeGroup() {
+        try {
+            const addGroupResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                params: {
+                    action: 'rm',
+                    target: 'user',
+                    arg2: addGroupName,
+                    arg3: addGroupZoneName,
+                },
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                console.log(res);
+                window.location.reload();
+            })
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const handlecurrentGroup = event => {
+        setCurrGroup(groups[event.target.id]);
     }
 
     const selectUser = event => {
@@ -184,7 +236,7 @@ function Group() {
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
                                             <TableCell align="right">{group[1]}</TableCell>
-                                    <TableCell align='right'><Button id={group_id} color="primary">Edit</Button>{group[0] == 'public' ? <span></span> : <Button id={group_id++} color="secondary">Remove</Button>}</TableCell>
+                                            <TableCell align='right'><Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup}>Edit</Button>{group[0] == 'public' ? <span></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>

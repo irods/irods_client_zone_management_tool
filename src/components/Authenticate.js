@@ -52,6 +52,10 @@ function Authenticate() {
         setPassword(event.target.value);
     }
 
+    const handleKeyDown = event => {
+        if(event.keyCode==13) handleAuthenticate();
+    }
+
     async function handleAuthenticate() {
         try {
             const authResult = await axios({
@@ -89,6 +93,7 @@ function Authenticate() {
                     label="Username"
                     fullWidth
                     required
+                    onKeyDown={handleKeyDown}
                     onChange={handleUsername} />
                 <TextField
                     variant="outlined"
@@ -97,6 +102,7 @@ function Authenticate() {
                     type="password"
                     fullWidth
                     required
+                    onKeyDown={handleKeyDown}
                     onChange={handlePassword} />
                 {incorrect == false ? <br /> : <Typography className={classes.error}>Incorrect username or password. Please try again.</Typography>}
                 <Button
