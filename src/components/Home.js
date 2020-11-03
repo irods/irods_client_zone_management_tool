@@ -30,11 +30,22 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: "pre-wrap",
         fontSize: 20
     },
+    tab_panel: {
+        width: 600,
+    },
+    info: {
+        margin: theme.spacing(1),
+    },
     server: {
         width: theme.spacing(8)
     },
     server_card: {
         width: theme.spacing(40),
+    },
+    server_details: {
+        flexGrow: 1,
+        display: 'flex',
+        height: 600
     },
     divider: {
         marginTop: theme.spacing(20)
@@ -49,6 +60,15 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         fontSize: theme.spacing(3)
+    },
+    tabs: {
+        width: 250,
+        borderRight: `1px solid ${theme.palette.divider}`,
+    },
+    tab: {
+        marginTop: 30,
+        textTransform: 'none',
+        fontSize: 18
     }
 }));
 
@@ -105,11 +125,11 @@ function Home() {
                 role="tabpanel"
                 hidden={value !== index}
                 id={`simple-tabpanel-${index}`}
-                aria-labelledby={`simple-tab-${index}`}
+                aria-labelledby={`vertical-tab-${index}`}
                 {...other}
             >
                 {value === index && (
-                    <Box p={4}>
+                    <Box p={3}>
                         <Typography>{children}</Typography>
                     </Box>
                 )}
@@ -155,32 +175,42 @@ function Home() {
                                 <Typography paragraph>OS Distribution Version: {zone_report['icat_server']['host_system_information']['os_distribution_version']}</Typography>
                                 <Button onClick={viewDetails} color="primary">Details</Button>
                             </CardContent>
-                            {details == true ? <Dialog open={details} onClose={closeDetails}>
+                            {details == true ? <Dialog open={details} className={classes.dialog} onClose={closeDetails}>
                                 <DialogTitle>Server Details</DialogTitle>
-                                <DialogContent>
-                                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
-                                        <Tab label="Version" {...a11yProps(0)} />
-                                        <Tab label="Service Account Environment" {...a11yProps(1)} />
-                                        <Tab label="Plugin" {...a11yProps(2)} />
-                                        <Tab label="Service Config" {...a11yProps(3)} />
+                                <DialogContent className={classes.server_details}>
+                                    <Tabs orientation="vertical" variant="scrollable" value={tabValue} className={classes.tabs} onChange={handleTabChange} aria-label="vertical tabs example">
+                                        <Tab className={classes.tab} label="Host" {...a11yProps(0)} />
+                                        <Tab className={classes.tab} label="Service" {...a11yProps(1)} />
+                                        <Tab className={classes.tab} label="Plugin" {...a11yProps(2)} />
+                                        <Tab className={classes.tab} label="Resource" {...a11yProps(3)} />
                                     </Tabs>
-                                    <TabPanel value={tabValue} index={0}>
-                                        <Typography>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
-                                        <Typography>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
-                                        <Typography>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
-                                        <Typography>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
-                                        <Typography>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
-                                        <Typography>Installation Time: {curr_zone['version']['installation_time']}</Typography>
+                                    <TabPanel className={classes.tab_panel} value={tabValue} index={0}>
+                                        <Typography className={classes.info}>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
+                                        <Typography className={classes.info}>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
+                                        <Typography className={classes.info}>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
+                                        <Typography className={classes.info}>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
+                                        <Typography className={classes.info}>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
+                                        <Typography className={classes.info}>Installation Time: {curr_zone['version']['installation_time']}</Typography>
                                     </TabPanel>
-                                    <TabPanel value={tabValue} index={1}>
-                                        <Typography>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
-                                        <Typography>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
+                                    <TabPanel className={classes.tab_panel} value={tabValue} index={1}>
+                                        <Typography className={classes.info}>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
+                                        <Typography className={classes.info}>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
+                                        <Typography className={classes.info}>iRODS Connection Refresh Time: {curr_zone['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</Typography>
+                                        <Typography className={classes.info}>iRODS CWD: {curr_zone['service_account_environment']['irods_cwd']}</Typography>
+                                        <Typography className={classes.info}>iRODS Default Hash Scheme: {curr_zone['service_account_environment']['irods_default_hash_scheme']}</Typography>
+                                        <Typography className={classes.info}>iRODS Default Resource: {curr_zone['service_account_environment']['irods_default_resource']}</Typography>
+                                        <Typography className={classes.info}>iRODS Encryption Algorithm: {curr_zone['service_account_environment']['irods_encryption_algorithm']}</Typography>
+                                        <Typography className={classes.info}>iRODS Encryption Key Size: {curr_zone['service_account_environment']['irods_encryption_key_size']}</Typography>
+                                        <Typography className={classes.info}>iRODS Encryption Hash Rounds: {curr_zone['service_account_environment']['irods_encryption_num_hash_rounds']}</Typography>
+                                        <Typography className={classes.info}>iRODS Encryption Salt Size: {curr_zone['service_account_environment']['irods_encryption_salt_size']}</Typography>
+
+                                    
                                     </TabPanel>
-                                    <TabPanel value={tabValue} index={2}>
-                                        <Typography>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
-                                        <Typography>{curr_zone['plugins']['0']['name']}</Typography>
+                                    <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
+                                        <Typography className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
+                                        <Typography className={classes.info}>{curr_zone['plugins']['0']['name']}</Typography>
                                     </TabPanel>
-                                    <TabPanel value={tabValue} index={3}>
+                                    <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
                                         <Typography>Default dir mode: {curr_zone['server_config']['default_dir_mode']}</Typography>
                                         <Typography>Default File Mode{curr_zone['server_config']['default_dir_mode']}</Typography>
                                     </TabPanel>
