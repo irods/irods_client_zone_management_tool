@@ -6,8 +6,8 @@ import BlockIcon from '@material-ui/icons/Block';
 import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
-import { makeStyles } from '@material-ui/core';
-import { Button, FormControl, TextField, InputLabel } from '@material-ui/core';
+import { makeStyles, Typography } from '@material-ui/core';
+import { Button, Checkbox, FormControl, TextField, InputLabel } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
@@ -37,12 +37,18 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap',
         minWidth: 200
     },
+    formContainer: {
+        Width: 700
+    },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120
     },
     table: {
         minWidth: 650
+    },
+    user_table: {
+        maxWidth: 650
     },
     tableContainer: {
         marginTop: 20
@@ -58,9 +64,11 @@ function Group() {
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
     const [addGroupZoneName, setAddGroupZoneName] = useState();
+    const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
-    const [users,setUsers] = useState([]);
+    const [users, setUsers] = useState([]);
     let group_id = 0;
+    let user_id = 0;
     const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
@@ -83,7 +91,7 @@ function Group() {
                 if (group[1] == 'rodsgroup') {
                     groupArray.push([group[0], group[2]]);
                 }
-                else{
+                else {
                     userArray.push([group[0], group[1], group[2]])
                 }
             })
@@ -92,14 +100,31 @@ function Group() {
         })
     }, [isAuthenticated])
 
-    async function addGroup(){
+    async function addGroup() {
+        console.log(addGroupUsers);
+    }
 
+    const selectUser = event => {
+        let _index = addGroupUsers.indexOf(users[event.target.id]);
+        if (_index == -1) {
+            let addArray = [...addGroupUsers];
+            addArray.push(users[event.target.id]);
+            setAddGroupUsers(addArray);
+        }
+        else {
+            console.log("else")
+            const oldArray = [...addGroupUsers];
+            const newArray = oldArray.filter(user => {
+                return user[0] != users[event.target.id][0];
+            })
+            setAddGroupUsers(newArray);
+        }
     }
 
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
     }
-    
+
     const handleAddFormClose = () => {
         setAddFormOpen(false);
     }
@@ -137,17 +162,17 @@ function Group() {
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
                                             <TableCell align="right">{group[1]}</TableCell>
-                                            <TableCell align='right'><Button color="primary">Edit</Button><Button color="secondary">Remove</Button></TableCell>
+                                            <TableCell align='right'><Button color="primary">Edit</Button><Button id={group_id++} color="secondary">Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Group</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    You can add a new group there.
+                                    Enter your group and zone name:
                                 </DialogContentText>
                                 <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
@@ -167,6 +192,28 @@ function Group() {
                                         />
                                     </FormControl>
                                 </form>
+                                <br />
+                                <DialogContentText>Add users to group: </DialogContentText>
+                                <Table className={classes.user_table} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell><b>User Name</b></TableCell>
+                                            <TableCell align="right"><b>User Type</b></TableCell>
+                                            <TableCell align="right"><b>Zone</b></TableCell>
+                                            <TableCell align="right"><b>Action</b></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {users.map(user =>
+                                            <TableRow key={user_id}>
+                                                <TableCell component="th" scope="row">{user[0]}</TableCell>
+                                                <TableCell align="right">{user[1]}</TableCell>
+                                                <TableCell align="right">{user[2]}</TableCell>
+                                                <TableCell align='right'><Checkbox id={user_id++} color="primary" onClick={selectUser} /></TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
                                 <p className={classes.errorMsg}>{}</p>
                             </DialogContent>
                             <DialogActions>
@@ -200,7 +247,7 @@ function Group() {
                     </div>
                 </main>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
-}
+            }
         </div >
     );
 }
