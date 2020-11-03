@@ -101,7 +101,29 @@ function Group() {
     }, [isAuthenticated])
 
     async function addGroup() {
-        console.log(addGroupUsers);
+        try {
+            const addGroupResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                params: {
+                    action: 'add',
+                    target: 'user',
+                    arg2: addGroupName,
+                    arg3: 'rodsgroup',
+                    arg4: addGroupZoneName,
+                    arg5: ''
+                },
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                console.log(res);
+                window.location.reload();
+            })
+        }catch(e){
+            console.log(e);
+        }
     }
 
     const selectUser = event => {
@@ -162,7 +184,7 @@ function Group() {
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
                                             <TableCell align="right">{group[1]}</TableCell>
-                                            <TableCell align='right'><Button color="primary">Edit</Button><Button id={group_id++} color="secondary">Remove</Button></TableCell>
+                                    <TableCell align='right'><Button id={group_id} color="primary">Edit</Button>{group[0] == 'public' ? <span></span> : <Button id={group_id++} color="secondary">Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
