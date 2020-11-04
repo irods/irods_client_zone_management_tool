@@ -153,6 +153,9 @@ function Group() {
                 let attachedUsers = res.data._embedded.slice(1, res.data._embedded.length);
                 setUserThisGroup(attachedUsers);
             }
+            else{
+                setUserThisGroup([]);
+            }
         })
     }
 
