@@ -6,7 +6,7 @@ import BlockIcon from '@material-ui/icons/Block';
 import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
-import { makeStyles, Typography } from '@material-ui/core';
+import { makeStyles, Tab, Typography } from '@material-ui/core';
 import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
@@ -68,6 +68,7 @@ function Group() {
     const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
     const [users, setUsers] = useState([]);
+    const [userThisGroup, setUserThisGroup] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
     let group_id = 0;
     let user_id = 0;
@@ -103,6 +104,9 @@ function Group() {
         })
     }, [isAuthenticated])
 
+    // select user_group_name where user_name =
+    // select user_name where user_group_name ='public'
+
     async function addGroup() {
         try {
             const addGroupResult = await axios({
@@ -121,12 +125,35 @@ function Group() {
                     'Accept': 'application/json'
                 }
             }).then(res => {
+                window.location.reload();
                 console.log(res);
             })
         }
         catch (e) {
             console.log(e);
         }
+    }
+
+    async function editGroup() {
+        const result = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            },
+            params: {
+                query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_GROUP_NAME = '${currGroup[0]}'`,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            if (res.data.count !== '1') {
+                let attachedUsers = res.data._embedded.slice(1, res.data._embedded.length);
+                setUserThisGroup(attachedUsers);
+            }
+        })
     }
 
     async function addUserToGroup() {
@@ -171,6 +198,7 @@ function Group() {
                     'Accept': 'application/json'
                 }
             }).then(res => {
+                console.log(res);
                 window.location.reload();
             })
         } catch (e) {
@@ -210,6 +238,7 @@ function Group() {
     }
 
     const handleEditFormOpen = () => {
+        editGroup();
         setEditFormOpen(true);
     }
 
@@ -315,6 +344,24 @@ function Group() {
                                 {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
                                 <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
+                                        <Typography>Attached Users: </Typography>
+                                        <Table className={classes.user_table} aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><b>User Name</b></TableCell>
+                                                    <TableCell align="right"><b>Zone</b></TableCell>
+                                                    <TableCell align="right"><b>Action</b></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            {userThisGroup.length > 0 ? <TableBody>
+                                                {userThisGroup.map(userThisGroup => <TableRow>
+                                                    <TableCell component="th" scope="row">{userThisGroup[0]}</TableCell>
+                                                    <TableCell align="right">{userThisGroup[1]}</TableCell>
+                                                    <TableCell align='right'><Button color="secondary" onClick={selectUser}>Remove</Button></TableCell>
+                                                </TableRow>)}
+                                            </TableBody> : <br />}
+                                        </Table>
+                                        <br/>
                                         <Typography>Add users to group: </Typography>
                                         <Table className={classes.user_table} aria-label="simple table">
                                             <TableHead>
