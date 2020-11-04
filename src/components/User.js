@@ -168,7 +168,6 @@ async function removeUser() {
 
 const handleCurrentUser = event => {
     if (event.target.id !== '') {
-        console.log(users[event.target.id]);
         setCurrUser(users[event.target.id])
     };
 }

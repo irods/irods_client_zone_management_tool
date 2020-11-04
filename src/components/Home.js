@@ -203,16 +203,17 @@ function Home() {
                                         <Typography className={classes.info}>iRODS Encryption Key Size: {curr_zone['service_account_environment']['irods_encryption_key_size']}</Typography>
                                         <Typography className={classes.info}>iRODS Encryption Hash Rounds: {curr_zone['service_account_environment']['irods_encryption_num_hash_rounds']}</Typography>
                                         <Typography className={classes.info}>iRODS Encryption Salt Size: {curr_zone['service_account_environment']['irods_encryption_salt_size']}</Typography>
-
-                                    
                                     </TabPanel>
                                     <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
                                         <Typography className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
                                         <Typography className={classes.info}>{curr_zone['plugins']['0']['name']}</Typography>
                                     </TabPanel>
                                     <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
-                                        <Typography>Default dir mode: {curr_zone['server_config']['default_dir_mode']}</Typography>
-                                        <Typography>Default File Mode{curr_zone['server_config']['default_dir_mode']}</Typography>
+                                        <Typography className={classes.info}>Hostname: {curr_zone['resources'][0]['host_name']}</Typography>
+                                        <Typography className={classes.info}>Name: {curr_zone['resources'][0]['name']}</Typography>
+                                        <Typography className={classes.info}>Status: {curr_zone['resources'][0]['status']}</Typography>
+                                        <Typography className={classes.info}>Type: {curr_zone['resources'][0]['type']}</Typography>
+                                        <Typography className={classes.info}>Vault Path: {curr_zone['resources'][0]['vault_path']}</Typography>
                                     </TabPanel>
                                 </DialogContent>
                             </Dialog> : <span />}

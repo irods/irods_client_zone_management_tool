@@ -7,7 +7,7 @@ import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
 import { makeStyles, Typography } from '@material-ui/core';
-import { Button, Checkbox, FormControl, TextField, InputLabel } from '@material-ui/core';
+import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
@@ -62,14 +62,16 @@ function Group() {
     const classes = useStyles();
     const token = Cookies.get('token');
     const [addFormOpen, setAddFormOpen] = useState(false);
+    const [editFormOpen, setEditFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
     const [addGroupZoneName, setAddGroupZoneName] = useState();
     const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
     const [users, setUsers] = useState([]);
-    const [currGroup, setCurrGroup] = useState();
+    const [currGroup, setCurrGroup] = useState([]);
     let group_id = 0;
     let user_id = 0;
+    let user_id_edit = 0;
     const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
@@ -120,33 +122,36 @@ function Group() {
                 }
             }).then(res => {
                 console.log(res);
-            }).then(res => {
-                if (addGroupUsers.length > 0) {
-                    addGroupUsers.forEach(user => {
-                        const addUserResult = axios({
-                            method: 'POST',
-                            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-                            params: {
-                                action: 'modify',
-                                target: 'group',
-                                arg2: addGroupName,
-                                arg3: 'add',
-                                arg4: user[0],
-                                arg5: user[2]
-                            },
-                            headers: {
-                                'Authorization': token,
-                                'Accept': 'application/json'
-                            }
-                        })
-                    }).then(res => {
-                        console.log(res);
-                    })
-                }
             })
         }
         catch (e) {
             console.log(e);
+        }
+    }
+
+    async function addUserToGroup() {
+        console.log(addGroupUsers);
+        if (addGroupUsers.length > 0) {
+            const addUserResult = addGroupUsers.map(async user => {
+                await axios({
+                    method: 'POST',
+                    url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                    params: {
+                        action: 'modify',
+                        target: 'group',
+                        arg2: currGroup[0],
+                        arg3: 'add',
+                        arg4: user[0],
+                        arg5: user[2]
+                    },
+                    headers: {
+                        'Authorization': token,
+                        'Accept': 'application/json'
+                    }
+                })
+            })
+            const allResults = await Promise.all(addUserResult);
+            console.log(allResults);
         }
     }
 
@@ -158,15 +163,14 @@ function Group() {
                 params: {
                     action: 'rm',
                     target: 'user',
-                    arg2: addGroupName,
-                    arg3: addGroupZoneName,
+                    arg2: currGroup[0],
+                    arg3: currGroup[1],
                 },
                 headers: {
                     'Authorization': token,
                     'Accept': 'application/json'
                 }
             }).then(res => {
-                console.log(res);
                 window.location.reload();
             })
         } catch (e) {
@@ -175,7 +179,10 @@ function Group() {
     }
 
     const handlecurrentGroup = event => {
-        setCurrGroup(groups[event.target.id]);
+        if (event.target.id !== '') {
+            setCurrGroup(groups[event.target.id]);
+            console.log(groups[event.target.id]);
+        }
     }
 
     const selectUser = event => {
@@ -186,7 +193,6 @@ function Group() {
             setAddGroupUsers(addArray);
         }
         else {
-            console.log("else")
             const oldArray = [...addGroupUsers];
             const newArray = oldArray.filter(user => {
                 return user[0] != users[event.target.id][0];
@@ -201,6 +207,14 @@ function Group() {
 
     const handleAddFormClose = () => {
         setAddFormOpen(false);
+    }
+
+    const handleEditFormOpen = () => {
+        setEditFormOpen(true);
+    }
+
+    const handleEditFormClose = () => {
+        setEditFormOpen(false);
     }
 
     const handleAddGroupName = event => {
@@ -236,7 +250,7 @@ function Group() {
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
                                             <TableCell align="right">{group[1]}</TableCell>
-                                            <TableCell align='right'><Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup}>Edit</Button>{group[0] == 'public' ? <span></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup}>Remove</Button>}</TableCell>
+                                            <TableCell align='right'><Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup} onClick={handleEditFormOpen}>Edit</Button>{group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -295,29 +309,42 @@ function Group() {
                                 <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
-                        {/* <Dialog open={editFormOpen} onClose={handleEditFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Edit User</DialogTitle>
+                        <Dialog open={editFormOpen} onClose={handleEditFormClose} aria-labelledby="form-dialog-title">
+                            <DialogTitle>Edit Group</DialogTitle>
                             <DialogContent>
+                                {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
                                 <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
-                                        <Select
-                                            native
-                                            id="user-type-select"
-                                            defaultValue={currUser[1]}
-                                            onChange={handleEditUserType}
-                                        >
-                                            <option aria-label="None" value="" />
-                                        </Select>
+                                        <Typography>Add users to group: </Typography>
+                                        <Table className={classes.user_table} aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell><b>User Name</b></TableCell>
+                                                    <TableCell align="right"><b>User Type</b></TableCell>
+                                                    <TableCell align="right"><b>Zone</b></TableCell>
+                                                    <TableCell align="right"><b>Action</b></TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {users.map(user =>
+                                                    <TableRow key={user_id_edit}>
+                                                        <TableCell component="th" scope="row">{user[0]}</TableCell>
+                                                        <TableCell align="right">{user[1]}</TableCell>
+                                                        <TableCell align="right">{user[2]}</TableCell>
+                                                        <TableCell align='right'><Checkbox id={user_id_edit++} color="primary" onClick={selectUser} /></TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
                                     </FormControl>
                                 </form>
-                                <p className={classes.errorMsg}>{editErrorMessage}</p>
+                                <p className={classes.errorMsg}>{}</p>
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={editUser} color="primary">Save</Button>
+                                <Button onClick={addUserToGroup} color="primary">Save</Button>
                                 <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
                             </DialogActions>
-                        </Dialog> */}
+                        </Dialog>
                     </div>
                 </main>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
