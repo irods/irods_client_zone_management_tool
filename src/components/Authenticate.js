@@ -34,6 +34,9 @@ const useStyles = makeStyles((theme) => ({
         color: 'red',
         fontSize: 15,
         padding: '10px 10px',
+    },
+    login_button: {
+        background: '#18bc9c'
     }
 }))
 
@@ -110,6 +113,7 @@ function Authenticate() {
                     color="primary"
                     size="large"
                     fullWidth
+                    className={classes.login_button}
                     onClick={handleAuthenticate}>Login</Button>
                 <br />
                 <Box mt={8}>

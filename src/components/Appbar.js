@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
     appBar: {
         width: `calc(100% - ${drawerWidth}px)`,
         marginLeft: drawerWidth,
+        background: '#18bc9c'
     },
     rightToolbar: {
         marginLeft: "auto",

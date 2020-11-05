@@ -69,7 +69,10 @@ function Group() {
     const [groups, setGroup] = useState([]);
     const [users, setUsers] = useState([]);
     const [userThisGroup, setUserThisGroup] = useState([]);
+    const [userNotThisGroup, setUserNotThisGroup] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
+    const [removeThisUserName, setRemoveUserName] = useState();
+    const [removeThisUserZone, setRemoveUserZone] = useState();
     let group_id = 0;
     let user_id = 0;
     let user_id_edit = 0;
@@ -143,19 +146,28 @@ function Group() {
                 'Authorization': token
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_GROUP_NAME = '${currGroup[0]}'`,
+                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${currGroup[0]}'`,
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then(res => {
             if (res.data.count !== '1') {
+                console.log(res.data._embedded)
+                let notAttachedUsers = [...users];
                 let attachedUsers = res.data._embedded.slice(1, res.data._embedded.length);
+                attachedUsers.forEach(user => {
+                    let _index = notAttachedUsers.indexOf([user[0], user[1], user[2]]);
+                    console.log(_index);
+                    notAttachedUsers.splice(_index, _index + 1);
+                    console.log(notAttachedUsers);
+                })
                 setUserThisGroup(attachedUsers);
             }
-            else{
+            else {
                 setUserThisGroup([]);
             }
+
         })
     }
 
@@ -182,6 +194,33 @@ function Group() {
             })
             const allResults = await Promise.all(addUserResult);
             console.log(allResults);
+            window.location.reload();
+        }
+    }
+
+    async function removeUserFromGroup() {
+        try {
+            const removeUserResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                params: {
+                    action: 'modify',
+                    target: 'group',
+                    arg2: currGroup[0],
+                    arg3: 'remove',
+                    arg4: removeThisUserName,
+                    arg5: removeThisUserZone
+                },
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                window.location.reload();
+                console.log(res);
+            })
+        }catch(e){
+            console.log(e);
         }
     }
 
@@ -229,6 +268,17 @@ function Group() {
                 return user[0] != users[event.target.id][0];
             })
             setAddGroupUsers(newArray);
+        }
+    }
+
+    const handleremoveUserFromGroup = event => {
+        if (event.target.id !== undefined && event.target.id !== '') {
+            console.log(event.target.id);
+            setRemoveUserName(event.target.id);
+        }
+        if (event.target.name !== undefined) {
+            console.log(event.target.name);
+            setRemoveUserZone(event.target.name);
         }
     }
 
@@ -359,12 +409,12 @@ function Group() {
                                             {userThisGroup.length > 0 ? <TableBody>
                                                 {userThisGroup.map(userThisGroup => <TableRow>
                                                     <TableCell component="th" scope="row">{userThisGroup[0]}</TableCell>
-                                                    <TableCell align="right">{userThisGroup[1]}</TableCell>
-                                                    <TableCell align='right'><Button color="secondary" onClick={selectUser}>Remove</Button></TableCell>
+                                                    <TableCell align="right">{userThisGroup[2]}</TableCell>
+                                                    <TableCell align='right'><Button id={userThisGroup[0]} name={userThisGroup[2]} color="secondary" onMouseOver={handleremoveUserFromGroup} onClick={removeUserFromGroup}>Remove</Button></TableCell>
                                                 </TableRow>)}
                                             </TableBody> : <br />}
                                         </Table>
-                                        <br/>
+                                        <br />
                                         <Typography>Add users to group: </Typography>
                                         <Table className={classes.user_table} aria-label="simple table">
                                             <TableHead>

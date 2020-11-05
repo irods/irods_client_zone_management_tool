@@ -88,8 +88,11 @@ function User() {
                 query_type: 'general'
             }
         }).then(res => {
+            let oldArray = res.data['_embedded'];
+            let filteredArray = res.data['_embedded'].filter(user => user[1] !== 'rodsgroup');
             console.log(res.data['_embedded']);
-            setUsers(res.data['_embedded']);
+            console.log(filteredArray);
+            setUsers(filteredArray);
         })
     }, [isAuthenticated])
 
@@ -280,7 +283,6 @@ return (
                                         <option aria-label="None" value="" />
                                         <option value="rodsadmin">rodsadmin</option>
                                         <option value="groupadmin">groupadmin</option>
-                                        <option value="rodsuser">rodsuser</option>
                                         <option value="rodsgroup">rodsgroup</option>
                                     </Select>
                                 </FormControl>
@@ -308,7 +310,6 @@ return (
                                         <option value="rodsadmin">rodsadmin</option>
                                         <option value="groupadmin">groupadmin</option>
                                         <option value="rodsuser">rodsuser</option>
-                                        <option value="rodsgroup">rodsgroup</option>
                                     </Select>
                                 </FormControl>
                             </form>
