@@ -58,10 +58,13 @@ function Sidebar() {
                         <ListItemText primary='Home' />
                     </ListItem>
                     <ListItem button component={Link} to="/user" key='user'>
-                        <ListItemText primary='User' />
+                        <ListItemText primary='Users' />
                     </ListItem>
                     <ListItem button component={Link} to="/group" key='group'>
-                        <ListItemText primary='Group' />
+                        <ListItemText primary='Groups' />
+                    </ListItem>
+                    <ListItem button component={Link} to="/resource" key='resource'>
+                        <ListItemText primary='Resources' />
                     </ListItem>
                     <ListItem button component={Link} to="/session" key='current_session'>
                         <ListItemText primary='Current Session' />

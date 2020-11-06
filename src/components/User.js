@@ -71,6 +71,7 @@ function User() {
     const [editName, setEditName] = useState();
     const [editUser_type, setEditUserType] = useState();
     const [editZone_name, setEditZoneName] = useState();
+    const [zones, setZone] = useState([]);
     const isAuthenticated = token != null ? true : false;
     let user_id = 0;
 
@@ -93,7 +94,22 @@ function User() {
             console.log(res.data['_embedded']);
             console.log(filteredArray);
             setUsers(filteredArray);
-        })
+        });
+        const zoneResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                query_string: 'SELECT ZONE_NAME',
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            setZone(res.data._embedded);
+        });
     }, [isAuthenticated])
 
     async function addUser() {
@@ -265,12 +281,14 @@ return (
                                     />
                                 </FormControl>
                                 <FormControl className={classes.formControl}>
-                                    <TextField
+                                    <Select
                                         native
                                         id="zone"
                                         label="Zone Name"
                                         onChange={handleAddZoneName}
-                                    />
+                                    >
+                                    {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
+                                    </Select>
                                 </FormControl>
                                 <FormControl className={classes.formControl}>
                                     <InputLabel htmlFor="user-type-select">User Type</InputLabel>
