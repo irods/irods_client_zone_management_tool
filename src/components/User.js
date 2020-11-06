@@ -281,6 +281,7 @@ return (
                                     />
                                 </FormControl>
                                 <FormControl className={classes.formControl}>
+                                <InputLabel htmlFor="user-type-select">Zone Name</InputLabel>
                                     <Select
                                         native
                                         id="zone"
