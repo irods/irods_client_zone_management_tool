@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
     },
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120
+        width: 200
     },
     table: {
         minWidth: 650
@@ -47,6 +47,10 @@ const useStyles = makeStyles((theme) => ({
     tableContainer: {
         marginTop: 20
     },
+    container: {
+        display: 'flex',
+        flexDirection: 'row'
+    }
 }));
 
 function Resource() {
@@ -55,6 +59,7 @@ function Resource() {
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
 
+    const [rescView, setRescView] = useState('list');
     const [resc, setResc] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     let resc_id = 0;
@@ -113,8 +118,8 @@ function Resource() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={addResource}>Add Resource</Button>
-                        <br/>
+                        <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>Add Resource</Button>
+                        <br />
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
@@ -137,13 +142,12 @@ function Resource() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <Dialog open={addFormOpen} onClose={handleAddFormClose}  aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
                                     You can add a new resource there.
                                 </DialogContentText>
-                                <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
                                         <TextField
                                             native
@@ -151,18 +155,36 @@ function Resource() {
                                             label="Resource name"
                                         />
                                     </FormControl>
+                                    <br/>
                                     <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="user-type-select">Zone</InputLabel>
+                                        <InputLabel htmlFor="user-type-select">Type</InputLabel>
                                         <Select
                                             native
-                                            id="zone"
-                                            label="Zone Name"
+                                            id="zone-type-select"
                                         >
-                                            {/* {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)} */}
+                                            <option aria-label="None" value="" />
+                                            <option value="compound">Compound</option>
+                                            <option value="load_balance">Load Balance</option>
+                                            <option value="passthru">Passthru</option>
+                                            <option value="random">Random</option>
+                                            <option value="replication">Replication</option>
+                                            <option value="round_robin">Round Robin</option>
+                                            <option value="passthru">Deferred</option>
+                                            <option value="passthru">EMC ECS</option>
+                                            <option value="passthru">EMC Isilon</option>
+                                            <option value="passthru">Mockarchive</option>
+                                            <option value="passthru">MSO</option>
+                                            <option value="passthru">MSSOFile</option>
+                                            <option value="passthru">Non-blocking</option>
+                                            <option value="passthru">Struct file</option>
+                                            <option value="passthru">Universal Mass Storage</option>
+                                            <option value="passthru">Unix File System</option>
+                                            <option value="passthru">WOS</option>
                                         </Select>
                                     </FormControl>
+                                    <br/>
                                     <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
+                                        <InputLabel htmlFor="user-type-select">Parent</InputLabel>
                                         <Select
                                             native
                                             id="user-type-select"
@@ -173,8 +195,19 @@ function Resource() {
                                             <option value="rodsgroup">rodsgroup</option>
                                         </Select>
                                     </FormControl>
-                                </form>
-                                <p className={classes.errorMsg}>{}</p>
+                                    <br/>
+
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="user-type-select">Zone</InputLabel>
+                                        <Select
+                                            native
+                                            id="zone"
+                                            label="Zone Name"
+                                        >
+                                            {/* {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)} */}
+                                        </Select>
+                                    </FormControl>
+                                <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                         </Dialog>
                     </div>
