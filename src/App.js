@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Authenticate from './components/Authenticate';
-import User from './components/User';
-import Group from './components/Group';
-import Session from './components/Session';
-import Resource from './components/Resource';
-import Home from './components/Home';
+import User from './views/User';
+import Group from './views/Group';
+import Session from './views/Session';
+import Resource from './views/Resource';
+import Home from './views/Home';
 import './App.css';
 
 class App extends Component {
