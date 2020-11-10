@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         fontSize: theme.spacing(3)
     },
+    dialog_action:{
+        margin: theme.spacing(1)
+    },
     formControl: {
         margin: theme.spacing(1),
         width: 200
@@ -209,6 +212,10 @@ function Resource() {
                                     </FormControl>
                                 <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
+                            <DialogActions className={classes.dialog_action}>
+                                <Button variant="outlined" color="primary">Save</Button>
+                                <Button variant="outlined" color="primary">Cancel</Button>
+                            </DialogActions>
                         </Dialog>
                     </div>
                 </main>
