@@ -6,8 +6,13 @@ import BlockIcon from '@material-ui/icons/Block';
 import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+import { FormControl, InputLabel } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Button } from '@material-ui/core';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
 
@@ -31,7 +36,17 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         fontSize: theme.spacing(3)
-    }
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120
+    },
+    table: {
+        minWidth: 650
+    },
+    tableContainer: {
+        marginTop: 20
+    },
 }));
 
 function Resource() {
@@ -41,6 +56,7 @@ function Resource() {
     const isAuthenticated = token != null ? true : false;
 
     const [resc, setResc] = useState([]);
+    const [addFormOpen, setAddFormOpen] = useState(false);
     let resc_id = 0;
 
     useEffect(() => {
@@ -60,7 +76,34 @@ function Resource() {
         }).then(res => {
             setResc(res.data._embedded)
         })
+
+        const zoneResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token,
+                'Accept': 'application/json'
+            },
+            params: {
+                query_string: 'SELECT ZONE_NAME',
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        })
     }, [isAuthenticated])
+
+    async function addResource() {
+
+    }
+
+    const handleAddFormOpen = () => {
+        setAddFormOpen(true);
+    }
+
+    const handleAddFormClose = () => {
+        setAddFormOpen(false);
+    }
 
     return (
         <div>
@@ -70,6 +113,8 @@ function Resource() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
+                        <Button variant="outlined" color="primary" onClick={addResource}>Add Resource</Button>
+                        <br/>
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
@@ -92,6 +137,46 @@ function Resource() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                            <DialogTitle>Add New Resource</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    You can add a new resource there.
+                                </DialogContentText>
+                                <form className={classes.container}>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="name"
+                                            label="Resource name"
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="user-type-select">Zone</InputLabel>
+                                        <Select
+                                            native
+                                            id="zone"
+                                            label="Zone Name"
+                                        >
+                                            {/* {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)} */}
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
+                                        <Select
+                                            native
+                                            id="user-type-select"
+                                        >
+                                            <option aria-label="None" value="" />
+                                            <option value="rodsadmin">rodsadmin</option>
+                                            <option value="groupadmin">groupadmin</option>
+                                            <option value="rodsgroup">rodsgroup</option>
+                                        </Select>
+                                    </FormControl>
+                                </form>
+                                <p className={classes.errorMsg}>{}</p>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </main>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
