@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
         minWidth: 200
     },
     formContainer: {
-        Width: 700
     },
     formControl: {
         margin: theme.spacing(1),
@@ -338,7 +337,7 @@ function Group() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} fullWidth="true" aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Group</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
