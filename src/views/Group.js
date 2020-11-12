@@ -72,6 +72,9 @@ function Group() {
     const [currGroup, setCurrGroup] = useState([]);
     const [removeThisUserName, setRemoveUserName] = useState();
     const [removeThisUserZone, setRemoveUserZone] = useState();
+
+
+    const [searchUserName, setSearchName] = useState();
     let group_id = 0;
     let user_id = 0;
     let user_id_edit = 0;
@@ -105,6 +108,24 @@ function Group() {
             setGroup(groupArray);
         })
     }, [isAuthenticated])
+
+    useEffect(() => {
+        const searchResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers:{
+                'Authorization': token,
+            },
+            params: {
+                query_string: `SELECT USER_NAME WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            console.log(res);
+        })
+    }, [searchUserName])
 
     // select user_group_name where user_name =
     // select user_name where user_group_name ='public'
@@ -218,7 +239,7 @@ function Group() {
                 window.location.reload();
                 console.log(res);
             })
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     }
@@ -279,6 +300,10 @@ function Group() {
             console.log(event.target.name);
             setRemoveUserZone(event.target.name);
         }
+    }
+
+    const handleSearchUserName = event => {
+        setSearchName(event.target.value);
     }
 
     const handleAddFormOpen = () => {
@@ -383,7 +408,7 @@ function Group() {
                                         )}
                                     </TableBody>
                                 </Table>
-                                <p className={classes.errorMsg}>{}</p>
+                                <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={addGroup} color="primary">Save</Button>
@@ -414,30 +439,17 @@ function Group() {
                                             </TableBody> : <br />}
                                         </Table>
                                         <br />
-                                        <Typography>Add users to group: </Typography>
-                                        <Table className={classes.user_table} aria-label="simple table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell><b>User Name</b></TableCell>
-                                                    <TableCell align="right"><b>User Type</b></TableCell>
-                                                    <TableCell align="right"><b>Zone</b></TableCell>
-                                                    <TableCell align="right"><b>Action</b></TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {users.map(user =>
-                                                    <TableRow key={user_id_edit}>
-                                                        <TableCell component="th" scope="row">{user[0]}</TableCell>
-                                                        <TableCell align="right">{user[1]}</TableCell>
-                                                        <TableCell align="right">{user[2]}</TableCell>
-                                                        <TableCell align='right'><Checkbox id={user_id_edit++} color="primary" onClick={selectUser} /></TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                native
+                                                id="searchUserName"
+                                                label="User Name"
+                                                onChange={handleSearchUserName}
+                                            />
+                                        </FormControl>
                                     </FormControl>
                                 </form>
-                                <p className={classes.errorMsg}>{}</p>
+                                <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={addUserToGroup} color="primary">Save</Button>

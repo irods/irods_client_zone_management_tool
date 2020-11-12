@@ -59,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
 function User() {
     const classes = useStyles();
     const token = Cookies.get('token');
+    console.log(token);
     const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
@@ -80,7 +81,8 @@ function User() {
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
             headers: {
-                'Authorization': token
+                'Authorization': token,
+                'Accept': 'application/json'
             },
             params: {
                 query_string: 'SELECT USER_NAME, USER_TYPE, USER_ZONE',
@@ -88,6 +90,7 @@ function User() {
                 row_offset: 0,
                 query_type: 'general'
             }
+
         }).then(res => {
             let oldArray = res.data['_embedded'];
             let filteredArray = res.data['_embedded'].filter(user => user[1] !== 'rodsgroup');
@@ -110,7 +113,7 @@ function User() {
         }).then(res => {
             setZone(res.data._embedded);
         });
-    }, [isAuthenticated])
+    }, [])
 
     async function addUser() {
         console.log(addUser_type);
