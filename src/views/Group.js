@@ -75,6 +75,7 @@ function Group() {
 
 
     const [searchUserName, setSearchName] = useState();
+    const [searchUserNameResult, setSearchNameResult] = useState([]);
     let group_id = 0;
     let user_id = 0;
     let user_id_edit = 0;
@@ -113,17 +114,17 @@ function Group() {
         const searchResult = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers:{
+            headers: {
                 'Authorization': token,
             },
             params: {
-                query_string: `SELECT USER_NAME WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
-                query_limit: 100,
+                query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
+                query_limit: 5,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then(res => {
-            console.log(res);
+            setSearchNameResult(res.data._embedded);
         })
     }, [searchUserName])
 
@@ -439,6 +440,7 @@ function Group() {
                                             </TableBody> : <br />}
                                         </Table>
                                         <br />
+                                        <Typography>Add Users: </Typography>
                                         <FormControl className={classes.formControl}>
                                             <TextField
                                                 native
@@ -447,6 +449,13 @@ function Group() {
                                                 onChange={handleSearchUserName}
                                             />
                                         </FormControl>
+                                        {searchUserNameResult.length > 0 ? <TableBody>
+                                            {searchUserNameResult.map(userResult => <TableRow>
+                                                <TableCell component="th" scope="row">{userResult[0]}</TableCell>
+                                                <TableCell align="right">{userResult[1]}</TableCell>
+                                                <TableCell align='right'><Button color="secondary">Add</Button></TableCell>
+                                            </TableRow>)}
+                                        </TableBody> : <br/> }
                                     </FormControl>
                                 </form>
                                 <p className={classes.errorMsg}>{ }</p>
