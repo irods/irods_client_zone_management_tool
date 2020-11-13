@@ -423,7 +423,7 @@ function Group() {
                                 <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
-                        {isLoading == true ? <div><LinearProgress/>Loading data...</div> : 
+                        {isLoading == true ? <div><LinearProgress/></div> : 
                         <Dialog open={editFormOpen} onClose={handleEditFormClose} fullScreen="true" aria-labelledby="form-dialog-title">
                             <DialogTitle><Button onClick={handleEditFormClose}><ArrowBackIcon/></Button>Edit Group</DialogTitle>
                             <DialogContent>
