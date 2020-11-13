@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import { Link }from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { BlockIcon } from '@material-ui/icons';
 
@@ -42,7 +42,8 @@ const useStyles = makeStyles((theme) => ({
         flexWrap: 'wrap',
         minWidth: 200
     },
-    formContainer: {
+    link_button: {
+        textDecoration: 'none'
     },
     formControl: {
         margin: theme.spacing(1),
@@ -246,239 +247,238 @@ function Group() {
             })
         }
         catch (e) {
-        console.log(e);
+            console.log(e);
+        }
     }
-}
 
-async function removeGroup() {
-    try {
-        const addGroupResult = await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-            params: {
-                action: 'rm',
-                target: 'user',
-                arg2: currGroup[0],
-                arg3: currGroup[1],
-            },
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            }
-        }).then(res => {
-            console.log(res);
-            window.location.reload();
-        })
-    } catch (e) {
-        console.log(e);
+    async function removeGroup() {
+        try {
+            const addGroupResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                params: {
+                    action: 'rm',
+                    target: 'user',
+                    arg2: currGroup[0],
+                    arg3: currGroup[1],
+                },
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                console.log(res);
+                window.location.reload();
+            })
+        } catch (e) {
+            console.log(e);
+        }
     }
-}
 
-const handlecurrentGroup = event => {
-    if (event.target.id !== '') {
-        setCurrGroup(groups[event.target.id]);
-        console.log(groups[event.target.id]);
+    const handlecurrentGroup = event => {
+        if (event.target.id !== '') {
+            setCurrGroup(groups[event.target.id]);
+            console.log(groups[event.target.id]);
+        }
     }
-}
 
-const selectUser = event => {
-    let _index = addGroupUsers.indexOf(users[event.target.id]);
-    if (_index == -1) {
-        let addArray = [...addGroupUsers];
-        addArray.push(users[event.target.id]);
-        setAddGroupUsers(addArray);
+    const selectUser = event => {
+        let _index = addGroupUsers.indexOf(users[event.target.id]);
+        if (_index == -1) {
+            let addArray = [...addGroupUsers];
+            addArray.push(users[event.target.id]);
+            setAddGroupUsers(addArray);
+        }
+        else {
+            const oldArray = [...addGroupUsers];
+            const newArray = oldArray.filter(user => {
+                return user[0] != users[event.target.id][0];
+            })
+            setAddGroupUsers(newArray);
+        }
     }
-    else {
-        const oldArray = [...addGroupUsers];
-        const newArray = oldArray.filter(user => {
-            return user[0] != users[event.target.id][0];
-        })
-        setAddGroupUsers(newArray);
+
+    const handleremoveUserFromGroup = event => {
+        if (event.target.id !== undefined && event.target.id !== '') {
+            console.log(event.target.id);
+            setRemoveUserName(event.target.id);
+        }
+        if (event.target.name !== undefined) {
+            console.log(event.target.name);
+            setRemoveUserZone(event.target.name);
+        }
     }
-}
 
-const handleremoveUserFromGroup = event => {
-    if (event.target.id !== undefined && event.target.id !== '') {
-        console.log(event.target.id);
-        setRemoveUserName(event.target.id);
+    const handleSearchUserName = event => {
+        setSearchName(event.target.value);
     }
-    if (event.target.name !== undefined) {
-        console.log(event.target.name);
-        setRemoveUserZone(event.target.name);
+
+    const handleAddFormOpen = () => {
+        setAddFormOpen(true);
     }
-}
 
-const handleSearchUserName = event => {
-    setSearchName(event.target.value);
-}
+    const handleAddFormClose = () => {
+        setAddFormOpen(false);
+    }
 
-const handleAddFormOpen = () => {
-    setAddFormOpen(true);
-}
+    const handleEditFormOpen = () => {
+        editGroup();
+        setEditFormOpen(true);
+    }
 
-const handleAddFormClose = () => {
-    setAddFormOpen(false);
-}
+    const handleEditFormClose = () => {
+        setEditFormOpen(false);
+    }
 
-const handleEditFormOpen = () => {
-    editGroup();
-    setEditFormOpen(true);
-}
+    const handleAddGroupName = event => {
+        setAddGroupName(event.target.value);
+    }
 
-const handleEditFormClose = () => {
-    setEditFormOpen(false);
-}
+    const handleAddZoneName = event => {
+        setAddGroupZoneName(event.target.value);
+    }
 
-const handleAddGroupName = event => {
-    setAddGroupName(event.target.value);
-}
-
-const handleAddZoneName = event => {
-    setAddGroupZoneName(event.target.value);
-}
-
-return (
-    <div>
-        {isAuthenticated == true ? <div className={classes.root}>
-            <Appbar />
-            <Sidebar />
-            <main className={classes.content}>
-                <div className={classes.toolbar} />
-                <div className={classes.main}>
-                    <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>
-                        Add New Group
+    return (
+        <div>
+            {isAuthenticated == true ? <div className={classes.root}>
+                <Appbar />
+                <Sidebar />
+                <main className={classes.content}>
+                    <div className={classes.toolbar} />
+                    <div className={classes.main}>
+                        <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                            Add New Group
                         </Button>
-                    <TableContainer className={classes.tableContainer} component={Paper}>
-                        <Table className={classes.table} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><b>Group Name</b></TableCell>
-                                    <TableCell align="right"><b>Zone</b></TableCell>
-                                    <TableCell align="right"><b>Action</b></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {groups.map(group =>
-                                    <TableRow key={group_id}>
-                                        <TableCell component="th" scope="row">{group[0]}</TableCell>
-                                        <TableCell align="right">{group[1]}</TableCell>
-                                        <TableCell align='right'>                        <Link to={{pathname: '/group/edit', groupInfo: group}}>Edit</Link>
-<Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup} onClick={handleEditFormOpen}>Edit</Button>{group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} fullWidth="true" aria-labelledby="form-dialog-title">
-                        <DialogTitle>Add New Group</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                Enter your group and zone name:
-                                </DialogContentText>
-                            <form className={classes.container}>
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="name"
-                                        label="Group Name"
-                                        onChange={handleAddGroupName}
-                                    />
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="zone"
-                                        label="Zone Name"
-                                        onChange={handleAddZoneName}
-                                    />
-                                </FormControl>
-                            </form>
-                            <br />
-                            <DialogContentText>Add users to group: </DialogContentText>
-                            <Table className={classes.user_table} aria-label="simple table">
+                        <TableContainer className={classes.tableContainer} component={Paper}>
+                            <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell><b>User Name</b></TableCell>
-                                        <TableCell align="right"><b>User Type</b></TableCell>
+                                        <TableCell><b>Group Name</b></TableCell>
                                         <TableCell align="right"><b>Zone</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {users.map(user =>
-                                        <TableRow key={user_id}>
-                                            <TableCell component="th" scope="row">{user[0]}</TableCell>
-                                            <TableCell align="right">{user[1]}</TableCell>
-                                            <TableCell align="right">{user[2]}</TableCell>
-                                            <TableCell align='right'><Checkbox id={user_id++} color="primary" onClick={selectUser} /></TableCell>
+                                    {groups.map(group =>
+                                        <TableRow key={group_id}>
+                                            <TableCell component="th" scope="row">{group[0]}</TableCell>
+                                            <TableCell align="right">{group[1]}</TableCell>
+                                            <TableCell align='right'><Link className={classes.link_button} to={{ pathname: '/group/edit', groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
-                            <p className={classes.errorMsg}>{ }</p>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={addGroup} color="primary">Save</Button>
-                            <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
-                        </DialogActions>
-                    </Dialog>
-                    {isLoading == true ? <div><LinearProgress /></div> :
-                        <Dialog open={editFormOpen} onClose={handleEditFormClose} fullScreen="true" aria-labelledby="form-dialog-title">
-                            <DialogTitle><Button size="large" onClick={handleEditFormClose}><ArrowBackIcon /></Button>Edit Group</DialogTitle>
+                        </TableContainer>
+                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} fullWidth="true" aria-labelledby="form-dialog-title">
+                            <DialogTitle>Add New Group</DialogTitle>
                             <DialogContent>
-                                {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
+                                <DialogContentText>
+                                    Enter your group and zone name:
+                                </DialogContentText>
                                 <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
-                                        {userThisGroup.length}
-                                        <Typography>Attached Users: </Typography>
-                                        <Table className={classes.user_table} aria-label="simple table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell><b>User Name</b></TableCell>
-                                                    <TableCell align="right"><b>Zone</b></TableCell>
-                                                    <TableCell align="right"><b>Action</b></TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            {userThisGroup.length > 0 ? <TableBody>
-                                                {userThisGroup.map(userThisGroup => <TableRow>
-                                                    <TableCell component="th" scope="row">{userThisGroup[0]}</TableCell>
-                                                    <TableCell align="right">{userThisGroup[2]}</TableCell>
-                                                    <TableCell align='right'><Button id={userThisGroup[0]} name={userThisGroup[2]} color="secondary" onMouseOver={handleremoveUserFromGroup} onClick={removeUserFromGroup}>Remove</Button></TableCell>
-                                                </TableRow>)}
-                                            </TableBody> : <br />}
-                                        </Table>
-                                        <br />
-                                        <Typography>Add Users: </Typography>
-                                        <FormControl className={classes.formControl}>
-                                            <TextField
-                                                native
-                                                id="searchUserName"
-                                                label="User Name"
-                                                onChange={handleSearchUserName}
-                                            />
-                                        </FormControl>
-                                        {searchUserNameResult.length > 0 ? <TableBody>
-                                            {searchUserNameResult.map(userResult => <TableRow>
-                                                <TableCell component="th" scope="row">{userResult[0]}</TableCell>
-                                                <TableCell align="right">{userResult[1]}</TableCell>
-                                                <TableCell align='right'><Button color="secondary" onClick={() => addUserToGroup(userResult)}>Add</Button></TableCell>
-                                            </TableRow>)}
-                                        </TableBody> : <br />}
+                                        <TextField
+                                            native
+                                            id="name"
+                                            label="Group Name"
+                                            onChange={handleAddGroupName}
+                                        />
+                                    </FormControl>
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            native
+                                            id="zone"
+                                            label="Zone Name"
+                                            onChange={handleAddZoneName}
+                                        />
                                     </FormControl>
                                 </form>
+                                <br />
+                                <DialogContentText>Add users to group: </DialogContentText>
+                                <Table className={classes.user_table} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell><b>User Name</b></TableCell>
+                                            <TableCell align="right"><b>User Type</b></TableCell>
+                                            <TableCell align="right"><b>Zone</b></TableCell>
+                                            <TableCell align="right"><b>Action</b></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {users.map(user =>
+                                            <TableRow key={user_id}>
+                                                <TableCell component="th" scope="row">{user[0]}</TableCell>
+                                                <TableCell align="right">{user[1]}</TableCell>
+                                                <TableCell align="right">{user[2]}</TableCell>
+                                                <TableCell align='right'><Checkbox id={user_id++} color="primary" onClick={selectUser} /></TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
                                 <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={addUserToGroup} color="primary">Save</Button>
-                                <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
+                                <Button onClick={addGroup} color="primary">Save</Button>
+                                <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
-                        </Dialog>}
-                </div>
-            </main>
-        </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
-        }
-    </div >
-);
+                        </Dialog>
+                        {isLoading == true ? <div><LinearProgress /></div> :
+                            <Dialog open={editFormOpen} onClose={handleEditFormClose} fullScreen="true" aria-labelledby="form-dialog-title">
+                                <DialogTitle><Button size="large" onClick={handleEditFormClose}><ArrowBackIcon /></Button>Edit Group</DialogTitle>
+                                <DialogContent>
+                                    {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
+                                    <form className={classes.container}>
+                                        <FormControl className={classes.formControl}>
+                                            {userThisGroup.length}
+                                            <Typography>Attached Users: </Typography>
+                                            <Table className={classes.user_table} aria-label="simple table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell><b>User Name</b></TableCell>
+                                                        <TableCell align="right"><b>Zone</b></TableCell>
+                                                        <TableCell align="right"><b>Action</b></TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                {userThisGroup.length > 0 ? <TableBody>
+                                                    {userThisGroup.map(userThisGroup => <TableRow>
+                                                        <TableCell component="th" scope="row">{userThisGroup[0]}</TableCell>
+                                                        <TableCell align="right">{userThisGroup[2]}</TableCell>
+                                                        <TableCell align='right'><Button id={userThisGroup[0]} name={userThisGroup[2]} color="secondary" onMouseOver={handleremoveUserFromGroup} onClick={removeUserFromGroup}>Remove</Button></TableCell>
+                                                    </TableRow>)}
+                                                </TableBody> : <br />}
+                                            </Table>
+                                            <br />
+                                            <Typography>Add Users: </Typography>
+                                            <FormControl className={classes.formControl}>
+                                                <TextField
+                                                    native
+                                                    id="searchUserName"
+                                                    label="User Name"
+                                                    onChange={handleSearchUserName}
+                                                />
+                                            </FormControl>
+                                            {searchUserNameResult.length > 0 ? <TableBody>
+                                                {searchUserNameResult.map(userResult => <TableRow>
+                                                    <TableCell component="th" scope="row">{userResult[0]}</TableCell>
+                                                    <TableCell align="right">{userResult[1]}</TableCell>
+                                                    <TableCell align='right'><Button color="secondary" onClick={() => addUserToGroup(userResult)}>Add</Button></TableCell>
+                                                </TableRow>)}
+                                            </TableBody> : <br />}
+                                        </FormControl>
+                                    </form>
+                                    <p className={classes.errorMsg}>{ }</p>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={addUserToGroup} color="primary">Save</Button>
+                                    <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
+                                </DialogActions>
+                            </Dialog>}
+                    </div>
+                </main>
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
+            }
+        </div >
+    );
 }
 
 export default Group;

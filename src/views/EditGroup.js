@@ -90,7 +90,7 @@ function EditGroup(props) {
                 'Authorization': token,
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
+                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
                 query_limit: 5,
                 row_offset: 0,
                 query_type: 'general'
@@ -144,6 +144,7 @@ function EditGroup(props) {
                     'Accept': 'application/json'
                 }
             }).then(res => {
+                setRefresh(!refresh);
                 console.log(res);
             })
         }
@@ -171,6 +172,7 @@ function EditGroup(props) {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell><b>User Name</b></TableCell>
+                                        <TableCell align="right"><b>Type</b></TableCell>
                                         <TableCell align="right"><b>Zone</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
@@ -179,6 +181,7 @@ function EditGroup(props) {
                                     {usersInGroup.map(thisUser => <TableRow>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
+                                        <TableCell align="right">{thisUser[2]}</TableCell>
                                         <TableCell align='right'><Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button></TableCell>
                                     </TableRow>)}
                                 </TableBody> : <br />}
@@ -198,6 +201,7 @@ function EditGroup(props) {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell><b>User Name</b></TableCell>
+                                            <TableCell align="right"><b>Type</b></TableCell>
                                             <TableCell align="right"><b>Zone</b></TableCell>
                                             <TableCell align="right"><b>Action</b></TableCell>
                                         </TableRow>
@@ -206,6 +210,7 @@ function EditGroup(props) {
                                         {searchUserNameResult.map(thisUser => <TableRow>
                                             <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                             <TableCell align="right">{thisUser[1]}</TableCell>
+                                            <TableCell align="right">{thisUser[2]}</TableCell>
                                             <TableCell align='right'><Button color="secondary" onClick={() => { addUserToGroup(thisUser) }}>Add</Button></TableCell>
                                         </TableRow>)}
                                     </TableBody>
