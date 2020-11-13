@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import BlockIcon from '@material-ui/icons/Block';
+import { BlockIcon } from '@material-ui/icons';
+
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
+import { LinearProgress } from '@material-ui/core';
 import { makeStyles, Tab, Typography } from '@material-ui/core';
 import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
@@ -60,6 +63,9 @@ const useStyles = makeStyles((theme) => ({
 function Group() {
     const classes = useStyles();
     const token = Cookies.get('token');
+
+    const [isLoading, setLoading] = useState(false);
+
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [editFormOpen, setEditFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
@@ -159,6 +165,7 @@ function Group() {
     }
 
     async function editGroup() {
+        setLoading(true);
         const result = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
@@ -188,7 +195,7 @@ function Group() {
             else {
                 setUserThisGroup([]);
             }
-
+            setLoading(false);
         })
     }
 
@@ -416,8 +423,9 @@ function Group() {
                                 <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
-                        <Dialog open={editFormOpen} onClose={handleEditFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Edit Group</DialogTitle>
+                        {isLoading == true ? <div><LinearProgress/>Loading data...</div> : 
+                        <Dialog open={editFormOpen} onClose={handleEditFormClose} fullScreen="true" aria-labelledby="form-dialog-title">
+                            <DialogTitle><Button onClick={handleEditFormClose}><ArrowBackIcon/></Button>Edit Group</DialogTitle>
                             <DialogContent>
                                 {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
                                 <form className={classes.container}>
@@ -464,7 +472,7 @@ function Group() {
                                 <Button onClick={addUserToGroup} color="primary">Save</Button>
                                 <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
                             </DialogActions>
-                        </Dialog>
+                        </Dialog>}
                     </div>
                 </main>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
