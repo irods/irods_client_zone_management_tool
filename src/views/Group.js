@@ -198,6 +198,31 @@ function Group() {
             setLoading(false);
         })
     }
+    async function removeUserFromGroup() {
+        try {
+            const removeUserResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                params: {
+                    action: 'modify',
+                    target: 'group',
+                    arg2: currGroup[0],
+                    arg3: 'remove',
+                    arg4: removeThisUserName,
+                    arg5: removeThisUserZone
+                },
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
+                }
+            }).then(res => {
+                window.location.reload();
+                console.log(res);
+            })
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     async function addUserToGroup(props) {
         try {
@@ -221,32 +246,6 @@ function Group() {
             })
         }
         catch (e) {
-        console.log(e);
-    }
-}
-
-async function removeUserFromGroup() {
-    try {
-        const removeUserResult = await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-            params: {
-                action: 'modify',
-                target: 'group',
-                arg2: currGroup[0],
-                arg3: 'remove',
-                arg4: removeThisUserName,
-                arg5: removeThisUserZone
-            },
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            }
-        }).then(res => {
-            window.location.reload();
-            console.log(res);
-        })
-    } catch (e) {
         console.log(e);
     }
 }
