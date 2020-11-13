@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Authenticate from './components/Authenticate';
 import User from './views/User';
 import Group from './views/Group';
+import EditGroup from './views/EditGroup';
 import Session from './views/Session';
 import Resource from './views/Resource';
 import Home from './views/Home';
@@ -18,7 +19,8 @@ class App extends Component {
             <Route path="/user" component={User} />
             <Route path="/resource" component={Resource} />
             <Route path="/home" component={Home} />
-            <Route path="/group" component={Group} />
+            <Route path="/group/edit" component={EditGroup} />
+            <Route exact path="/group" component={Group} />
             <Route path="/" component={Authenticate} />
           </Switch>
         </div>

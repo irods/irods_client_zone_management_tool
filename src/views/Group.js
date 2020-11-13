@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import { Link }from 'react-router-dom'
+
 import { BlockIcon } from '@material-ui/icons';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -114,7 +116,7 @@ function Group() {
             setUsers(userArray);
             setGroup(groupArray);
         })
-    }, [isAuthenticated, addFormOpen])
+    }, [isAuthenticated, isLoading])
 
     useEffect(() => {
         const searchResult = axios({
@@ -361,7 +363,8 @@ return (
                                     <TableRow key={group_id}>
                                         <TableCell component="th" scope="row">{group[0]}</TableCell>
                                         <TableCell align="right">{group[1]}</TableCell>
-                                        <TableCell align='right'><Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup} onClick={handleEditFormOpen}>Edit</Button>{group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                        <TableCell align='right'>                        <Link to={{pathname: '/group/edit', groupInfo: group}}>Edit</Link>
+<Button id={group_id} color="primary" id={group_id} onMouseOver={handlecurrentGroup} onClick={handleEditFormOpen}>Edit</Button>{group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -427,6 +430,7 @@ return (
                                 {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
                                 <form className={classes.container}>
                                     <FormControl className={classes.formControl}>
+                                        {userThisGroup.length}
                                         <Typography>Attached Users: </Typography>
                                         <Table className={classes.user_table} aria-label="simple table">
                                             <TableHead>
