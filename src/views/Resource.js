@@ -83,7 +83,9 @@ function Resource() {
                 query_type: 'general'
             }
         }).then(res => {
-            setResc(res.data._embedded)
+            const sortedArray = [...res.data._embedded];
+            sortedArray.sort();
+            setResc(sortedArray);
         });
 
         const zoneResult = axios({

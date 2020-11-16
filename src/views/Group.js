@@ -101,7 +101,7 @@ function Group() {
                 'Authorization': token
             },
             params: {
-                query_string: 'SELECT USER_NAME, USER_TYPE, USER_ZONE',
+                query_string: "SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE = 'rodsgroup'",
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
