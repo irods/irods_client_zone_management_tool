@@ -69,6 +69,8 @@ function Group() {
 
     const [isLoading, setLoading] = useState(false);
 
+    const [zones, setZone] = useState([]);
+
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [editFormOpen, setEditFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
@@ -116,7 +118,23 @@ function Group() {
             })
             setUsers(userArray);
             setGroup(groupArray);
-        })
+        });
+
+        const zoneResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                query_string: 'SELECT ZONE_NAME',
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            setZone(res.data._embedded);
+        });
     }, [isAuthenticated, isLoading])
 
     useEffect(() => {
@@ -369,7 +387,7 @@ function Group() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} fullWidth="true" aria-labelledby="form-dialog-title">
+                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Group</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
@@ -385,36 +403,19 @@ function Group() {
                                         />
                                     </FormControl>
                                     <FormControl className={classes.formControl}>
-                                        <TextField
+                                        <InputLabel htmlFor="group-zone-select">Zone Name</InputLabel>
+                                        <Select
                                             native
                                             id="zone"
                                             label="Zone Name"
                                             onChange={handleAddZoneName}
-                                        />
+                                        >
+                                        <option value="" selected disabled></option>
+                                        {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
+                                        </Select>
                                     </FormControl>
                                 </form>
                                 <br />
-                                <DialogContentText>Add users to group: </DialogContentText>
-                                <Table className={classes.user_table} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><b>User Name</b></TableCell>
-                                            <TableCell align="right"><b>User Type</b></TableCell>
-                                            <TableCell align="right"><b>Zone</b></TableCell>
-                                            <TableCell align="right"><b>Action</b></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {users.map(user =>
-                                            <TableRow key={user_id}>
-                                                <TableCell component="th" scope="row">{user[0]}</TableCell>
-                                                <TableCell align="right">{user[1]}</TableCell>
-                                                <TableCell align="right">{user[2]}</TableCell>
-                                                <TableCell align='right'><Checkbox id={user_id++} color="primary" onClick={selectUser} /></TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
                                 <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>

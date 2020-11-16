@@ -291,6 +291,7 @@ return (
                                         label="Zone Name"
                                         onChange={handleAddZoneName}
                                     >
+                                    <option value="" selected disabled></option>
                                     {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
                                     </Select>
                                 </FormControl>

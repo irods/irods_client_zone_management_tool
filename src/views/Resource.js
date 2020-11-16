@@ -84,21 +84,6 @@ function Resource() {
         }).then(res => {
             setResc(res.data._embedded)
         })
-
-        const zoneResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            },
-            params: {
-                query_string: 'SELECT ZONE_NAME',
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        })
     }, [isAuthenticated])
 
     async function addResource() {
