@@ -86,7 +86,7 @@ function EditGroup(props) {
             },
             params: {
                 query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
-                query_limit: 5,
+                query_limit: 3,
                 row_offset: 0,
                 query_type: 'general'
             }

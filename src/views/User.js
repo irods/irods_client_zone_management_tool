@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 import BlockIcon from '@material-ui/icons/Block';
@@ -53,6 +53,9 @@ const useStyles = makeStyles((theme) => ({
     },
     errorMsg: {
         color: 'red'
+    },
+    link_button:{
+        textDecoration: 'none'
     }
 }));
 
@@ -262,7 +265,7 @@ return (
                                         <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                         <TableCell align="right">{this_user[1]}</TableCell>
                                         <TableCell align="right">{this_user[2]}</TableCell>
-                                        <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p id={user_id++}></p> : <span><Button color="primary" id={user_id} onMouseOver={handleCurrentUser} onClick={handleEditFormOpen}>Edit</Button><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
+                                        <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p id={user_id++}></p> : <span><Link className={classes.link_button} to={{ pathname: '/user/edit', userInfo: this_user }}><Button color="primary">Edit</Button></Link><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
