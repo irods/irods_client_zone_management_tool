@@ -65,19 +65,14 @@ function EditGroup(props) {
                 'Authorization': token
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${currentGroup[0]}'`,
+                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then(res => {
-            if (res.data.count !== '1') {
-                let attachedUsers = res.data._embedded.slice(1, res.data._embedded.length);
-                setUsersInGroup(attachedUsers);
-            }
-            else {
-                setUsersInGroup([]);
-            }
+            console.log(res.data._embedded);
+            setUsersInGroup(res.data._embedded);
             setLoading(false);
         })
     }, [isAuthenticated, refresh])

@@ -71,6 +71,7 @@ function Group() {
 
     const [zones, setZone] = useState([]);
 
+    const [errorMsg, setErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [editFormOpen, setEditFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
@@ -110,7 +111,7 @@ function Group() {
             let userArray = [];
             res.data['_embedded'].forEach(group => {
                 if (group[1] == 'rodsgroup') {
-                    groupArray.push([group[0], group[2]]);
+                    groupArray.push([group[0], group[1], group[2]]);
                 }
                 else {
                     userArray.push([group[0], group[1], group[2]])
@@ -179,6 +180,7 @@ function Group() {
             })
         }
         catch (e) {
+            setErrorMsg("Cannot add new group. Please check your group name or zone name.")
             console.log(e);
         }
     }
@@ -278,7 +280,7 @@ function Group() {
                     action: 'rm',
                     target: 'user',
                     arg2: currGroup[0],
-                    arg3: currGroup[1],
+                    arg3: currGroup[2],
                 },
                 headers: {
                     'Authorization': token,
@@ -380,7 +382,7 @@ function Group() {
                                     {groups.map(group =>
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
-                                            <TableCell align="right">{group[1]}</TableCell>
+                                            <TableCell align="right">{group[2]}</TableCell>
                                             <TableCell align='right'><Link className={classes.link_button} to={{ pathname: '/group/edit', groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
@@ -416,7 +418,7 @@ function Group() {
                                     </FormControl>
                                 </form>
                                 <br />
-                                <p className={classes.errorMsg}>{ }</p>
+                                <p className={classes.errorMsg}>{errorMsg}</p>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={addGroup} color="primary">Save</Button>
