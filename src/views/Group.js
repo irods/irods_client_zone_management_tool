@@ -107,18 +107,7 @@ function Group() {
                 query_type: 'general'
             }
         }).then(res => {
-            let groupArray = [];
-            let userArray = [];
-            res.data['_embedded'].forEach(group => {
-                if (group[1] == 'rodsgroup') {
-                    groupArray.push([group[0], group[1], group[2]]);
-                }
-                else {
-                    userArray.push([group[0], group[1], group[2]])
-                }
-            })
-            setUsers(userArray);
-            setGroup(groupArray);
+            setGroup(res.data._embedded);
         });
 
         const zoneResult = axios({
