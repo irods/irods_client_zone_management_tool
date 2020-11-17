@@ -274,7 +274,7 @@ function User() {
                         <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Warning</DialogTitle>
                             <DialogContent>
-                                <Typography>Are you sure to remove {currUser[0]}?</Typography>
+                                <Typography>Are you sure to remove <b>{currUser[0]}</b>?</Typography>
                                 <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>
