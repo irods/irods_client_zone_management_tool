@@ -66,6 +66,11 @@ function Resource() {
     const [resc, setResc] = useState([]);
     const [zones, setZone] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
+
+    const [rescName, setRescName] = useState();
+    const [rescType, setRescType] = useState();
+    const [rescLocation, setRescLocation] = useState();
+    const [rescZone, setRescZone] = useState();
     let resc_id = 0;
 
     useEffect(() => {
@@ -107,7 +112,24 @@ function Resource() {
     }, [isAuthenticated])
 
     async function addResource() {
-
+        const rescAddResult = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                action: 'add',
+                target: 'resource',
+                arg2: rescName,
+                arg3: rescType,
+                arg4: rescLocation,
+                arg5: "",
+                arg6: rescZone
+            }
+        }).then(res => {
+            console.log(res);
+        })
     }
 
     const handleAddFormOpen = () => {
@@ -117,6 +139,22 @@ function Resource() {
     const handleAddFormClose = () => {
         setAddFormOpen(false);
     }
+
+    const handleRescNameChange = event => {
+        setRescName(event.target.value);
+    }
+
+    const handleRescTypeChange = event => {
+        setRescType(event.target.value);
+    }
+
+    const handleRescLocationChange = event => {
+        setRescLocation(event.target.value);
+    }
+    const handleRescZoneChange = event => {
+        setRescZone(event.target.value);
+    }
+
 
     return (
         <div>
@@ -161,6 +199,7 @@ function Resource() {
                                         native
                                         id="name"
                                         label="Resource name"
+                                        onChange={handleRescNameChange}
                                     />
                                 </FormControl>
                                 <br />
@@ -169,6 +208,7 @@ function Resource() {
                                     <Select
                                         native
                                         id="zone-type-select"
+                                        onChange={handleRescTypeChange}
                                     >
                                         <option aria-label="None" value="" />
                                         <option value="compound">Compound</option>
@@ -192,25 +232,21 @@ function Resource() {
                                 </FormControl>
                                 <br />
                                 <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="user-type-select">Parent</InputLabel>
-                                    <Select
+                                    <TextField
                                         native
-                                        id="user-type-select"
-                                    >
-                                        <option aria-label="None" value="" />
-                                        <option value="rodsadmin">rodsadmin</option>
-                                        <option value="groupadmin">groupadmin</option>
-                                        <option value="rodsgroup">rodsgroup</option>
-                                    </Select>
+                                        id="location"
+                                        label="Location"
+                                        onChange={handleRescLocationChange}
+                                    />
                                 </FormControl>
                                 <br />
-
                                 <FormControl className={classes.formControl}>
                                     <InputLabel htmlFor="user-type-select">Zone</InputLabel>
                                     <Select
                                         native
                                         id="zone"
                                         label="Zone Name"
+                                        onChange={handleRescZoneChange}
                                     >
                                         <option selected value="" disabled></option>
                                         {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
@@ -219,8 +255,8 @@ function Resource() {
                                 <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions className={classes.dialog_action}>
-                                <Button variant="outlined" color="primary">Save</Button>
-                                <Button variant="outlined" color="primary">Cancel</Button>
+                                <Button onClick={addResource} variant="outlined" color="primary">Save</Button>
+                                <Button onClick={handleAddFormClose} variant="outlined" color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
                     </div>
