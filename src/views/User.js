@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import { FormControl, InputLabel } from '@material-ui/core';
+import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
@@ -73,7 +73,6 @@ function User() {
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [zones, setZone] = useState([]);
     const isAuthenticated = token != null ? true : false;
-    let user_id = 0;
 
     useEffect(() => {
         const result = axios({
@@ -160,13 +159,6 @@ function User() {
         }
     }
 
-    const handleCurrentUser = event => {
-        if (event.target.id !== '') {
-            setCurrUser(users[event.target.id])
-        };
-    }
-
-
     const handleAddUserType = event => {
         setAddUserType(event.target.value);
     }
@@ -179,7 +171,8 @@ function User() {
         setAddZoneName(event.target.value);
     }
 
-    const handleRemoveConfirmationOpen = () => {
+    const handleRemoveConfirmationOpen = props => {
+        setCurrUser(props);
         setRemoveConfirmation(true);
     }
 
@@ -218,11 +211,12 @@ function User() {
                                 </TableHead>
                                 <TableBody>
                                     {users.map(this_user =>
-                                        <TableRow key={user_id}>
+                                        <TableRow key={this_user[0]}>
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p id={user_id++}></p> : <span><Link className={classes.link_button} to={{ pathname: '/user/edit', userInfo: this_user }}><Button color="primary">Edit</Button></Link><Button color="secondary" id={user_id++} onMouseOver={handleCurrentUser} onClick={removeUser}>Remove</Button></span>}</TableCell>
+                                            <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to={{ pathname: '/user/edit', userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                                <Button color="secondary" onClick={() => {handleRemoveConfirmationOpen(this_user)}}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -278,13 +272,14 @@ function User() {
                             </DialogActions>
                         </Dialog>
                         <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Edit User</DialogTitle>
+                            <DialogTitle>Warning</DialogTitle>
                             <DialogContent>
-                                <p className={classes.errorMsg}>{}</p>
+                                <Typography>Are you sure to remove {currUser[0]}?</Typography>
+                                <p className={classes.errorMsg}>{ }</p>
                             </DialogContent>
                             <DialogActions>
-                                <Button onClick={removeUser} color="primary">Save</Button>
-                                <Button color="primary">Cancel</Button>
+                                <Button onClick={removeUser} color="secondary">Remove</Button>
+                                <Button onClick={handleRemoveConfirmationClose} color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
                     </div>
