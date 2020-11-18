@@ -62,6 +62,7 @@ function Resource() {
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
 
+    const [isLoading, setLoading] = useState(false);
     const [rescView, setRescView] = useState('list');
     const [resc, setResc] = useState([]);
     const [zones, setZone] = useState([]);
@@ -112,6 +113,7 @@ function Resource() {
     }, [isAuthenticated])
 
     async function addResource() {
+        setLoading(true);
         const rescAddResult = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -128,7 +130,9 @@ function Resource() {
                 arg6: rescZone
             }
         }).then(res => {
+            window.location.reload();
             console.log(res);
+            setLoading(false);
         })
     }
 
