@@ -53,6 +53,9 @@ const useStyles = makeStyles((theme) => ({
     container: {
         display: 'flex',
         flexDirection: 'row'
+    },
+    progress: {
+
     }
 }));
 
@@ -67,6 +70,7 @@ function Resource() {
     const [resc, setResc] = useState([]);
     const [zones, setZone] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
+    const [addResult, setAddResult] = useState();
 
     const [rescName, setRescName] = useState();
     const [rescType, setRescType] = useState();
@@ -113,27 +117,34 @@ function Resource() {
     }, [isAuthenticated])
 
     async function addResource() {
-        setLoading(true);
-        const rescAddResult = axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                action: 'add',
-                target: 'resource',
-                arg2: rescName,
-                arg3: rescType,
-                arg4: rescLocation,
-                arg5: "",
-                arg6: rescZone
-            }
-        }).then(res => {
-            window.location.reload();
-            console.log(res);
+        try {
+            setLoading(true);
+            const rescAddResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                headers: {
+                    'Authorization': token
+                },
+                params: {
+                    action: 'add',
+                    target: 'resource',
+                    arg2: rescName,
+                    arg3: rescType,
+                    arg4: rescLocation,
+                    arg5: "",
+                    arg6: rescZone
+                }
+            }).then(res => {
+                console.log(res);
+                window.location.reload();
+                setAddResult("Resource created.")
+                setLoading(false);
+            })
+        }catch(e){
+            console.log(e);
+            setAddResult("Failed to create resource.");
             setLoading(false);
-        })
+        }
     }
 
     const handleAddFormOpen = () => {
@@ -256,7 +267,7 @@ function Resource() {
                                         {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
                                     </Select>
                                 </FormControl>
-                                {isLoading == true ? <div><CircularProgress/>Loading...</div> : <p></p>}
+                                {isLoading == true ? <div className={classes.progress}>Adding in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                             </DialogContent>
                             <DialogActions className={classes.dialog_action}>
                                 <Button onClick={addResource} variant="outlined" color="primary">Save</Button>
