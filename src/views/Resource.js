@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import BlockIcon from '@material-ui/icons/Block';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
@@ -221,17 +221,17 @@ function Resource() {
                                         <option value="random">Random</option>
                                         <option value="replication">Replication</option>
                                         <option value="round_robin">Round Robin</option>
-                                        <option value="passthru">Deferred</option>
-                                        <option value="passthru">EMC ECS</option>
-                                        <option value="passthru">EMC Isilon</option>
-                                        <option value="passthru">Mockarchive</option>
-                                        <option value="passthru">MSO</option>
-                                        <option value="passthru">MSSOFile</option>
-                                        <option value="passthru">Non-blocking</option>
-                                        <option value="passthru">Struct file</option>
-                                        <option value="passthru">Universal Mass Storage</option>
-                                        <option value="passthru">Unix File System</option>
-                                        <option value="passthru">WOS</option>
+                                        <option value="deferred">Deferred</option>
+                                        <option value="emc_ecs">EMC ECS</option>
+                                        <option value="emc_isilon">EMC Isilon</option>
+                                        <option value="mockarchive">Mockarchive</option>
+                                        <option value="mso">MSO</option>
+                                        <option value="mssofile">MSSOFile</option>
+                                        <option value="non_blocking">Non-blocking</option>
+                                        <option value="struct_file">Struct file</option>
+                                        <option value="universal_mass_storage">Universal Mass Storage</option>
+                                        <option value="unixfilesystem">Unix File System</option>
+                                        <option value="wos">WOS</option>
                                     </Select>
                                 </FormControl>
                                 <br />
@@ -256,7 +256,7 @@ function Resource() {
                                         {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
                                     </Select>
                                 </FormControl>
-                                <p className={classes.errorMsg}>{ }</p>
+                                {isLoading == true ? <div><CircularProgress/>Loading...</div> : <p></p>}
                             </DialogContent>
                             <DialogActions className={classes.dialog_action}>
                                 <Button onClick={addResource} variant="outlined" color="primary">Save</Button>
