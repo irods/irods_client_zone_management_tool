@@ -147,6 +147,32 @@ function Resource() {
         }
     }
 
+    async function removeResource(props) {
+        try {
+            setLoading(true);
+            const rescAddResult = await axios({
+                method: 'POST',
+                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                headers: {
+                    'Authorization': token
+                },
+                params: {
+                    action: 'rm',
+                    target: 'resource',
+                    arg2: props[0],
+                    arg3: ''
+                }
+            }).then(res => {
+                console.log(res);
+                setLoading(false);
+            })
+        }catch(e){
+            console.log(e);
+            setAddResult("Failed to remove resource.");
+            setLoading(false);
+        }
+    }
+
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
     }
@@ -197,7 +223,7 @@ function Resource() {
                                             <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
                                             <TableCell align="right">{this_resc[1]}</TableCell>
                                             <TableCell align="right">{this_resc[2]}</TableCell>
-                                            <TableCell align="right"><Button id={resc_id++}>Info</Button></TableCell>
+                                            <TableCell align="right"><Button id={resc_id++}>Info</Button><Button onClick={() => removeResource(this_resc)}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
