@@ -8,7 +8,7 @@ import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import { FormControl, InputLabel } from '@material-ui/core';
+import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
@@ -54,8 +54,12 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row'
     },
-    progress: {
-
+    remove_content: {
+        fontSize: 18
+    },
+    remove_result: {
+        textAlign: 'center',
+        color: 'red'
     }
 }));
 
@@ -168,8 +172,8 @@ function Resource() {
             console.log(res);
             setLoading(false);
         }).catch(e => {
-            console.log(e);
-            setAddResult("Failed to remove resource.");
+            console.log(e.response);
+            setRemoveResult(`Failed with code ${e.response.data.error_code}: ${e.response.data.error_message}`);
             setLoading(false);
         });
 }
@@ -189,6 +193,7 @@ function Resource() {
 
     const handleRemoveFormClose = () => {
         setRemoveFormOpen(false);
+        setRemoveResult();
     }
 
     const handleRescNameChange = event => {
@@ -240,7 +245,8 @@ function Resource() {
                             </Table>
                         </TableContainer>
                         <Dialog open={removeFormOpen} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
-                            <DialogContent>Are you sure to remove resource {rescName}? </DialogContent>
+                            <DialogContent className={classes.remove_content}>Are you sure to remove resource {rescName}? </DialogContent>
+                            <DialogContentText className={classes.remove_result}>{removeResult}</DialogContentText>
                             <DialogActions><Button color="secondary" onClick={removeResource}>Remove</Button><Button onClick={handleRemoveFormClose}>Cancel</Button></DialogActions>
                         </Dialog>
                         <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
