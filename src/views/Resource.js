@@ -72,6 +72,9 @@ function Resource() {
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
 
+    const [removeFormOpen, setRemoveFormOpen] = useState(false);
+    const [removeResult, setRemoveResult] = useState();
+
     const [rescName, setRescName] = useState();
     const [rescType, setRescType] = useState();
     const [rescLocation, setRescLocation] = useState();
@@ -140,38 +143,36 @@ function Resource() {
                 setAddResult("Resource created.")
                 setLoading(false);
             })
-        }catch(e){
+        } catch (e) {
             console.log(e);
             setAddResult("Failed to create resource.");
             setLoading(false);
         }
     }
 
-    async function removeResource(props) {
-        try {
-            setLoading(true);
-            const rescAddResult = await axios({
-                method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-                headers: {
-                    'Authorization': token
-                },
-                params: {
-                    action: 'rm',
-                    target: 'resource',
-                    arg2: props[0],
-                    arg3: ''
-                }
-            }).then(res => {
-                console.log(res);
-                setLoading(false);
-            })
-        }catch(e){
+    async function removeResource() {
+        setLoading(true);
+        const rescAddResult = await axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                action: 'rm',
+                target: 'resource',
+                arg2: rescName,
+                arg3: ''
+            }
+        }).then(res => {
+            console.log(res);
+            setLoading(false);
+        }).catch(e => {
             console.log(e);
             setAddResult("Failed to remove resource.");
             setLoading(false);
-        }
-    }
+        });
+}
 
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
@@ -179,6 +180,15 @@ function Resource() {
 
     const handleAddFormClose = () => {
         setAddFormOpen(false);
+    }
+
+    const handleRemoveFormOpen = props => {
+        setRescName(props[0]);
+        setRemoveFormOpen(true);
+    }
+
+    const handleRemoveFormClose = () => {
+        setRemoveFormOpen(false);
     }
 
     const handleRescNameChange = event => {
@@ -223,12 +233,16 @@ function Resource() {
                                             <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
                                             <TableCell align="right">{this_resc[1]}</TableCell>
                                             <TableCell align="right">{this_resc[2]}</TableCell>
-                                            <TableCell align="right"><Button id={resc_id++}>Info</Button><Button onClick={() => removeResource(this_resc)}>Remove</Button></TableCell>
+                                            <TableCell align="right"><Button id={resc_id++}>Info</Button><Button color="secondary" onClick={() => { handleRemoveFormOpen(this_resc) }}>Remove</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <Dialog open={removeFormOpen} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
+                            <DialogContent>Are you sure to remove resource {rescName}? </DialogContent>
+                            <DialogActions><Button color="secondary" onClick={removeResource}>Remove</Button><Button onClick={handleRemoveFormClose}>Cancel</Button></DialogActions>
+                        </Dialog>
                         <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
