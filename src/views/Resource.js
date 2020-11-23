@@ -124,34 +124,32 @@ function Resource() {
     }, [isAuthenticated])
 
     async function addResource() {
-        try {
-            setLoading(true);
-            const rescAddResult = await axios({
-                method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-                headers: {
-                    'Authorization': token
-                },
-                params: {
-                    action: 'add',
-                    target: 'resource',
-                    arg2: rescName,
-                    arg3: rescType,
-                    arg4: rescLocation,
-                    arg5: "",
-                    arg6: rescZone
-                }
-            }).then(res => {
-                console.log(res);
-                window.location.reload();
-                setAddResult("Resource created.")
-                setLoading(false);
-            })
-        } catch (e) {
-            console.log(e);
-            setAddResult("Failed to create resource.");
+        setLoading(true);
+        const rescAddResult = await axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                action: 'add',
+                target: 'resource',
+                arg2: rescName,
+                arg3: rescType,
+                arg4: rescLocation,
+                arg5: "",
+                arg6: rescZone
+            }
+        }).then(res => {
+            console.log(res);
+            window.location.reload();
+            setAddResult("Resource created.")
             setLoading(false);
-        }
+        }).catch(e => {
+            console.log(e.response.data);
+            setAddResult(`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`);
+            setLoading(false);
+        })
     }
 
     async function removeResource() {
@@ -173,10 +171,10 @@ function Resource() {
             setLoading(false);
         }).catch(e => {
             console.log(e.response);
-            setRemoveResult(`Failed with code ${e.response.data.error_code}: ${e.response.data.error_message}`);
+            setRemoveResult(`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`);
             setLoading(false);
         });
-}
+    }
 
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
