@@ -18,6 +18,8 @@ import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
 
+import Rows from '../components/Rows';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -77,8 +79,6 @@ function Resource() {
     const [zones, setZone] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
-
-    const [open, setOpen] = useState(false);
 
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [removeResult, setRemoveResult] = useState();
@@ -214,7 +214,7 @@ function Resource() {
     }
 
     const handleZoneInfoCollapse = event => {
-        
+
     }
 
 
@@ -239,17 +239,15 @@ function Resource() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {resc.map(this_resc =>
+                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} />)}
+                                    {/* {resc.map(this_resc =>
                                         <TableRow key={resc_id}>
-                                            <IconButton size="small" onClick={}>
-                                                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                                            </IconButton>
                                             <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
                                             <TableCell align="right">{this_resc[1]}</TableCell>
                                             <TableCell align="right">{this_resc[2]}</TableCell>
                                             <TableCell align="right"><Button id={resc_id++}>Info</Button><Button color="secondary" onClick={() => { handleRemoveFormOpen(this_resc) }}>Remove</Button></TableCell>
                                         </TableRow>
-                                    )}
+                                    )} */}
                                 </TableBody>
                             </Table>
                         </TableContainer>
