@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import BlockIcon from '@material-ui/icons/Block';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
@@ -12,7 +14,7 @@ import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
-
+import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
 
@@ -75,6 +77,8 @@ function Resource() {
     const [zones, setZone] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
+
+    const [open, setOpen] = useState(false);
 
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [removeResult, setRemoveResult] = useState();
@@ -209,6 +213,10 @@ function Resource() {
         setRescZone(event.target.value);
     }
 
+    const handleZoneInfoCollapse = event => {
+        
+    }
+
 
     return (
         <div>
@@ -233,6 +241,9 @@ function Resource() {
                                 <TableBody>
                                     {resc.map(this_resc =>
                                         <TableRow key={resc_id}>
+                                            <IconButton size="small" onClick={}>
+                                                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                                            </IconButton>
                                             <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
                                             <TableCell align="right">{this_resc[1]}</TableCell>
                                             <TableCell align="right">{this_resc[2]}</TableCell>
