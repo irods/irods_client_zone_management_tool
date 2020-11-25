@@ -208,7 +208,8 @@ function Resource() {
     }
 
     const handleRescLocationChange = event => {
-        setRescLocation(event.target.value);
+        console.log(decodeURI(event.target.value));
+        setRescLocation(decodeURI(event.target.value));
     }
     const handleRescZoneChange = event => {
         setRescZone(event.target.value);
