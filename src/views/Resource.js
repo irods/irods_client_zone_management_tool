@@ -98,7 +98,7 @@ function Resource() {
                 'Accept': 'application/json'
             },
             params: {
-                query_string: 'SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME',
+                query_string: 'SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC',
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
@@ -125,7 +125,7 @@ function Resource() {
         }).then(res => {
             setZone(res.data._embedded);
         })
-    }, [isAuthenticated])
+    }, [isLoading])
 
     async function addResource() {
         setLoading(true);
@@ -171,6 +171,7 @@ function Resource() {
                 arg3: ''
             }
         }).then(res => {
+            window.location.reload();
             console.log(res);
             setLoading(false);
         }).catch(e => {
@@ -239,7 +240,7 @@ function Resource() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} />)}
+                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen = {handleRemoveFormOpen} />)}
                                     {/* {resc.map(this_resc =>
                                         <TableRow key={resc_id}>
                                             <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
