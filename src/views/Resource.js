@@ -98,7 +98,7 @@ function Resource() {
                 'Accept': 'application/json'
             },
             params: {
-                query_string: 'SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC',
+                query_string: 'SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT',
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
