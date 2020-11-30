@@ -11,7 +11,7 @@ import BlockIcon from '@material-ui/icons/Block';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Pagination from '@material-ui/lab/Pagination';
-import { CssBaseline, Typography, CircularProgress } from '@material-ui/core';
+import { CssBaseline, Typography, CircularProgress, Container } from '@material-ui/core';
 import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     },
     status_box: {
         display: 'flex',
-        fontSize: theme.spacing(3),
+        justifyContent: 'center'
     },
     logout: {
         marginTop: theme.spacing(20),
@@ -70,9 +70,19 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'none',
         fontSize: 18
     },
-    paper:{
-        height: 180,
-        width: 180
+    paper: {
+        height: 170,
+        width: 180,
+        padding: theme.spacing(1)
+    },
+    paper_title: {
+        fontSize: 20
+    },
+    paper_content: {
+        paddingTop: 20,
+        textAlign: 'center',
+        color: '#18bc9c',
+        fontSize: 50,
     }
 }));
 
@@ -88,6 +98,10 @@ function Home() {
     const theme = useTheme();
     let zone_id = 0;
 
+    const [users, setUsers] = useState();
+    const [groups, setGroups] = useState();
+    const [rescs, setRescs] = useState();
+
     useEffect(() => {
         const result = axios({
             method: 'POST',
@@ -100,8 +114,59 @@ function Home() {
             console.log(res);
             setReport(res.data.zones);
             Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
-        })
+        });
+        const userResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                query_string: "SELECT USER_NAME",
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            setUsers(res.data.total);
+        });
     }, [isAuthenticated]);
+
+    useEffect(() => {
+        const groupResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            setGroups(res.data.total);
+        });
+    },[users])
+
+    useEffect(() => {
+        const groupResult = axios({
+            method: 'GET',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            headers: {
+                'Authorization': token
+            },
+            params: {
+                query_string: "SELECT RESC_NAME",
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            setRescs(res.data.total);
+        });
+    },[groups])
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -158,14 +223,39 @@ function Home() {
         <div>
             {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>
-                    <Grid item xs={12} md={8} lg={9}>
-                        <Paper className={classes.paper}>
-                            <div>
-                                <Typography>Number of Server</Typography>
-                                <Typography>{zone_reports.length}</Typography>
-                            </div>
-                        </Paper>
-                    </Grid>
+                    <Container className={classes.status_box}>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Servers Running</Typography>
+                                <Typography className={classes.paper_content}>{zone_reports.length}</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Status</Typography>
+                                <Typography className={classes.paper_content}>OK</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Users</Typography>
+                                <Typography className={classes.paper_content}>{users}</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Groups</Typography>
+                                <Typography className={classes.paper_content}>{groups}</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Resources</Typography>
+                                <Typography className={classes.paper_content}>{rescs}</Typography>
+                            </Paper>
+                        </Grid>
+                    </Container>
+                    <br />
                     <Pagination count={1} /><br />{zone_reports.length > 0 ? zone_reports.map(zone_report =>
                         <Card className={classes.server_card} id={zone_id}>
                             <CardHeader
@@ -233,7 +323,7 @@ function Home() {
                             </Collapse>
                         </Card>
                     ) : <div><CircularProgress /> Loading...</div>}</div></main>
-
+                <footer>iRODS Consortium</footer>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
             }
         </div >
