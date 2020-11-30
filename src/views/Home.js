@@ -98,6 +98,8 @@ function Home() {
     const theme = useTheme();
     let zone_id = 0;
 
+    const [servers, setServers] = useState();
+    const [status, setStatus] = useState()
     const [users, setUsers] = useState();
     const [groups, setGroups] = useState();
     const [rescs, setRescs] = useState();
@@ -113,6 +115,8 @@ function Home() {
         }).then(res => {
             console.log(res);
             setReport(res.data.zones);
+            setServers(res.data.zones.length);
+            setStatus("OK");
             Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
         });
         const userResult = axios({
@@ -227,13 +231,13 @@ function Home() {
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Servers Running</Typography>
-                                <Typography className={classes.paper_content}>{zone_reports.length}</Typography>
+                                <Typography className={classes.paper_content}>{servers}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
-                                <Typography className={classes.paper_title}>Status</Typography>
-                                <Typography className={classes.paper_content}>OK</Typography>
+                                <Typography className={classes.paper_title}>Zone Status</Typography>
+                                <Typography className={classes.paper_content}>{status}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
