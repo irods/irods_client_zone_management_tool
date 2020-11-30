@@ -7,7 +7,7 @@ import Appbar from '../components/Appbar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Sidebar from '../components/Sidebar';
-import { FormControl, Select, TextField, Typography } from '@material-ui/core';
+import { FormControl, InputLabel, Select, TextField, Typography } from '@material-ui/core';
 
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
@@ -83,18 +83,32 @@ function EditResource(props) {
     }, [isAuthenticated])
 
     async function updateResc() {
-        if (rescInfo !== currentResc[5]) {
-            setInfoString(rescInfo);
+        let list = [];
+        if (rescType !== undefined && rescType !== currentResc[1]) {
+            list.push([setType, rescType])
         }
-        if (rescFreeSpace !== currentResc[6]){
-            setFreeSpace(rescFreeSpace);
+        if (rescVaultPath !== undefined && rescVaultPath !== currentResc[3]) {
+            list.push([setVaultPath, rescVaultPath])
         }
-        if (rescVaultPath !== currentResc[3]){
-            setVaultPath(rescVaultPath);
+        if (rescLoc !== undefined && rescLoc !== currentResc[4]) {
+            list.push([setLoc, rescLoc]);
         }
-        if (rescStatus !== currentResc[8]){
-            setStatus(rescStatus);
+        if (rescInfo !== undefined && rescInfo !== currentResc[5]) {
+            list.push([setInfoString, rescInfo]);
         }
+        if (rescFreeSpace !== undefined && rescFreeSpace !== currentResc[6]) {
+            list.push([setFreeSpace, rescFreeSpace]);
+        }
+        if (rescComment !== undefined && rescComment !== currentResc[7]) {
+            list.push([setComment, rescComment]);
+        }
+        if (rescStatus !== undefined && rescStatus !== currentResc[8]) {
+            list.push([setStatus, rescStatus]);
+        }
+        if (rescContext !== undefined && rescContext !== currentResc[9]) {
+            list.push([setContext, rescContext]);
+        }
+        console.log(list);
     }
 
     async function setInfoString(info) {
@@ -111,6 +125,46 @@ function EditResource(props) {
                 arg2: currentResc[0],
                 arg3: 'info',
                 arg4: info
+            }
+        }).then(res => {
+            console.log(res);
+        })
+    }
+
+    async function setType(type) {
+        const result = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            },
+            params: {
+                action: 'modify',
+                target: 'resource',
+                arg2: currentResc[0],
+                arg3: 'type',
+                arg4: type
+            }
+        }).then(res => {
+            console.log(res);
+        })
+    }
+        
+    async function setLoc(loc) {
+        const result = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            },
+            params: {
+                action: 'modify',
+                target: 'resource',
+                arg2: currentResc[0],
+                arg3: 'host',
+                arg4: loc
             }
         }).then(res => {
             console.log(res);
@@ -177,100 +231,161 @@ function EditResource(props) {
         })
     }
 
-    return (
-            <div>
-                {isAuthenticated == true ? <div className={classes.root}>
-                    <Appbar />
-                    <Sidebar />
-                    <main className={classes.content}>
-                        <div className={classes.toolbar} />
-                        <div className={classes.main}>
-                            <Link to="/resource" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
-                        Edit Resource: {currentRescBasics[0]}
-                            <br />
-                            <Box className={classes.box} display="flex" flexDirection="column" borderColor="grey.500" border={1}>
-                            <div>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Type</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={currentRescBasics[1]}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Hostname</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={currentRescBasics[4]}
-                                            onChange={(event) => { setRescLoc(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                </div>
-                                <div>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Vault Path</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={decodeURIComponent(currentRescBasics[3])}
-                                            onChange={(event) => { setRescPath(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Information</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={decodeURIComponent(currentRescBasics[5])}
-                                            onChange={(event) => { setRescInfo(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                </div>
-                                <div>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Freespace</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={currentRescBasics[6]}
-                                            onChange={(event) => { setRescFreeSpace(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Comment</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={currentRescBasics[7]}
-                                            onChange={(event) => { setRescComment(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                </div>
-                                <div>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Status</Typography>
-                                        <Select
-                                            native
-                                            defaultValue={currentRescBasics[8]}
-                                            onChange={(event) => { setRescStatus(event.target.value) }}
-                                        >
-                                            <option value="" selected disabled></option>
-                                            <option value="up">Up</option>
-                                            <option value="down">Down</option>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl className={classes.form_control}>
-                                        <Typography>Resource Context</Typography>
-                                        <TextField
-                                            native
-                                            defaultValue={currentRescBasics[9]}
-                                            onChange={(event) => { setRescContext(event.target.value) }}
-                                        />
-                                    </FormControl>
-                                </div>
-                                <div><Button color="primary" onClick={updateResc}>Save</Button><Button>Cancel</Button></div>
-                            </Box>
-                        </div>
-                    </main>
-                </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
-            </div>
-        );
+    async function setComment(comment) {
+        const result = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            },
+            params: {
+                action: 'modify',
+                target: 'resource',
+                arg2: currentResc[0],
+                arg3: 'comment',
+                arg4: comment
+            }
+        }).then(res => {
+            console.log(res);
+        })
     }
 
-    export default EditResource;
+    async function setContext(context) {
+        const result = axios({
+            method: 'POST',
+            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            },
+            params: {
+                action: 'modify',
+                target: 'resource',
+                arg2: currentResc[0],
+                arg3: 'context',
+                arg4: context
+            }
+        }).then(res => {
+            console.log(res);
+        })
+    }
+
+    return (
+        <div>
+            {isAuthenticated == true ? <div className={classes.root}>
+                <Appbar />
+                <Sidebar />
+                <main className={classes.content}>
+                    <div className={classes.toolbar} />
+                    <div className={classes.main}>
+                        <Link to="/resource" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
+                        Edit Resource: {currentRescBasics[0]}
+                        <br />
+                        <Box className={classes.box} display="flex" flexDirection="column" borderColor="grey.500" border={1}>
+                            <div>
+                                <FormControl className={classes.form_control}>
+                                <InputLabel htmlFor="user-type-select">Type</InputLabel>
+                                    <Select
+                                        native
+                                        id="zone-type-select"
+                                        defaultValue={currentRescBasics[1]}
+                                        onChange={(event) => {setRescType(event.target.value)}}
+                                    >
+                                        <option aria-label="None" value="" />
+                                        <option value="compound">Compound</option>
+                                        <option value="load_balance">Load Balance</option>
+                                        <option value="passthru">Passthru</option>
+                                        <option value="random">Random</option>
+                                        <option value="replication">Replication</option>
+                                        <option value="round_robin">Round Robin</option>
+                                        <option value="deferred">Deferred</option>
+                                        <option value="emc_ecs">EMC ECS</option>
+                                        <option value="emc_isilon">EMC Isilon</option>
+                                        <option value="mockarchive">Mockarchive</option>
+                                        <option value="mso">MSO</option>
+                                        <option value="mssofile">MSSOFile</option>
+                                        <option value="non_blocking">Non-blocking</option>
+                                        <option value="struct_file">Struct file</option>
+                                        <option value="universal_mass_storage">Universal Mass Storage</option>
+                                        <option value="unixfilesystem">Unix File System</option>
+                                        <option value="wos">WOS</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Hostname</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={currentRescBasics[4]}
+                                        onChange={(event) => { setRescLoc(event.target.value) }}
+                                    />
+                                </FormControl>
+                            </div>
+                            <div>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Vault Path</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={decodeURIComponent(currentRescBasics[3])}
+                                        onChange={(event) => { setRescPath(event.target.value) }}
+                                    />
+                                </FormControl>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Information</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={decodeURIComponent(currentRescBasics[5])}
+                                        onChange={(event) => { setRescInfo(event.target.value) }}
+                                    />
+                                </FormControl>
+                            </div>
+                            <div>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Freespace</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={currentRescBasics[6]}
+                                        onChange={(event) => { setRescFreeSpace(event.target.value) }}
+                                    />
+                                </FormControl>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Comment</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={currentRescBasics[7]}
+                                        onChange={(event) => { setRescComment(event.target.value) }}
+                                    />
+                                </FormControl>
+                            </div>
+                            <div>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Status</Typography>
+                                    <Select
+                                        native
+                                        defaultValue={currentRescBasics[8]}
+                                        onChange={(event) => { setRescStatus(event.target.value) }}
+                                    >
+                                        <option value="" selected disabled></option>
+                                        <option value="up">Up</option>
+                                        <option value="down">Down</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl className={classes.form_control}>
+                                    <Typography>Resource Context</Typography>
+                                    <TextField
+                                        native
+                                        defaultValue={currentRescBasics[9]}
+                                        onChange={(event) => { setRescContext(event.target.value) }}
+                                    />
+                                </FormControl>
+                            </div>
+                            <div><Button color="primary" onClick={updateResc}>Save</Button><Button>Cancel</Button></div>
+                        </Box>
+                    </div>
+                </main>
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+        </div>
+    );
+}
+
+export default EditResource;
