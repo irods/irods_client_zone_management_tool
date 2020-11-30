@@ -126,7 +126,7 @@ function Home() {
                 'Authorization': token
             },
             params: {
-                query_string: "SELECT USER_NAME",
+                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
@@ -230,7 +230,7 @@ function Home() {
                     <Container className={classes.status_box}>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
-                                <Typography className={classes.paper_title}>Servers Running</Typography>
+                                <Typography className={classes.paper_title}>Servers</Typography>
                                 <Typography className={classes.paper_content}>{servers}</Typography>
                             </Paper>
                         </Grid>
