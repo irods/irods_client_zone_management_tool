@@ -38,10 +38,14 @@ const useStyles = makeStyles((theme) => ({
     },
     box: {
         padding: theme.spacing(2),
-        width: '40%'
+        width: '70%'
     },
     form_control: {
+        width: 250,
         margin: theme.spacing(2)
+    },
+    save_button: {
+        marginTop: 50
     }
 }));
 
@@ -108,10 +112,12 @@ function EditResource(props) {
         if (rescContext !== undefined && rescContext !== currentResc[9]) {
             list.push([setContext, rescContext]);
         }
-        console.log(list);
+        for (const handler of list) {
+            await setInfoString(handler[1]);
+        }
     }
 
-    async function setInfoString(info) {
+    function setInfoString(info) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -131,7 +137,7 @@ function EditResource(props) {
         })
     }
 
-    async function setType(type) {
+    function setType(type) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -150,8 +156,8 @@ function EditResource(props) {
             console.log(res);
         })
     }
-        
-    async function setLoc(loc) {
+
+    function setLoc(loc) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -171,7 +177,7 @@ function EditResource(props) {
         })
     }
 
-    async function setFreeSpace(free_space) {
+    function setFreeSpace(free_space) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -191,7 +197,7 @@ function EditResource(props) {
         })
     }
 
-    async function setVaultPath(path) {
+    function setVaultPath(path) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -211,7 +217,7 @@ function EditResource(props) {
         })
     }
 
-    async function setStatus(status) {
+    function setStatus(status) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -231,7 +237,7 @@ function EditResource(props) {
         })
     }
 
-    async function setComment(comment) {
+    function setComment(comment) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -251,7 +257,7 @@ function EditResource(props) {
         })
     }
 
-    async function setContext(context) {
+    function setContext(context) {
         const result = axios({
             method: 'POST',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
@@ -283,14 +289,14 @@ function EditResource(props) {
                         Edit Resource: {currentRescBasics[0]}
                         <br />
                         <Box className={classes.box} display="flex" flexDirection="column" borderColor="grey.500" border={1}>
-                            <div>
-                                <FormControl className={classes.form_control}>
-                                <InputLabel htmlFor="user-type-select">Type</InputLabel>
+                            <div className={classes.root}>
+                                <div className={classes.form_control}>
+                                    <InputLabel htmlFor="user-type-select">Type</InputLabel>
                                     <Select
                                         native
-                                        id="zone-type-select"
+                                        id="resc-type-select"
                                         defaultValue={currentRescBasics[1]}
-                                        onChange={(event) => {setRescType(event.target.value)}}
+                                        onChange={(event) => { setRescType(event.target.value) }}
                                     >
                                         <option aria-label="None" value="" />
                                         <option value="compound">Compound</option>
@@ -311,57 +317,13 @@ function EditResource(props) {
                                         <option value="unixfilesystem">Unix File System</option>
                                         <option value="wos">WOS</option>
                                     </Select>
-                                </FormControl>
-                                <FormControl className={classes.form_control}>
-                                    <Typography>Resource Hostname</Typography>
-                                    <TextField
-                                        native
-                                        defaultValue={currentRescBasics[4]}
-                                        onChange={(event) => { setRescLoc(event.target.value) }}
-                                    />
-                                </FormControl>
-                            </div>
-                            <div>
-                                <FormControl className={classes.form_control}>
-                                    <Typography>Resource Vault Path</Typography>
-                                    <TextField
-                                        native
-                                        defaultValue={decodeURIComponent(currentRescBasics[3])}
-                                        onChange={(event) => { setRescPath(event.target.value) }}
-                                    />
-                                </FormControl>
-                                <FormControl className={classes.form_control}>
-                                    <Typography>Resource Information</Typography>
-                                    <TextField
-                                        native
-                                        defaultValue={decodeURIComponent(currentRescBasics[5])}
-                                        onChange={(event) => { setRescInfo(event.target.value) }}
-                                    />
-                                </FormControl>
-                            </div>
-                            <div>
-                                <FormControl className={classes.form_control}>
-                                    <Typography>Resource Freespace</Typography>
-                                    <TextField
-                                        native
-                                        defaultValue={currentRescBasics[6]}
-                                        onChange={(event) => { setRescFreeSpace(event.target.value) }}
-                                    />
-                                </FormControl>
-                                <FormControl className={classes.form_control}>
-                                    <Typography>Resource Comment</Typography>
-                                    <TextField
-                                        native
-                                        defaultValue={currentRescBasics[7]}
-                                        onChange={(event) => { setRescComment(event.target.value) }}
-                                    />
-                                </FormControl>
-                            </div>
-                            <div>
-                                <FormControl className={classes.form_control}>
+                                    {rescType !== undefined && rescType !== currentRescBasics[1] ? <span><Button color="primary" onClick={() => { setType(rescType); }}>Save</Button><Button color="secondary" onClick={() => { setRescType(currentRescBasics[1]); document.getElementById('resc-type-select').value = currentRescBasics[1]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                                <div className={classes.form_control}>
                                     <Typography>Resource Status</Typography>
                                     <Select
                                         native
+                                        id="resc-status-select"
                                         defaultValue={currentRescBasics[8]}
                                         onChange={(event) => { setRescStatus(event.target.value) }}
                                     >
@@ -369,22 +331,88 @@ function EditResource(props) {
                                         <option value="up">Up</option>
                                         <option value="down">Down</option>
                                     </Select>
-                                </FormControl>
-                                <FormControl className={classes.form_control}>
+                                    {rescStatus !== undefined && rescStatus !== currentRescBasics[8] ? <span><Button color="primary" onClick={() => { setStatus(rescStatus); }}>Save</Button><Button color="secondary" onClick={() => { setRescStatus(currentRescBasics[8]); document.getElementById('resc-status-select').value = currentRescBasics[8]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                            </div>
+                            <div className={classes.root}>
+                                <div className={classes.form_control}>
+                                    <Typography>Resource Hostname</Typography>
+                                    <TextField
+                                        native
+                                        variant="outlined"
+                                        id="resc-loc-textfield"
+                                        defaultValue={currentRescBasics[4]}
+                                        onChange={(event) => { setRescLoc(event.target.value) }}
+                                    />
+                                    {rescLoc !== undefined && rescLoc !== currentRescBasics[4] ? <span><Button color="primary" onClick={() => { setLoc(rescLoc); }}>Save</Button><Button color="secondary" onClick={() => { setRescLoc(currentRescBasics[4]); document.getElementById('resc-loc-textfield').value = currentRescBasics[4]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                                <div className={classes.form_control}>
+                                    <Typography>Resource Vault Path</Typography>
+                                    <TextField
+                                        native
+                                        variant="outlined"
+                                        id="resc-path-textfield"
+                                        defaultValue={decodeURIComponent(currentRescBasics[3])}
+                                        onChange={(event) => { setRescPath(event.target.value) }}
+                                    />
+                                    {rescVaultPath !== undefined && rescVaultPath !== currentRescBasics[3] ? <span><Button color="primary" onClick={() => { setRescPath(rescVaultPath); }}>Save</Button><Button color="secondary" onClick={() => { setRescStatus(currentRescBasics[3]); document.getElementById('resc-path-textfield').value = currentRescBasics[3]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                            </div>
+                            <div>
+                                <div className={classes.form_control}>
+                                    <Typography>Resource Information</Typography>
+                                    <TextField
+                                        native
+                                        variant="outlined"
+                                        id="resc-info-textfield"
+                                        defaultValue={decodeURIComponent(currentRescBasics[5])}
+                                        onChange={(event) => { setRescInfo(event.target.value) }}
+                                    />
+                                    {rescInfo !== undefined && rescInfo !== currentRescBasics[5] ? <span><Button color="primary" onClick={() => { setInfoString(rescInfo); }}>Save</Button><Button color="secondary" onClick={() => { setRescInfo(currentRescBasics[5]); document.getElementById('resc-info-textfield').value = currentRescBasics[5]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                                <div className={classes.form_control}>
+                                    <Typography>Resource Freespace</Typography>
+                                    <TextField
+                                        native
+                                        variant="outlined"
+                                        id="resc-freespace-textfield"
+                                        defaultValue={currentRescBasics[6]}
+                                        onChange={(event) => { setRescFreeSpace(event.target.value) }}
+                                    />
+                                    {rescFreeSpace !== undefined && rescFreeSpace !== currentRescBasics[6] ? <span><Button color="primary" onClick={() => { setFreeSpace(rescFreeSpace); }}>Save</Button><Button color="secondary" onClick={() => { setFreeSpace(currentRescBasics[6]); document.getElementById('resc-freespace-textfield').value = currentRescBasics[6]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                            </div>
+                            <div>
+                                <div className={classes.form_control}>
+                                    <Typography>Resource Comment</Typography>
+                                    <TextField
+                                        native
+                                        variant="outlined"
+                                        id="resc-comment-textfield"
+                                        defaultValue={currentRescBasics[7]}
+                                        onChange={(event) => { setRescComment(event.target.value) }}
+                                    />
+                                    {rescComment !== undefined && rescComment !== currentRescBasics[7] ? <span><Button color="primary" onClick={() => { setRescComment(rescComment); }}>Save</Button><Button color="secondary" onClick={() => { setComment(currentRescBasics[7]); document.getElementById('resc-comment-textfield').value = currentRescBasics[7]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                </div>
+                                <div className={classes.form_control}>
                                     <Typography>Resource Context</Typography>
                                     <TextField
                                         native
+                                        variant="outlined"
+                                        id="resc-context-textfield"
                                         defaultValue={currentRescBasics[9]}
                                         onChange={(event) => { setRescContext(event.target.value) }}
                                     />
-                                </FormControl>
+                                    {rescContext !== undefined && rescContext !== currentRescBasics[9] ? <span><Button color="primary" onClick={() => { setContext(rescContext); }}>Save</Button><Button color="secondary" onClick={() => { setContext(currentRescBasics[9]); document.getElementById('resc-context-textfield').value = currentRescBasics[9]; }}>Reset</Button></span> : <span className={classes.span}></span>}                              
+                                </div>
                             </div>
                             <div><Button color="primary" onClick={updateResc}>Save</Button><Button>Cancel</Button></div>
                         </Box>
                     </div>
                 </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
-        </div>
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
+            }
+        </div >
     );
 }
 
