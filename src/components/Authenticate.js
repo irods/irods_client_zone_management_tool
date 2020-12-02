@@ -89,7 +89,7 @@ function Authenticate() {
             <div className={classes.mainForm}>
                 <img className={classes.logo} src={logo}></img>
                 <br />
-                <Typography component="h4" variant="h5">Client Zone Management Tool</Typography>
+                <Typography component="h4" variant="h5">Zone Management Tool</Typography>
                 <TextField
                     variant="outlined"
                     margin="normal"

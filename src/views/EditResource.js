@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import BlockIcon from '@material-ui/icons/Block';
@@ -133,6 +134,8 @@ function EditResource(props) {
                 arg4: info
             }
         }).then(res => {
+            alert("Resource information updated.");
+            <Redirect to="http://localhost:3000/resource" push={true} />;
             console.log(res);
         })
     }
@@ -153,6 +156,7 @@ function EditResource(props) {
                 arg4: type
             }
         }).then(res => {
+            alert("Resource type updated.");
             console.log(res);
         })
     }
@@ -193,6 +197,7 @@ function EditResource(props) {
                 arg4: free_space
             }
         }).then(res => {
+            alert("Resource Freespace updated.");
             console.log(res);
         })
     }
@@ -213,6 +218,7 @@ function EditResource(props) {
                 arg4: path
             }
         }).then(res => {
+            alert("Resource Vault Path updated.");
             console.log(res);
         })
     }
@@ -233,6 +239,7 @@ function EditResource(props) {
                 arg4: status
             }
         }).then(res => {
+            alert("Resource status updated.");
             console.log(res);
         })
     }
@@ -253,6 +260,7 @@ function EditResource(props) {
                 arg4: comment
             }
         }).then(res => {
+            alert("Resource comment updated.");
             console.log(res);
         })
     }
@@ -273,6 +281,7 @@ function EditResource(props) {
                 arg4: context
             }
         }).then(res => {
+            alert("Resource context updated.");
             console.log(res);
         })
     }
@@ -355,7 +364,7 @@ function EditResource(props) {
                                         defaultValue={decodeURIComponent(currentRescBasics[3])}
                                         onChange={(event) => { setRescPath(event.target.value) }}
                                     />
-                                    {rescVaultPath !== undefined && rescVaultPath !== currentRescBasics[3] ? <span><Button color="primary" onClick={() => { setRescPath(rescVaultPath); }}>Save</Button><Button color="secondary" onClick={() => { setRescStatus(currentRescBasics[3]); document.getElementById('resc-path-textfield').value = currentRescBasics[3]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                    {rescVaultPath !== undefined && rescVaultPath !== currentRescBasics[3] ? <span><Button color="primary" onClick={() => { setVaultPath(rescVaultPath); }}>Save</Button><Button color="secondary" onClick={() => { setRescPath(currentRescBasics[3]); document.getElementById('resc-path-textfield').value = currentRescBasics[3]; }}>Reset</Button></span> : <span className={classes.span}></span>}
                                 </div>
                             </div>
                             <div>
@@ -379,7 +388,7 @@ function EditResource(props) {
                                         defaultValue={currentRescBasics[6]}
                                         onChange={(event) => { setRescFreeSpace(event.target.value) }}
                                     />
-                                    {rescFreeSpace !== undefined && rescFreeSpace !== currentRescBasics[6] ? <span><Button color="primary" onClick={() => { setFreeSpace(rescFreeSpace); }}>Save</Button><Button color="secondary" onClick={() => { setFreeSpace(currentRescBasics[6]); document.getElementById('resc-freespace-textfield').value = currentRescBasics[6]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                    {rescFreeSpace !== undefined && rescFreeSpace !== currentRescBasics[6] ? <span><Button color="primary" onClick={() => { setFreeSpace(rescFreeSpace); }}>Save</Button><Button color="secondary" onClick={() => { setRescFreeSpace(currentRescBasics[6]); document.getElementById('resc-freespace-textfield').value = currentRescBasics[6]; }}>Reset</Button></span> : <span className={classes.span}></span>}
                                 </div>
                             </div>
                             <div>
@@ -392,7 +401,7 @@ function EditResource(props) {
                                         defaultValue={currentRescBasics[7]}
                                         onChange={(event) => { setRescComment(event.target.value) }}
                                     />
-                                    {rescComment !== undefined && rescComment !== currentRescBasics[7] ? <span><Button color="primary" onClick={() => { setRescComment(rescComment); }}>Save</Button><Button color="secondary" onClick={() => { setComment(currentRescBasics[7]); document.getElementById('resc-comment-textfield').value = currentRescBasics[7]; }}>Reset</Button></span> : <span className={classes.span}></span>}
+                                    {rescComment !== undefined && rescComment !== currentRescBasics[7] ? <span><Button color="primary" onClick={() => { setComment(rescComment); }}>Save</Button><Button color="secondary" onClick={() => { setRescComment(currentRescBasics[7]); document.getElementById('resc-comment-textfield').value = currentRescBasics[7]; }}>Reset</Button></span> : <span className={classes.span}></span>}
                                 </div>
                                 <div className={classes.form_control}>
                                     <Typography>Resource Context</Typography>
@@ -403,10 +412,9 @@ function EditResource(props) {
                                         defaultValue={currentRescBasics[9]}
                                         onChange={(event) => { setRescContext(event.target.value) }}
                                     />
-                                    {rescContext !== undefined && rescContext !== currentRescBasics[9] ? <span><Button color="primary" onClick={() => { setContext(rescContext); }}>Save</Button><Button color="secondary" onClick={() => { setContext(currentRescBasics[9]); document.getElementById('resc-context-textfield').value = currentRescBasics[9]; }}>Reset</Button></span> : <span className={classes.span}></span>}                              
+                                    {rescContext !== undefined && rescContext !== currentRescBasics[9] ? <span><Button color="primary" onClick={() => { setContext(rescContext); }}>Save</Button><Button color="secondary" onClick={() => { setRescComment(currentRescBasics[9]); document.getElementById('resc-context-textfield').value = currentRescBasics[9]; }}>Reset</Button></span> : <span className={classes.span}></span>}                              
                                 </div>
                             </div>
-                            <div><Button color="primary" onClick={updateResc}>Save</Button><Button>Cancel</Button></div>
                         </Box>
                     </div>
                 </main>
