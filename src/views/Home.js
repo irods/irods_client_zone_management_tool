@@ -289,7 +289,6 @@ function Home() {
                                             <Tab className={classes.tab} label="Host" {...a11yProps(0)} />
                                             <Tab className={classes.tab} label="Service" {...a11yProps(1)} />
                                             <Tab className={classes.tab} label="Plugin" {...a11yProps(2)} />
-                                            <Tab className={classes.tab} label="Resource" {...a11yProps(3)} />
                                         </Tabs>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={0}>
                                             <Typography className={classes.info}>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
@@ -313,14 +312,7 @@ function Home() {
                                         </TabPanel>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
                                             <Typography className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
-                                            <Typography className={classes.info}>{curr_zone['plugins']['0']['name']}</Typography>
-                                        </TabPanel>
-                                        <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
-                                            <Typography className={classes.info}>Hostname: {curr_zone['resources'][0]['host_name']}</Typography>
-                                            <Typography className={classes.info}>Name: {curr_zone['resources'][0]['name']}</Typography>
-                                            <Typography className={classes.info}>Status: {curr_zone['resources'][0]['status']}</Typography>
-                                            <Typography className={classes.info}>Type: {curr_zone['resources'][0]['type']}</Typography>
-                                            <Typography className={classes.info}>Vault Path: {curr_zone['resources'][0]['vault_path']}</Typography>
+                                            {/* <Typography className={classes.info}>{curr_zone['plugins']['0']['name']}</Typography> */}
                                         </TabPanel>
                                     </DialogContent>
                                 </Dialog> : <span />}

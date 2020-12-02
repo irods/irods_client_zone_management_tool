@@ -34,7 +34,7 @@ function Appbar() {
             <AppBar position="fixed" className={classes.appBar}>
                 <Toolbar>
                     <Typography variant="h6" noWrap>
-                        iRODS Client Zone Management Tool
+                        iRODS Zone Management Tool
           </Typography>
                     <Typography className={classes.rightToolbar} variant="h6" noWrap>
                         Welcome, {Cookies.get('username')}!

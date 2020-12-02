@@ -237,6 +237,7 @@ function Resource() {
                                         <TableCell><b>Resource Name</b></TableCell>
                                         <TableCell align="right"><b>Type</b></TableCell>
                                         <TableCell align="right"><b>Zone</b></TableCell>
+                                        <TableCell align="right"><b>Status</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -305,7 +306,7 @@ function Resource() {
                                     <TextField
                                         native
                                         id="location"
-                                        label="Location"
+                                        label="Vault Path"
                                         onChange={handleRescLocationChange}
                                     />
                                 </FormControl>

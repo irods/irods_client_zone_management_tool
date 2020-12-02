@@ -67,9 +67,6 @@ function Sidebar() {
                     <ListItem button component={Link} to="/resource" key='resource'>
                         <ListItemText primary='Resources' />
                     </ListItem>
-                    <ListItem button component={Link} to="/session" key='current_session'>
-                        <ListItemText primary='Current Session' />
-                    </ListItem>
                 </List>
                 <Divider />
                 <List>
