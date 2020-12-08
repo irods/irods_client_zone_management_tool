@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Collapse from '@material-ui/core/Collapse';
+import TextField from '@material-ui/core/TextField';
+import Input from '@material-ui/core/Input';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+
+import ResourceController from '../controllers/ResourceController';
 
 import { makeStyles, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
 
@@ -15,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   link_button: {
     textDecoration: 'none'
   },
-  row :{
+  row: {
     paddingTop: 10
   }
 }));
@@ -23,9 +30,14 @@ const useStyles = makeStyles((theme) => ({
 function Rows(props) {
   const { row } = props;
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [isEditing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  return(
+  const editResource = props => {
+    setEditing(true);
+  }
+
+  return (
     <React.Fragment >
       <TableRow>
         <TableCell align="left">{row[0]}</TableCell>
@@ -44,7 +56,7 @@ function Rows(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Typography className={classes.row} variant="h6" gutterBottom component="div">
-            Resource Details
+              Resource Details
                 </Typography>
             <Table size="small" aria-label="purchases">
               <TableBody>
@@ -58,7 +70,7 @@ function Rows(props) {
                 </TableRow>
                 <TableRow>
                   <TableCell>Comment: {row[7]}</TableCell>
-                  <TableCell>Context: {row[9]}</TableCell>
+                  <TableCell>{isEditing ? <span>Context: <Input defaultValue={row[9]}></Input></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small"><ToggleButton onClick={editResource}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
