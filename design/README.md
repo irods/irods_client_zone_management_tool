@@ -30,7 +30,7 @@
  - physical - just a table view - grouped by server?
  - /resource/create
  - /resource/remove
-    when things in it(show the error code)
+   - show error if resource was not empty
  - /resource/update
    - name, type, host, path, status, comment, info, free_space, context_string
  - /resource/rebalance
