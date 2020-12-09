@@ -16,7 +16,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
-import ResourceController from '../controllers/ResourceController';
+import { ResourceController } from '../controllers/ResourceController';
 
 import { makeStyles, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
 
@@ -41,8 +41,12 @@ function Rows(props) {
   const [isEditing, setEditing] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const editResource = props => {
-    setEditing(true);
+  const [context, setContext] = useState(row[9]);
+
+  const editResource = async (name, arg, value) => {
+
+    const result = await ResourceController(name, arg, value);
+    console.log(result);
   }
 
   return (
@@ -78,7 +82,7 @@ function Rows(props) {
                 </TableRow>
                 <TableRow>
                   <TableCell>Comment: {row[7]}</TableCell>
-                  <TableCell className={classes.table_cell}>{isEditing ? <span>Context: <input style={{ fontSize: 15}} defaultValue={row[9]}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton><SaveIcon style={{ fontSize: 15 }}/></ToggleButton><ToggleButton onClick={() => {setEditing(false)}}><CancelIcon style={{ fontSize: 15 }}/></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={editResource}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditing ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditing(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditing(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
