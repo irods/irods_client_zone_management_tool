@@ -89,6 +89,9 @@ function Resource() {
     const [rescZone, setRescZone] = useState();
     let resc_id = 0;
 
+    const [order, setOrder] = useState("asc");
+    const [orderBy, setOrderBy] = useState(0);
+
     useEffect(() => {
         const rescResult = axios({
             method: 'GET',
@@ -127,8 +130,24 @@ function Resource() {
     }, [isLoading])
 
     useEffect(() => {
+        const sortedArray = [...resc];
+        sortedArray.sort(getComparator(order, orderBy));
+        setResc(sortedArray);
+    }, [order, orderBy])
 
-    }, [])
+    function descendingComparator(a, b, orderBy) {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    function getComparator(order, orderBy) {
+        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+    }
 
     async function addResource() {
         setLoading(true);
@@ -218,8 +237,10 @@ function Resource() {
         setRescZone(event.target.value);
     }
 
-    const handleZoneInfoCollapse = event => {
-
+    const handleSort = props => {
+        const isAsc = orderBy === props && order == 'desc';
+        setOrder(isAsc ? 'asc' : 'desc');
+        setOrderBy(props);
     }
 
 
@@ -237,15 +258,15 @@ function Resource() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell key="0"><TableSortLabel active="true" direction="dec" /><b>Resource Name</b></TableCell>
-                                        <TableCell key="1" align="right"><TableSortLabel direction="asc" /><b>Type</b></TableCell>
-                                        <TableCell key="3" align="right"><TableSortLabel direction="asc" /><b>Zone</b></TableCell>
-                                        <TableCell key="8" align="right"><TableSortLabel direction="asc" /><b>Status</b></TableCell>
+                                        <TableCell key="0"><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /><b>Resource Name</b></TableCell>
+                                        <TableCell key="1" align="right"><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /><b>Type</b></TableCell>
+                                        <TableCell key="3" align="right"><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /><b>Zone</b></TableCell>
+                                        <TableCell key="8" align="right"><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /><b>Status</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen = {handleRemoveFormOpen} />)}
+                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                                 </TableBody>
                             </Table>
                         </TableContainer>
