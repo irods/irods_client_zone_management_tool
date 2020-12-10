@@ -15,7 +15,7 @@ import { makeStyles } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Collapse, IconButton } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 
 
 import Rows from '../components/Rows';
@@ -105,7 +105,6 @@ function Resource() {
             }
         }).then(res => {
             const sortedArray = [...res.data._embedded];
-            sortedArray.sort();
             setResc(sortedArray);
         });
 
@@ -126,6 +125,10 @@ function Resource() {
             setZone(res.data._embedded);
         })
     }, [isLoading])
+
+    useEffect(() => {
+
+    }, [])
 
     async function addResource() {
         setLoading(true);
@@ -234,23 +237,15 @@ function Resource() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell><b>Resource Name</b></TableCell>
-                                        <TableCell align="right"><b>Type</b></TableCell>
-                                        <TableCell align="right"><b>Zone</b></TableCell>
-                                        <TableCell align="right"><b>Status</b></TableCell>
+                                        <TableCell key="0"><TableSortLabel active="true" direction="dec" /><b>Resource Name</b></TableCell>
+                                        <TableCell key="1" align="right"><TableSortLabel direction="asc" /><b>Type</b></TableCell>
+                                        <TableCell key="3" align="right"><TableSortLabel direction="asc" /><b>Zone</b></TableCell>
+                                        <TableCell key="8" align="right"><TableSortLabel direction="asc" /><b>Status</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen = {handleRemoveFormOpen} />)}
-                                    {/* {resc.map(this_resc =>
-                                        <TableRow key={resc_id}>
-                                            <TableCell component="th" scope="row">{this_resc[0]}</TableCell>
-                                            <TableCell align="right">{this_resc[1]}</TableCell>
-                                            <TableCell align="right">{this_resc[2]}</TableCell>
-                                            <TableCell align="right"><Button id={resc_id++}>Info</Button><Button color="secondary" onClick={() => { handleRemoveFormOpen(this_resc) }}>Remove</Button></TableCell>
-                                        </TableRow>
-                                    )} */}
                                 </TableBody>
                             </Table>
                         </TableContainer>
