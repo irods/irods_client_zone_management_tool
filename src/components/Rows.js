@@ -77,7 +77,7 @@ function Rows(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Typography className={classes.row} variant="h6" gutterBottom component="div">
-              Resource Details
+              Resource Details ({row[0]})
                 </Typography>
             <Table size="small" aria-label="purchases">
               <TableBody>
@@ -86,8 +86,8 @@ function Rows(props) {
                   <TableCell>Hostname: {row[4]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell>Information: {row[5]}</TableCell>
-                  <TableCell>Freespace: {row[6]}</TableCell>
+                <TableCell className={classes.table_cell}>{isEditingInformation ? <span>Information: <input style={{ fontSize: 15 }} defaultValue={row[5]} onChange={(event) => { setInformation(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'information', information) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingInformation(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Information: {row[5]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingInformation(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                <TableCell className={classes.table_cell}>{isEditingFreespace ? <span>Freespace: <input style={{ fontSize: 15 }} defaultValue={row[6]} onChange={(event) => { setFreespace(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'freespace', freespace) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingFreespace(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Freespace: {row[6]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingFreespace(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className={classes.table_cell}>{isEditingComment ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingComment(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingComment(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
