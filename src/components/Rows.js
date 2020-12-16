@@ -87,7 +87,7 @@ function Rows(props) {
       setEditResult("Success");
       setTimeout(() => {
         window.location.reload();
-      }, 1000)
+      }, 700)
     } catch (e) {
       setEditResult("Failed");
     }
@@ -147,8 +147,8 @@ function Rows(props) {
         <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={() => setRemoveForm(false)}>Cancel</Button></DialogActions>
       </Dialog>
       <Dialog open={editFormOpen} onClose={() => { setEditForm(false) }} aria-labelledby="form-dialog-title">
-        <DialogContent className={classes.dialog_content}>Modify Resource Progress</DialogContent>
-        <DialogContent className={classes.dialog_contenttext}>{editStatus}...{editResult}</DialogContent>
+        <DialogContent className={classes.dialog_content}>Modify Resource</DialogContent>
+        <DialogContent className={classes.dialog_contenttext}>{editResult}</DialogContent>
         <DialogActions><Button onClick={() => setEditForm(false)}>Close</Button></DialogActions>
       </Dialog>
     </React.Fragment >
