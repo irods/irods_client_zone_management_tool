@@ -45,9 +45,12 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     color: 'red'
   },
-  dialog_contenttext:{
+  dialog_contenttext: {
     padding: theme.spacing(3),
     fontSize: 15
+  },
+  cell: {
+    fontSize: '1rem'
   }
 }));
 
@@ -102,15 +105,15 @@ function Rows(props) {
   return (
     <React.Fragment >
       <TableRow hover={true} onClick={() => setOpen(!open)}>
-        <TableCell align="left">{row[0]}</TableCell>
-        <TableCell align="left">{row[1]}</TableCell>
-        <TableCell align="left">{row[3]}</TableCell>
-        <TableCell align="left">{row[2]}</TableCell>
-        <TableCell align="right">{row[8]}</TableCell>
+        <TableCell className={classes.cell} align="left">{row[0]}</TableCell>
+        <TableCell className={classes.cell} align="left">{row[1]}</TableCell>
+        <TableCell className={classes.cell} align="left">{decodeURIComponent(row[3])}</TableCell>
+        <TableCell className={classes.cell} align="left">{row[2]}</TableCell>
+        <TableCell className={classes.cell} align="right">{row[8]}<IconButton aria-label="expand row" size="small" >
+          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </IconButton></TableCell>
         {/* <TableCell align="right">
-          <IconButton aria-label="expand row" size="small" >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          
         </TableCell> */}
       </TableRow>
       <TableRow hover={true}>

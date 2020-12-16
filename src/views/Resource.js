@@ -10,13 +10,16 @@ import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import { FormControl, InputLabel, Typography } from '@material-ui/core';
+import { FormControl, Input, InputLabel, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { StylesProvider } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import SaveIcon from '@material-ui/icons/Save';
+import CloseIcon from '@material-ui/icons/Close';
 
 import '../App.css';
 import Rows from '../components/Rows';
@@ -68,6 +71,9 @@ const useStyles = makeStyles((theme) => ({
     },
     sort_arrow: {
         opacity: 0.2
+    },
+    add_hidden: {
+        display: 'none'
     }
 }));
 
@@ -154,6 +160,7 @@ function Resource() {
     }
 
     async function addResource() {
+        setAddFormOpen(true);
         setLoading(true);
         const rescAddResult = await axios({
             method: 'POST',
@@ -182,12 +189,17 @@ function Resource() {
         })
     }
 
-    const handleAddFormOpen = () => {
-        setAddFormOpen(true);
+    const handleAddRowOpen = () => {
+        // setAddFormOpen(true);
+        document.getElementById("add_newrow").style["display"] = "contents";
     }
 
     const handleAddFormClose = () => {
         setAddFormOpen(false);
+    }
+
+    const handleAddRowClose = () => {
+        document.getElementById("add_newrow").style["display"] = "none";
     }
 
     const handleRemoveFormOpen = props => {
@@ -209,8 +221,8 @@ function Resource() {
     }
 
     const handleRescLocationChange = event => {
-        console.log(decodeURI(event.target.value));
-        setRescLocation(decodeURI(event.target.value));
+        console.log(encodeURI(event.target.value));
+        setRescLocation(encodeURI(event.target.value));
     }
     const handleRescZoneChange = event => {
         setRescZone(event.target.value);
@@ -231,22 +243,62 @@ function Resource() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>Add Resource</Button>
+                        <Button variant="outlined" color="primary" onClick={handleAddRowOpen}>Add Resource</Button>
                         <br />
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <StylesProvider injectFirst>
                                         <TableRow>
-                                            <TableCell style={{ width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                            <TableCell style={{ width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                            <TableCell style={{ width: '35%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                            <TableCell style={{ width: '15%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
-                                            <TableCell style={{ width: '10%' }} key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '35%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '10%' }} key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
                                         </TableRow>
                                     </StylesProvider>
                                 </TableHead>
                                 <TableBody>
+                                    <TableRow id="add_newrow" className={classes.add_hidden}>
+                                        <TableCell><Input id="name"
+                                            onChange={handleRescNameChange}></Input></TableCell>
+                                        <TableCell><Select
+                                            native
+                                            id="zone-type-select"
+                                            placeholder="Resource Type"
+                                            onChange={handleRescTypeChange}
+                                        >
+                                            <option aria-label="None" value="" />
+                                            <option value="compound">Compound</option>
+                                            <option value="load_balance">Load Balance</option>
+                                            <option value="passthru">Passthru</option>
+                                            <option value="random">Random</option>
+                                            <option value="replication">Replication</option>
+                                            <option value="round_robin">Round Robin</option>
+                                            <option value="deferred">Deferred</option>
+                                            <option value="emc_ecs">EMC ECS</option>
+                                            <option value="emc_isilon">EMC Isilon</option>
+                                            <option value="mockarchive">Mockarchive</option>
+                                            <option value="mso">MSO</option>
+                                            <option value="mssofile">MSSOFile</option>
+                                            <option value="non_blocking">Non-blocking</option>
+                                            <option value="struct_file">Struct file</option>
+                                            <option value="universal_mass_storage">Universal Mass Storage</option>
+                                            <option value="unixfilesystem">Unix File System</option>
+                                            <option value="wos">WOS</option>
+                                        </Select></TableCell>
+                                        <TableCell><Input id="location"
+                                            onChange={handleRescLocationChange}></Input></TableCell>
+                                        <TableCell><Select
+                                            native
+                                            id="zone"
+                                            onChange={handleRescZoneChange}
+                                        >
+                                            <option selected value="" disabled></option>
+                                            {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
+                                        </Select></TableCell>
+                                        <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    </TableRow>
                                     {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                                 </TableBody>
                             </Table>
@@ -255,66 +307,8 @@ function Resource() {
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    You can add a new resource there.
+                                    Resource Name: 
                                 </DialogContentText>
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="name"
-                                        label="Resource name"
-                                        onChange={handleRescNameChange}
-                                    />
-                                </FormControl>
-                                <br />
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="user-type-select">Type</InputLabel>
-                                    <Select
-                                        native
-                                        id="zone-type-select"
-                                        onChange={handleRescTypeChange}
-                                    >
-                                        <option aria-label="None" value="" />
-                                        <option value="compound">Compound</option>
-                                        <option value="load_balance">Load Balance</option>
-                                        <option value="passthru">Passthru</option>
-                                        <option value="random">Random</option>
-                                        <option value="replication">Replication</option>
-                                        <option value="round_robin">Round Robin</option>
-                                        <option value="deferred">Deferred</option>
-                                        <option value="emc_ecs">EMC ECS</option>
-                                        <option value="emc_isilon">EMC Isilon</option>
-                                        <option value="mockarchive">Mockarchive</option>
-                                        <option value="mso">MSO</option>
-                                        <option value="mssofile">MSSOFile</option>
-                                        <option value="non_blocking">Non-blocking</option>
-                                        <option value="struct_file">Struct file</option>
-                                        <option value="universal_mass_storage">Universal Mass Storage</option>
-                                        <option value="unixfilesystem">Unix File System</option>
-                                        <option value="wos">WOS</option>
-                                    </Select>
-                                </FormControl>
-                                <br />
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="location"
-                                        label="Vault Path"
-                                        onChange={handleRescLocationChange}
-                                    />
-                                </FormControl>
-                                <br />
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="user-type-select">Zone</InputLabel>
-                                    <Select
-                                        native
-                                        id="zone"
-                                        label="Zone Name"
-                                        onChange={handleRescZoneChange}
-                                    >
-                                        <option selected value="" disabled></option>
-                                        {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
-                                    </Select>
-                                </FormControl>
                                 {isLoading == true ? <div className={classes.progress}>Adding in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                             </DialogContent>
                             <DialogActions className={classes.dialog_action}>
