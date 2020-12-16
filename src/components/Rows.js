@@ -18,7 +18,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
 
-import { makeStyles, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -36,6 +36,13 @@ const useStyles = makeStyles((theme) => ({
   },
   remove_button: {
     float: 'right'
+  },
+  remove_content: {
+    fontSize: 18
+  },
+  remove_result: {
+    textAlign: 'center',
+    color: 'red'
   }
 }));
 
@@ -57,6 +64,9 @@ function Rows(props) {
   const [comment, setComment] = useState(row[7]);
   const [context, setContext] = useState(row[9]);
 
+  const [removeFormOpen, setRemoveForm] = useState(false);
+  const [removeStatus, setRemoveStatus] = useState();
+
   const editResource = async (name, arg, value) => {
 
     const result = await ModifyResourceController(name, arg, value);
@@ -64,8 +74,12 @@ function Rows(props) {
   }
 
   const removeResource = async (name) => {
-    const result = await RemoveResourceController(name);
-    console.log(result);
+    try {
+      const result = await RemoveResourceController(name);
+      window.location.reload();
+    }catch(e){
+      setRemoveStatus(e.response.data);
+    }
   }
 
   return (
@@ -85,7 +99,7 @@ function Rows(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Typography className={classes.row} variant="h6" gutterBottom component="div">
-              Resource Details ({row[0]}) <span className={classes.remove_button}><Button variant="outlined" color="secondary">Remove</Button></span>
+              Resource Details ({row[0]}) <span className={classes.remove_button}><Button variant="outlined" color="secondary" onClick={() => setRemoveForm(true)}>Remove</Button></span>
             </Typography>
             <Table size="small" aria-label="purchases">
               <TableBody>
@@ -106,6 +120,11 @@ function Rows(props) {
           </Collapse>
         </TableCell>
       </TableRow>
+      <Dialog open={removeFormOpen} onClose={() => { setRemoveForm(false) }} aria-labelledby="form-dialog-title">
+        <DialogContent className={classes.remove_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
+        {removeStatus !== undefined ? <DialogContentText className={classes.remove_result}>Error Code {removeStatus.error_code}: {removeStatus.error_message}</DialogContentText> : <span />}
+        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={() => setRemoveForm(false)}>Cancel</Button></DialogActions>
+      </Dialog>
     </React.Fragment >
   );
 }
