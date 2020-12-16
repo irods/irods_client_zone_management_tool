@@ -182,31 +182,6 @@ function Resource() {
         })
     }
 
-    async function removeResource() {
-        setLoading(true);
-        const rescAddResult = await axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                action: 'rm',
-                target: 'resource',
-                arg2: rescName,
-                arg3: ''
-            }
-        }).then(res => {
-            window.location.reload();
-            console.log(res);
-            setLoading(false);
-        }).catch(e => {
-            console.log(e.response);
-            setRemoveResult(`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`);
-            setLoading(false);
-        });
-    }
-
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
     }
@@ -278,7 +253,7 @@ function Resource() {
                         <Dialog open={removeFormOpen} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
                             <DialogContent className={classes.remove_content}>Are you sure to remove resource {rescName}? </DialogContent>
                             <DialogContentText className={classes.remove_result}>{removeResult}</DialogContentText>
-                            <DialogActions><Button color="secondary" onClick={removeResource}>Remove</Button><Button onClick={handleRemoveFormClose}>Cancel</Button></DialogActions>
+                            <DialogActions><Button color="secondary">Remove</Button><Button onClick={handleRemoveFormClose}>Cancel</Button></DialogActions>
                         </Dialog>
                         <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Resource</DialogTitle>
