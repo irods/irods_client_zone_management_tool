@@ -263,11 +263,10 @@ function Resource() {
                                 <TableHead>
                                     <StylesProvider injectFirst>
                                         <TableRow>
-                                            <TableCell key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                            <TableCell key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                            <TableCell key="3" align="left"><b>Zone</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                            <TableCell key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
-                                            <TableCell align="right"><b>Actions</b></TableCell>
+                                            <TableCell style={{ width: '35%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                            <TableCell style={{ width: '30%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                            <TableCell style={{ width: '25%' }} key="3" align="left"><b>Zone</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                            <TableCell style={{ width: '10%' }} key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
                                         </TableRow>
                                     </StylesProvider>
                                 </TableHead>
