@@ -101,7 +101,7 @@ function Rows(props) {
 
   return (
     <React.Fragment >
-      <TableRow onMouseOver={(event) => { console.log(event.target) }} onClick={() => setOpen(!open)}>
+      <TableRow hover={true} onClick={() => setOpen(!open)}>
         <TableCell align="left">{row[0]}</TableCell>
         <TableCell align="left">{row[1]}</TableCell>
         <TableCell align="left">{row[2]}</TableCell>
@@ -112,7 +112,7 @@ function Rows(props) {
           </IconButton>
         </TableCell> */}
       </TableRow>
-      <TableRow>
+      <TableRow hover={true}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Typography className={classes.row} variant="h6" gutterBottom component="div">
