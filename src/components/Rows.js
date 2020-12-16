@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20
   },
   table_cell: {
+    width: '50%',
     fontSize: 15
   }
 }));
@@ -38,9 +39,18 @@ const useStyles = makeStyles((theme) => ({
 function Rows(props) {
   const { row } = props;
   const classes = useStyles();
-  const [isEditing, setEditing] = useState(false);
+
+  const [isEditingVaultPath, setEditingVaultPath] = useState(false);
+  const [isEditingInformation, setEditingInformation] = useState(false);
+  const [isEditingFreespace, setEditingFreespace] = useState(false);
+  const [isEditingComment, setEditingComment] = useState(false);
+  const [isEditingContext, setEditingContext] = useState(false);
+
   const [open, setOpen] = useState(false);
 
+  const [vaultPath, setVaultPath] = useState(row[3]);
+  const [information, setInformation] = useState(row[5]);
+  const [freespace, setFreespace] = useState(row[6]);
   const [comment, setComment] = useState(row[7]);
   const [context, setContext] = useState(row[9]);
 
@@ -57,11 +67,11 @@ function Rows(props) {
         <TableCell align="left">{row[1]}</TableCell>
         <TableCell align="left">{row[2]}</TableCell>
         <TableCell align="right">{row[8]}</TableCell>
-        <TableCell align="right">
+        {/* <TableCell align="right">
           <IconButton aria-label="expand row" size="small" >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -72,7 +82,7 @@ function Rows(props) {
             <Table size="small" aria-label="purchases">
               <TableBody>
                 <TableRow>
-                  <TableCell style={{ width: '50%' }}>Vault Path: {decodeURIComponent(row[3])}</TableCell>
+                  <TableCell>Vault Path: {decodeURIComponent(row[3])}</TableCell>
                   <TableCell>Hostname: {row[4]}</TableCell>
                 </TableRow>
                 <TableRow>
@@ -80,8 +90,8 @@ function Rows(props) {
                   <TableCell>Freespace: {row[6]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.table_cell}>{isEditing ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditing(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditing(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
-                  <TableCell className={classes.table_cell}>{isEditing ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditing(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditing(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditingComment ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingComment(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingComment(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditingContext ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingContext(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingContext(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
