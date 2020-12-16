@@ -37,18 +37,27 @@ const useStyles = makeStyles((theme) => ({
   remove_button: {
     float: 'right'
   },
-  remove_content: {
-    fontSize: 18
+  dialog_content: {
+    paddingLeft: 20,
+    fontSize: 20
   },
   remove_result: {
     textAlign: 'center',
     color: 'red'
+  },
+  dialog_contenttext:{
+    padding: theme.spacing(3),
+    fontSize: 15
   }
 }));
 
 function Rows(props) {
   const { row } = props;
   const classes = useStyles();
+
+  const [editFormOpen, setEditForm] = useState(false);
+  const [editStatus, setEditStatus] = useState();
+  const [editResult, setEditResult] = useState();
 
   const [isEditingVaultPath, setEditingVaultPath] = useState(false);
   const [isEditingInformation, setEditingInformation] = useState(false);
@@ -68,23 +77,31 @@ function Rows(props) {
   const [removeStatus, setRemoveStatus] = useState();
 
   const editResource = async (name, arg, value) => {
-
-    const result = await ModifyResourceController(name, arg, value);
-    console.log(result);
+    setEditForm(true);
+    setEditStatus(`Modifying Resource ${arg} to ${value}`);
+    try {
+      const result = await ModifyResourceController(name, arg, value);
+      setEditResult("Success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000)
+    } catch (e) {
+      setEditResult("Failed");
+    }
   }
 
   const removeResource = async (name) => {
     try {
       const result = await RemoveResourceController(name);
       window.location.reload();
-    }catch(e){
+    } catch (e) {
       setRemoveStatus(e.response.data);
     }
   }
 
   return (
     <React.Fragment >
-      <TableRow onClick={() => setOpen(!open)}>
+      <TableRow onMouseOver={(event) => { console.log(event.target) }} onClick={() => setOpen(!open)}>
         <TableCell align="left">{row[0]}</TableCell>
         <TableCell align="left">{row[1]}</TableCell>
         <TableCell align="left">{row[2]}</TableCell>
@@ -121,9 +138,14 @@ function Rows(props) {
         </TableCell>
       </TableRow>
       <Dialog open={removeFormOpen} onClose={() => { setRemoveForm(false) }} aria-labelledby="form-dialog-title">
-        <DialogContent className={classes.remove_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
+        <DialogContent className={classes.dialog_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
         {removeStatus !== undefined ? <DialogContentText className={classes.remove_result}>Error Code {removeStatus.error_code}: {removeStatus.error_message}</DialogContentText> : <span />}
         <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={() => setRemoveForm(false)}>Cancel</Button></DialogActions>
+      </Dialog>
+      <Dialog open={editFormOpen} onClose={() => { setEditForm(false) }} aria-labelledby="form-dialog-title">
+        <DialogContent className={classes.dialog_content}>Modify Resource Progress</DialogContent>
+        <DialogContent className={classes.dialog_contenttext}>{editStatus}...{editResult}</DialogContent>
+        <DialogActions><Button onClick={() => setEditForm(false)}>Close</Button></DialogActions>
       </Dialog>
     </React.Fragment >
   );
