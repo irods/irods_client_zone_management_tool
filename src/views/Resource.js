@@ -250,11 +250,6 @@ function Resource() {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Dialog open={removeFormOpen} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
-                            <DialogContent className={classes.remove_content}>Are you sure to remove resource {rescName}? </DialogContent>
-                            <DialogContentText className={classes.remove_result}>{removeResult}</DialogContentText>
-                            <DialogActions><Button color="secondary">Remove</Button><Button onClick={handleRemoveFormClose}>Cancel</Button></DialogActions>
-                        </Dialog>
                         <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
