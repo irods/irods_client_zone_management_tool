@@ -52,14 +52,13 @@ function Rows(props) {
 
   return (
     <React.Fragment >
-      <TableRow>
+      <TableRow onClick={() => setOpen(!open)}>
         <TableCell align="left">{row[0]}</TableCell>
         <TableCell align="left">{row[1]}</TableCell>
         <TableCell align="left">{row[2]}</TableCell>
         <TableCell align="right">{row[8]}</TableCell>
         <TableCell align="right">
-          {/* <Button color="secondary" onClick={() => { props.handleRemoveFormOpen(row) }}>Remove</Button> */}
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+          <IconButton aria-label="expand row" size="small" >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
