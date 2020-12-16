@@ -307,13 +307,14 @@ function Resource() {
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Resource Name: 
+                                    Resource Name: {rescName}<br/>
+                                    Type: {rescType}<br/>
+                                    Vault Path: {rescLocation}<br/>
+                                    Zone: {rescZone}
                                 </DialogContentText>
-                                {isLoading == true ? <div className={classes.progress}>Adding in progress...<CircularProgress /></div> : <p>{addResult}</p>}
+                                {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                             </DialogContent>
                             <DialogActions className={classes.dialog_action}>
-                                <Button onClick={addResource} variant="outlined" color="primary">Save</Button>
-                                <Button onClick={handleAddFormClose} variant="outlined" color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
                     </div>
