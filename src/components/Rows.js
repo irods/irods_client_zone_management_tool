@@ -104,6 +104,7 @@ function Rows(props) {
       <TableRow hover={true} onClick={() => setOpen(!open)}>
         <TableCell align="left">{row[0]}</TableCell>
         <TableCell align="left">{row[1]}</TableCell>
+        <TableCell align="left">{row[3]}</TableCell>
         <TableCell align="left">{row[2]}</TableCell>
         <TableCell align="right">{row[8]}</TableCell>
         {/* <TableCell align="right">
@@ -116,13 +117,13 @@ function Rows(props) {
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Typography className={classes.row} variant="h6" gutterBottom component="div">
-              Resource Details ({row[0]}) <span className={classes.remove_button}><Button variant="outlined" color="secondary" onClick={() => setRemoveForm(true)}>Remove</Button></span>
+              Resource Details<span className={classes.remove_button}><Button variant="outlined" color="secondary" onClick={() => setRemoveForm(true)}>Remove</Button></span>
             </Typography>
             <Table size="small" aria-label="purchases">
               <TableBody>
                 <TableRow>
-                  <TableCell>Vault Path: {decodeURIComponent(row[3])}</TableCell>
-                  <TableCell>Hostname: {row[4]}</TableCell>
+                  <TableCell className={classes.table_cell}>Resource Name: {row[0]}</TableCell>
+                  <TableCell className={classes.table_cell}>Hostname: {row[4]}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className={classes.table_cell}>{isEditingInformation ? <span>Information: <input style={{ fontSize: 15 }} defaultValue={row[5]} onChange={(event) => { setInformation(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'information', information) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingInformation(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Information: {row[5]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingInformation(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
