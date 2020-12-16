@@ -12,12 +12,13 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
+import { StylesProvider } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 
-
+import '../App.css';
 import Rows from '../components/Rows';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
     remove_result: {
         textAlign: 'center',
         color: 'red'
+    },
+    sort_arrow: {
+        opacity: 0.2
     }
 }));
 
@@ -257,13 +261,15 @@ function Resource() {
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell key="0"><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /><b>Resource Name</b></TableCell>
-                                        <TableCell key="1" align="right"><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /><b>Type</b></TableCell>
-                                        <TableCell key="3" align="right"><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /><b>Zone</b></TableCell>
-                                        <TableCell key="8" align="right"><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /><b>Status</b></TableCell>
-                                        <TableCell align="right"><b>Action</b></TableCell>
-                                    </TableRow>
+                                    <StylesProvider injectFirst>
+                                        <TableRow>
+                                            <TableCell key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                            <TableCell key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                            <TableCell key="3" align="left"><b>Zone</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                            <TableCell key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
+                                            <TableCell align="right"><b>Actions</b></TableCell>
+                                        </TableRow>
+                                    </StylesProvider>
                                 </TableHead>
                                 <TableBody>
                                     {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
