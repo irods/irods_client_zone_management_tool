@@ -95,6 +95,7 @@ function Resource() {
 
     const [rescName, setRescName] = useState();
     const [rescType, setRescType] = useState();
+    const [rescHostname, setRescHostname] = useState();
     const [rescLocation, setRescLocation] = useState();
     const [rescZone, setRescZone] = useState();
     let resc_id = 0;
@@ -252,9 +253,9 @@ function Resource() {
                                         <TableRow>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '35%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '10%' }} key="8" align="right"><b>Status</b><TableSortLabel active={orderBy === 8} direction={orderBy === 8 ? order : 'asc'} onClick={() => { handleSort(8) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 4 ? order : 'asc'} onClick={() => { handleSort(4) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
                                         </TableRow>
                                     </StylesProvider>
                                 </TableHead>

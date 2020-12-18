@@ -87,7 +87,7 @@ function Rows(props) {
       setEditResult("Success");
       setTimeout(() => {
         window.location.reload();
-      }, 700)
+      }, 500)
     } catch (e) {
       setEditResult("Failed");
     }
@@ -107,9 +107,9 @@ function Rows(props) {
       <TableRow hover={true} onClick={() => setOpen(!open)}>
         <TableCell className={classes.cell} align="left">{row[0]}</TableCell>
         <TableCell className={classes.cell} align="left">{row[1]}</TableCell>
+        <TableCell className={classes.cell} align="left">{row[4]}</TableCell>
         <TableCell className={classes.cell} align="left">{decodeURIComponent(row[3])}</TableCell>
-        <TableCell className={classes.cell} align="left">{row[2]}</TableCell>
-        <TableCell className={classes.cell} align="right">{row[8]}<IconButton aria-label="expand row" size="small" >
+        <TableCell className={classes.cell} align="left">{row[2]}<IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton></TableCell>
         {/* <TableCell align="right">
@@ -126,7 +126,7 @@ function Rows(props) {
               <TableBody>
                 <TableRow>
                   <TableCell className={classes.table_cell}>Resource Name: {row[0]}</TableCell>
-                  <TableCell className={classes.table_cell}>Hostname: {row[4]}</TableCell>
+                  <TableCell className={classes.table_cell}>Status: {row[8]}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className={classes.table_cell}>{isEditingInformation ? <span>Information: <input style={{ fontSize: 15 }} defaultValue={row[5]} onChange={(event) => { setInformation(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'information', information) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingInformation(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Information: {row[5]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingInformation(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
@@ -149,7 +149,6 @@ function Rows(props) {
       <Dialog open={editFormOpen} onClose={() => { setEditForm(false) }} aria-labelledby="form-dialog-title">
         <DialogContent className={classes.dialog_content}>Modify Resource</DialogContent>
         <DialogContent className={classes.dialog_contenttext}>{editResult}</DialogContent>
-        <DialogActions><Button onClick={() => setEditForm(false)}>Close</Button></DialogActions>
       </Dialog>
     </React.Fragment >
   );
