@@ -18,6 +18,8 @@ import logo from '../img/iRODS-logo.png';
 import '../App.css';
 import { red } from '@material-ui/core/colors';
 
+import AuthProvider from '../contents/AuthContent';
+
 const useStyles = makeStyles((theme) => ({
     mainForm: {
         marginTop: theme.spacing(15),
@@ -76,6 +78,7 @@ function Authenticate() {
                     Cookies.set('last_login', new Date().toString());
                     Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     setToken(res.data)
+                    
                     window.location.replace(window.location.href + 'home');
                 }
             })
