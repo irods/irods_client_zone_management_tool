@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@reach/router';
 import axios from 'axios';
 
 import BlockIcon from '@material-ui/icons/Block';
@@ -15,7 +15,7 @@ import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
-import { useAuth } from '@reach/router';
+import { useAuth } from '../contents/AuthContent';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -218,8 +218,8 @@ function User() {
                                             <TableCell component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell align="right">{this_user[1]}</TableCell>
                                             <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to={{ pathname: '/user/edit', userInfo: this_user }}><Button color="primary">Edit</Button></Link>
-                                                <Button color="secondary" onClick={() => {handleRemoveConfirmationOpen(this_user)}}>Remove</Button></span>}</TableCell>
+                                            <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                                <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>

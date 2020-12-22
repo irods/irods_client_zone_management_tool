@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function EditGroup(props) {
-    const currentGroup = props.location.groupInfo;
+    const currentGroup = props.location.state.groupInfo;
     const classes = useStyles();
     const token = Cookies.get('token');
     const [isLoading, setLoading] = useState(false);

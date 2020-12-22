@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function EditUser(props) {
-    const currentUser = props.location.userInfo;
+    const currentUser = props.location.state.userInfo;
     const classes = useStyles();
     const token = Cookies.get('token');
     const [isLoading, setLoading] = useState(false);
