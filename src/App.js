@@ -16,8 +16,12 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <User path="/user" />
         <Home path="/home" />
+        <EditUser path='/user/edit' />
+        <User path="/user" />
+        <EditGroup path='group/edit' />
+        <Group path='/group' />
+        <Resource path='/resource' />
         <Authenticate path="/" />
         {/* <div>
           <Switch>

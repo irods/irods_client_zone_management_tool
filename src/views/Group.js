@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import { Link } from 'react-router-dom'
+import { Link } from '@reach/router'
 
 import { BlockIcon } from '@material-ui/icons';
 
@@ -375,7 +375,7 @@ function Group() {
                                         <TableRow key={group_id}>
                                             <TableCell component="th" scope="row">{group[0]}</TableCell>
                                             <TableCell align="right">{group[2]}</TableCell>
-                                            <TableCell align='right'><Link className={classes.link_button} to={{ pathname: '/group/edit', groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                            <TableCell align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
