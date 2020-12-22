@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+// import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Router } from '@reach/router';
 import Authenticate from './components/Authenticate';
 import User from './views/User';
 import EditUser from './views/EditUser';
@@ -15,7 +16,10 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div>
+        <User path="/user" />
+        <Home path="/home" />
+        <Authenticate path="/" />
+        {/* <div>
           <Switch>
             <Route path="/session" component={Session} />
             <Route exact path="/user" component={User} />
@@ -27,7 +31,7 @@ class App extends Component {
             <Route exact path="/group" component={Group} />
             <Route path="/" component={Authenticate} />
           </Switch>
-        </div>
+        </div> */}
       </Router>
     );
   }

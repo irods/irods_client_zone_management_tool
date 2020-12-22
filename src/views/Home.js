@@ -16,6 +16,8 @@ import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } 
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 
+import { useAuth } from '../contents/AuthContent';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -87,7 +89,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
-    const token = Cookies.get('token');
+    const auth = useAuth();
+    const token = auth.token;
+    console.log(auth);
+    // const token = Cookies.get('token');
     const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
     const [details, setDetails] = useState(false);
