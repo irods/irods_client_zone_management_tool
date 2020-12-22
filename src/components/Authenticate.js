@@ -18,7 +18,8 @@ import logo from '../img/iRODS-logo.png';
 import '../App.css';
 import { red } from '@material-ui/core/colors';
 
-import AuthProvider from '../contents/AuthContent';
+import { useAuth } from '../contents/AuthContent';
+import { useNavigate } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
@@ -48,6 +49,8 @@ function Authenticate() {
     const [token, setToken] = useState('');
     const [incorrect, setIncorrect] = useState(false);
     const classes = useStyles();
+    const auth = useAuth();
+    const navigate = useNavigate();
 
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -58,7 +61,7 @@ function Authenticate() {
     }
 
     const handleKeyDown = event => {
-        if(event.keyCode==13) handleAuthenticate();
+        if (event.keyCode == 13) handleAuthenticate();
     }
 
     async function handleAuthenticate() {
@@ -73,13 +76,14 @@ function Authenticate() {
                 }
             }).then(res => {
                 if (res.status == 200) {
-                    console.log(token)
                     Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     Cookies.set('last_login', new Date().toString());
                     Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     setToken(res.data)
-                    
-                    window.location.replace(window.location.href + 'home');
+                    auth.updateToken(res.data);
+                    console.log(auth);
+                    navigate('/home', { replace: true });
+                    //window.location.replace(window.location.href + 'home');
                 }
             })
         } catch (err) {
