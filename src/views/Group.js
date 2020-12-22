@@ -16,6 +16,8 @@ import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@m
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
+import { useAuth } from '../contents/AuthContent';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -65,7 +67,8 @@ const useStyles = makeStyles((theme) => ({
 
 function Group() {
     const classes = useStyles();
-    const token = Cookies.get('token');
+    const auth = useAuth();
+    const token = auth.token;
 
     const [isLoading, setLoading] = useState(false);
 
