@@ -24,6 +24,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import '../App.css';
 import Rows from '../components/Rows';
 
+import { useAuth } from '../contents/AuthContent';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -78,9 +80,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Resource() {
-    console.log("Visited");
+    const auth = useAuth();
     const classes = useStyles();
-    const token = Cookies.get('token');
+    const token = auth.token;
     const isAuthenticated = token != null ? true : false;
 
     const [isLoading, setLoading] = useState(false);

@@ -91,7 +91,6 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
     const auth = useAuth();
     const token = auth.token;
-    console.log(auth);
     // const token = Cookies.get('token');
     const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
