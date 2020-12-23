@@ -81,6 +81,7 @@ function Authenticate() {
                     Cookies.set('username', username, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     setToken(res.data)
                     auth.updateToken(res.data);
+                    localStorage.setItem('token',res.data);
                     console.log(auth);
                     navigate('/home', { replace: true });
                     //window.location.replace(window.location.href + 'home');
