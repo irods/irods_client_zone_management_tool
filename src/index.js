@@ -4,10 +4,13 @@ import App from './App';
 import './index.css';
 
 import { AuthProvider } from './contents/AuthContent';
+import { ServerProvider } from './contents/ServerContent';
 
 ReactDOM.render(
   <AuthProvider>
-    <App />
+    <ServerProvider>
+      <App />
+    </ServerProvider>
   </AuthProvider>,
   document.getElementById('root')
 );

@@ -17,6 +17,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 
 import { useAuth } from '../contents/AuthContent';
+import { useServer } from '../contents/ServerContent';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -92,6 +93,12 @@ function Home() {
     const auth = useAuth();
     const token = auth.token;
     // const token = Cookies.get('token');
+
+    const server = useServer();
+    server.updateZone();
+    // const zoneContent = server.zone;
+    // console.log(zoneContent);
+
     const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
     const [details, setDetails] = useState(false);
@@ -109,20 +116,23 @@ function Home() {
     const [rescs, setRescs] = useState();
 
     useEffect(() => {
-        const result = axios({
-            method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `${token}`
-            }
-        }).then(res => {
-            console.log(res);
-            setReport(res.data.zones);
-            setServers(res.data.zones.length);
-            setStatus("OK");
-            Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
-        });
+        setReport(server.zoneContent);
+        setServers(server.zoneContent.length);
+        setStatus("OK");
+        // const result = axios({
+        //     method: 'POST',
+        //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Authorization': `${token}`
+        //     }
+        // }).then(res => {
+        //     console.log(res);
+        //     setReport(server.zoneContent);
+        //     setServers(server.zoneContent.length);
+        //     setStatus("OK");
+        //     Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
+        // });
         const userResult = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
@@ -156,7 +166,7 @@ function Home() {
         }).then(res => {
             setGroups(res.data.total);
         });
-    },[users])
+    }, [users])
 
     useEffect(() => {
         const groupResult = axios({
@@ -174,7 +184,7 @@ function Home() {
         }).then(res => {
             setRescs(res.data.total);
         });
-    },[groups])
+    }, [groups])
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
