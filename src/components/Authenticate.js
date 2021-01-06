@@ -18,7 +18,6 @@ import logo from '../img/iRODS-logo.png';
 import '../App.css';
 import { red } from '@material-ui/core/colors';
 
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +48,6 @@ function Authenticate() {
     const [token, setToken] = useState('');
     const [incorrect, setIncorrect] = useState(false);
     const classes = useStyles();
-    const auth = useAuth();
     const navigate = useNavigate();
 
     const handleUsername = event => {
@@ -78,8 +76,6 @@ function Authenticate() {
                 if (res.status == 200) {
                     Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     setToken(res.data)
-                    auth.updateToken(res.data);
-                    console.log(auth);
                     navigate('/home', { replace: true });
                 }
             })

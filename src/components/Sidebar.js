@@ -12,6 +12,8 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
+import { useServer } from '../contexts/ServerContext';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -37,6 +39,9 @@ function Sidebar() {
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const theme = useTheme();
+
+    const server = useServer();
+
     const logout = () => {
         Cookies.remove('token');
         Cookies.remove('username');
@@ -59,7 +64,7 @@ function Sidebar() {
                         <ListItemText primary='Home' />
                     </ListItem>
                     <ListItem button component={Link} to="/user" key='user'>
-                        <ListItemText primary='Users' />
+                        <ListItemText>User ({server.userContext.total})</ListItemText>
                     </ListItem>
                     <ListItem button component={Link} to="/group" key='group'>
                         <ListItemText primary='Groups' />

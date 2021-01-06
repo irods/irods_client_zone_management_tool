@@ -16,7 +16,6 @@ import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } 
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 
-import { useAuth } from '../contexts/AuthContext';
 import { useServer } from '../contexts/ServerContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -90,9 +89,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
-    const auth = useAuth();
     const token = Cookies.get('token');
-    console.log(token);
 
     const server = useServer();
 
@@ -117,6 +114,7 @@ function Home() {
 
     useEffect(() => {
         setReport(server.zoneContext);
+        setUsers(server.userContext.total);
         setServers(server.zoneContext.length);
         setStatus("OK");
         // const result = axios({
@@ -133,21 +131,21 @@ function Home() {
         //     setStatus("OK");
         //     Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
         // });
-        const userResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            setUsers(res.data.total);
-        });
+        // const userResult = axios({
+        //     method: 'GET',
+        //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+        //     headers: {
+        //         'Authorization': token
+        //     },
+        //     params: {
+        //         query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
+        //         query_limit: 100,
+        //         row_offset: 0,
+        //         query_type: 'general'
+        //     }
+        // }).then(res => {
+        //     setUsers(res.data.total);
+        // });
     }, [isAuthenticated]);
 
     useEffect(() => {
