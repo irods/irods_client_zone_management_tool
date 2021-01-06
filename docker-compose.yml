@@ -4,8 +4,13 @@ services:
   frontend:
       container_name: zmt_frontend
       build:
-        context: .
+        context: ./
         dockerfile: Dockerfile
+      env_file: 
+        - .env
+      volumes: 
+        - ./:/usr/src/app
+        - /usr/src/app/node_modules
       ports: 
-        - 3000:3000
+        - $REACT_PORT:3000
       

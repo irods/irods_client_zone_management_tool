@@ -15,7 +15,7 @@ import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
-import { useAuth } from '../contents/AuthContent';
+import { useAuth } from '../contexts/AuthContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {

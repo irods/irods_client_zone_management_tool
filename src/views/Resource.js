@@ -24,7 +24,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import '../App.css';
 import Rows from '../components/Rows';
 
-import { useAuth } from '../contents/AuthContent';
+import { useAuth } from '../contexts/AuthContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
