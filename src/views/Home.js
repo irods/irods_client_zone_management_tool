@@ -16,8 +16,8 @@ import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } 
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 
-import { useAuth } from '../contents/AuthContent';
-import { useServer } from '../contents/ServerContent';
+import { useAuth } from '../contexts/AuthContext';
+import { useServer } from '../contexts/ServerContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -91,11 +91,11 @@ const useStyles = makeStyles((theme) => ({
 
 function Home() {
     const auth = useAuth();
-    const token = auth.token;
-    // const token = Cookies.get('token');
+    const token = Cookies.get('token');
+    console.log(token);
 
     const server = useServer();
-    server.updateZone();
+
     // const zoneContent = server.zone;
     // console.log(zoneContent);
 
@@ -116,8 +116,8 @@ function Home() {
     const [rescs, setRescs] = useState();
 
     useEffect(() => {
-        setReport(server.zoneContent);
-        setServers(server.zoneContent.length);
+        setReport(server.zoneContext);
+        setServers(server.zoneContext.length);
         setStatus("OK");
         // const result = axios({
         //     method: 'POST',
