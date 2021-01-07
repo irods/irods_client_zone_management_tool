@@ -15,8 +15,6 @@ import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
-import { useAuth } from '../contexts/AuthContext';
-
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -63,9 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 function User() {
     const classes = useStyles();
-    const auth = useAuth();
-    const token = auth.token;
-    console.log(token);
+    const token = Cookies.get('token');
     const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
