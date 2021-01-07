@@ -116,73 +116,10 @@ function Home() {
         setReport(server.zoneContext);
         setUsers(server.userContext.total);
         setServers(server.zoneContext.length);
+        setGroups(server.groupContext.total);
+        setRescs(server.rescContext.total);
         setStatus("OK");
-        // const result = axios({
-        //     method: 'POST',
-        //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/zone_report',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Authorization': `${token}`
-        //     }
-        // }).then(res => {
-        //     console.log(res);
-        //     setReport(server.zoneContent);
-        //     setServers(server.zoneContent.length);
-        //     setStatus("OK");
-        //     Cookies.set('zone_name', res.data.zones[0]['icat_server']['service_account_environment']['irods_zone_name'])
-        // });
-        // const userResult = axios({
-        //     method: 'GET',
-        //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-        //     headers: {
-        //         'Authorization': token
-        //     },
-        //     params: {
-        //         query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
-        //         query_limit: 100,
-        //         row_offset: 0,
-        //         query_type: 'general'
-        //     }
-        // }).then(res => {
-        //     setUsers(res.data.total);
-        // });
     }, [isAuthenticated]);
-
-    useEffect(() => {
-        const groupResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            setGroups(res.data.total);
-        });
-    }, [users])
-
-    useEffect(() => {
-        const groupResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                query_string: "SELECT RESC_NAME",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            setRescs(res.data.total);
-        });
-    }, [groups])
 
     const handleExpandClick = () => {
         setExpanded(!expanded);

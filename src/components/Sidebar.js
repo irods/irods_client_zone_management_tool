@@ -38,8 +38,6 @@ function Sidebar() {
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
-    const theme = useTheme();
-
     const server = useServer();
 
     const logout = () => {
@@ -67,10 +65,10 @@ function Sidebar() {
                         <ListItemText>User ({server.userContext.total})</ListItemText>
                     </ListItem>
                     <ListItem button component={Link} to="/group" key='group'>
-                        <ListItemText primary='Groups' />
+                        <ListItemText>Group ({server.groupContext.total})</ListItemText>
                     </ListItem>
                     <ListItem button component={Link} to="/resource" key='resource'>
-                        <ListItemText primary='Resources' />
+                        <ListItemText>Resource ({server.rescContext.total})</ListItemText>
                     </ListItem>
                 </List>
                 <Divider />
