@@ -9,7 +9,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
+import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
 import { useServer } from '../contexts/ServerContext';
@@ -34,17 +34,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Sidebar() {
+function Sidebar(props) {
+    console.log(props.menu_id)
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const server = useServer();
-
-    const logout = () => {
-        Cookies.remove('token');
-        Cookies.remove('username');
-        window.location.reload();
-    }
+    const selected = props.menu_id;
+    console.log(selected === 0); 
 
     return (
             <Drawer
@@ -58,24 +55,24 @@ function Sidebar() {
                 <div className={classes.toolbar} />
                 <Divider />
                 <List>
-                    <ListItem button component={Link} to="/home" key='home'>
+                    <MenuItem button selected={selected == 0} component={Link} to="/home" key='home'>
                         <ListItemText primary='Home' />
-                    </ListItem>
-                    <ListItem button component={Link} to="/user" key='user'>
+                    </MenuItem>
+                    <MenuItem button selected={selected == 1} component={Link} to="/user" key='user'>
                         <ListItemText>User ({server.userContext.total})</ListItemText>
-                    </ListItem>
-                    <ListItem button component={Link} to="/group" key='group'>
+                    </MenuItem>
+                    <MenuItem button selected={selected == 2} component={Link} to="/group" key='group'>
                         <ListItemText>Group ({server.groupContext.total})</ListItemText>
-                    </ListItem>
-                    <ListItem button component={Link} to="/resource" key='resource'>
+                    </MenuItem>
+                    <MenuItem button selected={selected == 3} component={Link} to="/resource" key='resource'>
                         <ListItemText>Resource ({server.rescContext.total})</ListItemText>
-                    </ListItem>
+                    </MenuItem>
                 </List>
                 <Divider />
                 <List>
-                    <ListItem button key='logout' onClick={logout}>
+                    <MenuItem button component={Link} to="/logout" key='logout'>
                         <ListItemText primary='Logout' />
-                    </ListItem>
+                    </MenuItem>
                 </List>
             </Drawer>
     );
