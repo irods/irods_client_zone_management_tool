@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { CssBaseline } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Cookies from 'js-cookie';
+import { useServer } from '../contexts/ServerContext';
 
 const drawerWidth = 240;
 
@@ -26,7 +27,8 @@ function Appbar() {
 
     const classes = useStyles();
     const current_window = "http://localhost:3000/home";
-
+    const server = useServer();
+    console.log(server.zoneContext);
 
     return (
         <div>
@@ -37,7 +39,7 @@ function Appbar() {
                         iRODS Zone Management Tool
           </Typography>
                     <Typography className={classes.rightToolbar} variant="h6" noWrap>
-                        Welcome, {Cookies.get('username')}!
+                        {server.zoneContext[0]['icat_server']['service_account_environment']['irods_zone_name']}
           </Typography>
                 </Toolbar>
             </AppBar>
