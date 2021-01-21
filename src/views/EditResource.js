@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link } from '@reach/router';
 import BlockIcon from '@material-ui/icons/Block';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Appbar from '../components/Appbar';
