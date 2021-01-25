@@ -15,6 +15,8 @@ import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
+import { useServer } from '../contexts/ServerContext';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -73,24 +75,16 @@ function User() {
     const [zones, setZone] = useState([]);
     const isAuthenticated = token != null ? true : false;
 
-    useEffect(() => {
-        const result = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            },
-            params: {
-                query_string: "SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE = 'rodsuser'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
+    const server = useServer();
 
-        }).then(res => {
-            setUsers(res.data['_embedded']);
-        });
+    useEffect(() => {
+        loadContent();
+    }, [])
+
+    const loadContent = async () => {
+        console.log("Loading User Content from Provider...")
+        console.log(server.userContext._embedded)
+        setUsers(server.userContext._embedded);
         const zoneResult = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
@@ -106,7 +100,13 @@ function User() {
         }).then(res => {
             setZone(res.data._embedded);
         });
-    }, [])
+    }
+
+    const updateContent = () => {
+        server.updateUser();
+        console.log("Request updating server provider.");
+        loadContent();
+    }
 
     async function addUser() {
         console.log(addUser_type);
@@ -129,7 +129,8 @@ function User() {
                 }
             }).then(res => {
                 console.log(res);
-                window.location.reload();
+                updateContent();
+                //window.location.reload();
             })
         } catch (e) {
             setAddError("Error when adding new user. Please check the input.")
@@ -191,7 +192,7 @@ function User() {
         <div>
             {isAuthenticated == true ? <div className={classes.root}>
                 <Appbar />
-                <Sidebar />
+                <Sidebar menu_id="1" />
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
@@ -202,19 +203,19 @@ function User() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell><b>Username</b></TableCell>
-                                        <TableCell align="right"><b>Type</b></TableCell>
-                                        <TableCell align="right"><b>Zone</b></TableCell>
-                                        <TableCell align="right"><b>Action</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Zone</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {users.map(this_user =>
                                         <TableRow key={this_user[0]}>
-                                            <TableCell component="th" scope="row">{this_user[0]}</TableCell>
-                                            <TableCell align="right">{this_user[1]}</TableCell>
-                                            <TableCell align="right">{this_user[2]}</TableCell>
-                                            <TableCell align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[2]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                                 <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     )}

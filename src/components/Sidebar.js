@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from '@reach/router';
 import Cookies from 'js-cookie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -35,13 +35,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Sidebar(props) {
-    console.log(props.menu_id)
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
     const server = useServer();
     const selected = props.menu_id;
-    console.log(selected === 0); 
+    const [userCounts, setUserCounts] = useState();
+    const [groupCounts, setGroupCounts] = useState();
+    const [rescCounts, setRescCounts] = useState();
+
+    useEffect(() => {
+        setUserCounts(`(${server.userContext.total})`);
+        setGroupCounts(`(${server.groupContext.total})`);
+        setRescCounts(`(${server.rescContext.total})`);
+    },[])
 
     return (
             <Drawer
@@ -59,13 +66,13 @@ function Sidebar(props) {
                         <ListItemText primary='Home' />
                     </MenuItem>
                     <MenuItem button selected={selected == 1} component={Link} to="/user" key='user'>
-                        <ListItemText>User ({server.userContext.total})</ListItemText>
+                        <ListItemText>User {userCounts}</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 2} component={Link} to="/group" key='group'>
-                        <ListItemText>Group ({server.groupContext.total})</ListItemText>
+                        <ListItemText>Group {groupCounts}</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 3} component={Link} to="/resource" key='resource'>
-                        <ListItemText>Resource ({server.rescContext.total})</ListItemText>
+                        <ListItemText>Resource {rescCounts}</ListItemText>
                     </MenuItem>
                 </List>
                 <Divider />

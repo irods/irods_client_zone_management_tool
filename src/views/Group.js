@@ -16,6 +16,8 @@ import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@m
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
 
+import { useServer } from '../contexts/ServerContext';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -66,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
 function Group() {
     const classes = useStyles();
     const token = Cookies.get('token');
-
+    const server = useServer();
     const [isLoading, setLoading] = useState(false);
 
     const [zones, setZone] = useState([]);
@@ -94,22 +96,7 @@ function Group() {
     const isAuthenticated = token != null ? true : false;
 
     useEffect(() => {
-        const result = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token
-            },
-            params: {
-                query_string: "SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE = 'rodsgroup'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            setGroup(res.data._embedded);
-        });
-
+        setGroup(server.groupContext._embedded);
         const zoneResult = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
@@ -351,7 +338,7 @@ function Group() {
         <div>
             {isAuthenticated == true ? <div className={classes.root}>
                 <Appbar />
-                <Sidebar />
+                <Sidebar menu_id="2" />
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
@@ -362,17 +349,18 @@ function Group() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell><b>Group Name</b></TableCell>
-                                        <TableCell align="right"><b>Zone</b></TableCell>
-                                        <TableCell align="right"><b>Action</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Group Name</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Zone</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {groups.map(group =>
                                         <TableRow key={group_id}>
-                                            <TableCell component="th" scope="row">{group[0]}</TableCell>
-                                            <TableCell align="right">{group[2]}</TableCell>
-                                            <TableCell align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{group[0]}</TableCell>
+
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{group[2]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
