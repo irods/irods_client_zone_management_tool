@@ -14,11 +14,13 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import logo from '../img/iRODS-logo.png';
 import '../App.css';
 import { red } from '@material-ui/core/colors';
 
 import { useNavigate } from '@reach/router';
+import { useServer } from '../contexts/ServerContext';
+import { useEnvironment } from '../contexts/EnvironmentContext';
+import { requirePropFactory } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
@@ -45,10 +47,16 @@ const useStyles = makeStyles((theme) => ({
 function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [token, setToken] = useState('');
     const [incorrect, setIncorrect] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
+    const server = useServer();
+    const token = Cookies.get('token');
+    const environment = useEnvironment();
+
+    if (token != null) {
+        navigate('/home', { replace: true });
+    }
 
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -75,11 +83,15 @@ function Authenticate() {
             }).then(res => {
                 if (res.status == 200) {
                     Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
-                    setToken(res.data)
+                    server.updateZone();
+                    server.updateUser();
+                    server.updateGroup();
+                    server.updateResource();
                     navigate('/home', { replace: true });
                 }
             })
         } catch (err) {
+            console.log(err)
             setIncorrect(true);
         }
     }
@@ -87,9 +99,9 @@ function Authenticate() {
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
-                <img className={classes.logo} src={logo}></img>
+                <img className={classes.logo} src={require(`../img/${environment.loginLogo}`)}></img>
                 <br />
-                <Typography component="h4" variant="h5">Zone Management Tool</Typography>
+                <Typography component="h4" variant="h5">{environment.brandingName}</Typography>
                 <TextField
                     variant="outlined"
                     margin="normal"

@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
     const token = Cookies.get('token');
 
-    const server = useServer();
+    let server = useServer();
 
     // const zoneContent = server.zone;
     // console.log(zoneContent);
@@ -113,13 +113,14 @@ function Home() {
     const [rescs, setRescs] = useState();
 
     useEffect(() => {
+        console.log(server);
         setReport(server.zoneContext);
         setUsers(server.userContext.total);
         setServers(server.zoneContext.length);
         setGroups(server.groupContext.total);
         setRescs(server.rescContext.total);
         setStatus("OK");
-    }, [isAuthenticated]);
+    }, [])
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
@@ -174,7 +175,7 @@ function Home() {
 
     return (
         <div>
-            {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar /><main className={classes.content}><div className={classes.toolbar} />
+            {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar menu_id="0" /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>
                     <Container className={classes.status_box}>
                         <Grid item xs={12} md={8} lg={9}>

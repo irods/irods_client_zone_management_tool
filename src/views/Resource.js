@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Table
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
+import { useServer } from '../contexts/ServerContext';
 
 import '../App.css';
 import Rows from '../components/Rows';
@@ -102,25 +103,12 @@ function Resource() {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
 
-    useEffect(() => {
-        const rescResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            },
-            params: {
-                query_string: 'SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT',
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            const sortedArray = [...res.data._embedded];
-            setResc(sortedArray);
-        });
+    const server = useServer();
 
+    useEffect(() => {
+        console.log(server);
+        setResc([...server.rescContext._embedded]);
+        
         const zoneResult = axios({
             method: 'GET',
             url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
@@ -140,9 +128,12 @@ function Resource() {
     }, [isLoading])
 
     useEffect(() => {
-        const sortedArray = [...resc];
-        sortedArray.sort(getComparator(order, orderBy));
-        setResc(sortedArray);
+        if (resc.length !== 0) {
+            const sortedArray = [...resc];
+            sortedArray.sort(getComparator(order, orderBy));
+            setResc(sortedArray);
+            console.log(sortedArray);
+        }
     }, [order, orderBy])
 
     function descendingComparator(a, b, orderBy) {
@@ -239,7 +230,7 @@ function Resource() {
         <div>
             {isAuthenticated == true ? <div className={classes.root}>
                 <Appbar />
-                <Sidebar />
+                <Sidebar menu_id="3" />
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
@@ -253,8 +244,8 @@ function Resource() {
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 4 ? order : 'asc'} onClick={() => { handleSort(4) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
                                         </TableRow>
                                     </StylesProvider>
                                 </TableHead>
@@ -307,9 +298,9 @@ function Resource() {
                             <DialogTitle>Add New Resource</DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Resource Name: {rescName}<br/>
-                                    Type: {rescType}<br/>
-                                    Vault Path: {rescLocation}<br/>
+                                    Resource Name: {rescName}<br />
+                                    Type: {rescType}<br />
+                                    Vault Path: {rescLocation}<br />
                                     Zone: {rescZone}
                                 </DialogContentText>
                                 {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}

@@ -7,11 +7,11 @@ import { ServerProvider } from './contexts/ServerContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 
 ReactDOM.render(
-    <EnvironmentProvider>
+  <EnvironmentProvider>
       <ServerProvider>
         <App />
       </ServerProvider>
-    </EnvironmentProvider>
-,
+  </EnvironmentProvider>
+  ,
   document.getElementById('root')
 );
