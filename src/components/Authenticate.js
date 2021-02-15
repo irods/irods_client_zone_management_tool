@@ -129,7 +129,7 @@ function Authenticate() {
                     onClick={handleAuthenticate}>Login</Button>
                 <br />
                 <Box mt={8}>
-                    Copyright © iRODS Consortium 2020
+                    Copyright © iRODS Consortium 2021
             </Box>
             </div>
         </Container>

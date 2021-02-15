@@ -13,16 +13,19 @@ import './App.css';
 class App extends Component {
   render() {
     return (
-      <Router>
-        <Home path="/home" />
-        <EditUser path='/user/edit' />
-        <User path="/user" />
-        <EditGroup path='group/edit' />
-        <Group path='/group' />
-        <Resource path='/resource' />
-        <Logout path='/logout' />
-        <Authenticate path="/" />
-      </Router>
+      <div>
+        <Router>
+          <Home path="/home" />
+          <EditUser path='/user/edit' />
+          <User path="/user" />
+          <EditGroup path='group/edit' />
+          <Group path='/group' />
+          <Resource path='/resource' />
+          <Logout path='/logout' />
+          <Authenticate path="/" />
+        </Router>
+        <div>Test</div>
+      </div>
     );
   }
 }
