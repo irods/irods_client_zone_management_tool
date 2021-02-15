@@ -18,12 +18,14 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import Pagination from '@material-ui/lab/Pagination';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
 import { useServer } from '../contexts/ServerContext';
 
 import '../App.css';
 import Rows from '../components/Rows';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -75,6 +77,26 @@ const useStyles = makeStyles((theme) => ({
     },
     add_hidden: {
         display: 'none'
+    },
+    pagination: {
+        display: 'flex',
+        flexDirection: 'row',
+        margin: theme.spacing(1),
+        justifyContent: 'center'
+    },
+    pagination_item: {
+        transitionDuration: '1.5s'
+    },
+    search: {
+        marginLeft: 30,
+        width: 200
+    },
+    add_button: {
+        marginLeft: 30
+    },
+    itemsControl: {
+        marginLeft: 30,
+        minWidth: 120
     }
 }));
 
@@ -86,7 +108,6 @@ function Resource() {
     const [isLoading, setLoading] = useState(false);
     const [rescView, setRescView] = useState('list');
     const [resc, setResc] = useState([]);
-    const [zones, setZone] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
 
@@ -103,29 +124,20 @@ function Resource() {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
 
+    const [zone, setZone] = useState(localStorage.getItem('zoneName'));
+    const [currPage, setCurrPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
+    const [totalPage, setTotalPage] = useState();
+
+    const [searchRescName, setSearchName] = useState();
+
+
     const server = useServer();
+    const environment = useEnvironment();
 
     useEffect(() => {
-        console.log(server);
-        setResc([...server.rescContext._embedded]);
-        
-        const zoneResult = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            },
-            params: {
-                query_string: 'SELECT USER_ZONE',
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            setZone(res.data._embedded);
-        })
-    }, [isLoading])
+        loadContent(currPage, perPage);
+    }, [currPage, perPage, searchRescName])
 
     useEffect(() => {
         if (resc.length !== 0) {
@@ -148,6 +160,43 @@ function Resource() {
 
     function getComparator(order, orderBy) {
         return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+    const loadContent = async (prop) => {
+        console.log(server)
+        let _query;
+        if (searchRescName == undefined) {
+            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
+        }
+        else {
+            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT WHERE RESC_NAME LIKE '%${searchRescName}%'`
+        }
+        const groupResult = axios({
+            method: 'GET',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
+            headers: {
+                'Authorization': Cookies.get('token')
+            },
+            params: {
+                query_string: _query,
+                query_limit: perPage,
+                row_offset: (currPage - 1) * perPage,
+                query_type: 'general'
+            }
+        }).then(res => {
+            let sortedArray = res.data._embedded;
+            sortedArray.sort();
+            setResc(sortedArray);
+            setTotalPage(Math.ceil(res.data.total / perPage));
+        }).catch(e => {
+            console.log(e);
+        });
+    }
+
+    const updateContent = () => {
+        server.updateResource();
+        console.log("Request updating server provider.");
+        loadContent();
     }
 
     async function addResource() {
@@ -225,6 +274,10 @@ function Resource() {
         setOrderBy(props);
     }
 
+    const handlePageChange = (event, value) => {
+        setCurrPage(value);
+    }
+
 
     return (
         <div>
@@ -234,7 +287,33 @@ function Resource() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={handleAddRowOpen}>Add Resource</Button>
+                        <div className={classes.pagination}>
+                            <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                            <FormControl className={classes.itemsControl}>
+                                <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
+                                <Select
+                                    native
+                                    id="items-per-page"
+                                    label="Items Per Page"
+                                    onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                className={classes.search}
+                                id="search-term"
+                                label="Search"
+                                placeholder="Search by ResourceName"
+                                onChange={(event) => setSearchName(event.target.value)}
+                            />
+                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
+                                Add New Resource
+                        </Button>
+                        </div>
                         <br />
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
@@ -284,9 +363,9 @@ function Resource() {
                                             native
                                             id="zone"
                                             onChange={handleRescZoneChange}
+                                            defaultValue={zone}
                                         >
-                                            <option selected value="" disabled></option>
-                                            {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
+                                            <option selected value={zone} selected>{zone}</option>
                                         </Select></TableCell>
                                         <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                     </TableRow>

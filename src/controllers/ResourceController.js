@@ -1,8 +1,8 @@
 import axios from 'axios';
-// import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 
 
-const token = "";
+const token = Cookies.get('token');
 
 export const ModifyResourceController = async (name, arg, value) => {
     const result = await axios({

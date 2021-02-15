@@ -9,13 +9,20 @@ import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
+import { Select, MenuItem } from '@material-ui/core';
+
+import Pagination from '@material-ui/lab/Pagination';
+import { StylesProvider } from '@material-ui/core/styles';
+import '../App.css';
 
 import { useServer } from '../contexts/ServerContext';
+import { useEnvironment } from '../contexts/EnvironmentContext';
+
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -47,6 +54,10 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         minWidth: 120
     },
+    itemsControl: {
+        marginLeft: 30,
+        minWidth: 120
+    },
     table: {
         minWidth: 650
     },
@@ -58,6 +69,21 @@ const useStyles = makeStyles((theme) => ({
     },
     link_button: {
         textDecoration: 'none'
+    },
+    pagination: {
+        display: 'flex',
+        flexDirection: 'row',
+        margin: theme.spacing(1),
+        justifyContent: 'center'
+    },
+    pagination_item: {
+        transitionDuration: '1.5s'
+    },
+    search: {
+        marginLeft: 30
+    },
+    add_button: {
+        marginLeft: 30
     }
 }));
 
@@ -72,33 +98,75 @@ function User() {
     const [addUser_type, setAddUserType] = useState();
     const [addZone_name, setAddZoneName] = useState();
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
-    const [zones, setZone] = useState([]);
+    const [zone, setZone] = useState(localStorage.getItem('zoneName'));
+    const [currPage, setCurrPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
+    const [totalPage, setTotalPage] = useState();
     const isAuthenticated = token != null ? true : false;
 
+    const [searchUsername, setSearchName] = useState();
+
     const server = useServer();
+    const environment = useEnvironment();
+
+    const [order, setOrder] = useState("asc");
+    const [orderBy, setOrderBy] = useState(0);
 
     useEffect(() => {
-        loadContent();
-    }, [])
+        loadContent(currPage, perPage);
+    }, [currPage, perPage, searchUsername])
 
-    const loadContent = async () => {
-        console.log("Loading User Content from Provider...")
-        console.log(server.userContext._embedded)
-        setUsers(server.userContext._embedded);
-        const zoneResult = axios({
+    useEffect(() => {
+        if (users.length !== 0) {
+            const sortedArray = [...users];
+            sortedArray.sort(getComparator(order, orderBy));
+            setUsers(sortedArray);
+            console.log(sortedArray);
+        }
+    }, [order, orderBy])
+
+    function descendingComparator(a, b, orderBy) {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    function getComparator(order, orderBy) {
+        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+    const loadContent = async (prop) => {
+        console.log(server)
+        let _query;
+        if (searchUsername == undefined) {
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser'`
+        }
+        else {
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser' and USER_NAME LIKE '%${searchUsername}%'`
+        }
+        const userResult = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
-                'Authorization': token
+                'Authorization': Cookies.get('token')
             },
             params: {
-                query_string: 'SELECT ZONE_NAME',
-                query_limit: 100,
-                row_offset: 0,
+                query_string: _query,
+                query_limit: perPage,
+                row_offset: (currPage - 1) * perPage,
                 query_type: 'general'
             }
         }).then(res => {
-            setZone(res.data._embedded);
+            let sortedArray = res.data._embedded;
+            sortedArray.sort();
+            setUsers(sortedArray);
+            setTotalPage(Math.ceil(res.data.total / perPage));
+        }).catch(e => {
+            console.log(e);
         });
     }
 
@@ -115,9 +183,9 @@ function User() {
         try {
             await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 headers: {
-                    'Authorization': token
+                    'Authorization': Cookies.get('token')
                 },
                 params: {
                     action: 'add',
@@ -129,8 +197,9 @@ function User() {
                 }
             }).then(res => {
                 console.log(res);
+                setAddFormOpen(false);
                 updateContent();
-                //window.location.reload();
+                window.location.reload();
             })
         } catch (e) {
             setAddError("Error when adding new user. Please check the input.")
@@ -141,21 +210,22 @@ function User() {
         try {
             await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 headers: {
-                    'Authorization': token
+                    'Authorization': Cookies.get('token')
                 },
                 params: {
                     action: 'rm',
                     target: 'user',
                     arg2: currUser[0],
-                    arg3: currUser[2]
+                    arg3: server.zoneName[0]
                 }
             }).then(res => {
+                updateContent();
                 window.location.reload();
             })
         } catch (e) {
-
+            console.log(e)
         }
     }
 
@@ -188,6 +258,17 @@ function User() {
         setAddFormOpen(false);
     }
 
+    const handlePageChange = (event, value) => {
+        setCurrPage(value);
+    }
+
+    const handleSort = props => {
+        const isAsc = orderBy === props && order == 'desc';
+        setOrder(isAsc ? 'asc' : 'desc');
+        setOrderBy(props);
+    }
+
+
     return (
         <div>
             {isAuthenticated == true ? <div className={classes.root}>
@@ -196,25 +277,49 @@ function User() {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     <div className={classes.main}>
-                        <Button variant="outlined" color="primary" onClick={handleAddFormOpen}>
-                            Add New User
+                        <div className={classes.pagination}>
+                            <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                            <FormControl className={classes.itemsControl}>
+                                <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
+                                <Select
+                                    native
+                                    id="items-per-page"
+                                    label="Items Per Page"
+                                    onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                className={classes.search}
+                                id="search-term"
+                                label="Search"
+                                placeholder="Search by username"
+                                onChange={(event) => setSearchName(event.target.value)}
+                            />
+                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                                Add New User
                         </Button>
+                        </div>
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Zone</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
-                                    </TableRow>
+                                    <StylesProvider injectFirst>
+                                        <TableRow>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
+                                        </TableRow>
+                                    </StylesProvider>
                                 </TableHead>
                                 <TableBody>
                                     {users.map(this_user =>
                                         <TableRow key={this_user[0]}>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[2]}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                                 <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
@@ -244,9 +349,9 @@ function User() {
                                             id="zone"
                                             label="Zone Name"
                                             onChange={handleAddZoneName}
+                                            defaultValue={zone}
                                         >
-                                            <option value="" selected disabled></option>
-                                            {zones.map(zone => <option value={zone[0]}>{zone[0]}</option>)}
+                                            <option value={zone} selected>{zone}</option>
                                         </Select>
                                     </FormControl>
                                     <FormControl className={classes.formControl}>
