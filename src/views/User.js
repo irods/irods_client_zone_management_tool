@@ -121,7 +121,6 @@ function User() {
             const sortedArray = [...users];
             sortedArray.sort(getComparator(order, orderBy));
             setUsers(sortedArray);
-            console.log(sortedArray);
         }
     }, [order, orderBy])
 
@@ -140,7 +139,6 @@ function User() {
     }
 
     const loadContent = async (prop) => {
-        console.log(server)
         let _query;
         if (searchUsername == undefined) {
             _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser'`

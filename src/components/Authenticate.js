@@ -67,7 +67,7 @@ function Authenticate() {
     }
 
     const handleKeyDown = (event) => {
-        if (event.keyCode == 13) handleAuthenticate();
+        if (event.keyCode === 13) handleAuthenticate();
     }
 
     async function handleAuthenticate() {
@@ -91,7 +91,6 @@ function Authenticate() {
                 }
             })
         } catch (err) {
-            console.log(err)
             setIncorrect(true);
         }
     }
