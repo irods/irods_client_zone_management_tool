@@ -44,5 +44,5 @@ docker-compose down
 ```
 
 ## Built With
--  [React](https://reactjs.org/) - Reactive frontend framework built by Facebook
--  [Material UI](https://material-ui.com/) - Material Design
+  - [React](https://reactjs.org/) - Reactive frontend framework built by Facebook
+  - [Material UI](https://material-ui.com/) - Material Design

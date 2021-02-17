@@ -19,7 +19,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        display: 'flex',
+        display: "flex",
     },
     toolbar: theme.mixins.toolbar,
     content: {
@@ -33,13 +33,13 @@ const useStyles = makeStyles((theme) => ({
     },
     logout: {
         marginTop: theme.spacing(20),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
         fontSize: theme.spacing(3)
     },
     link_button: {
-        textDecoration: 'none'
+        textDecoration: "none"
     }
 }));
 
@@ -119,7 +119,9 @@ function EditUser(props) {
                 setRefresh(!refresh);
             })
         } catch (e) {
+            alert("Error happens. Please try again.")
         }
+        
     }
 
     async function addGroupToUser(props) {
@@ -144,6 +146,7 @@ function EditUser(props) {
             })
         }
         catch (e) {
+            alert("Error happens. Please try again.")
         }
     }
 
