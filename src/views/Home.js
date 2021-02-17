@@ -113,7 +113,6 @@ function Home() {
     const [rescs, setRescs] = useState();
 
     useEffect(() => {
-        console.log(server);
         setReport(server.zoneContext);
         setUsers(server.userContext.total);
         setServers(server.zoneContext.length);
@@ -130,13 +129,12 @@ function Home() {
         setTab(newValue);
     }
 
-    const viewDetails = event => {
+    const viewDetails = (event) => {
         setCurrZone(zone_reports[document.getElementsByClassName(classes.server_card)[0].id]['icat_server']);
-        console.log(curr_zone);
         setDetails(true);
     }
 
-    const closeDetails = event => {
+    const closeDetails = (event) => {
         setDetails(false);
     }
 
@@ -210,7 +208,7 @@ function Home() {
                         </Grid>
                     </Container>
                     <br />
-                    <Pagination count={1} /><br />{zone_reports.length > 0 ? zone_reports.map(zone_report =>
+                    <Pagination count={1} /><br />{zone_reports.length > 0 ? zone_reports.map((zone_report) =>
                         <Card className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={

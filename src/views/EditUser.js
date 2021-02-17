@@ -70,12 +70,11 @@ function EditUser(props) {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             let newArray = [];
             for (let user in res.data._embedded) {
                 if (res.data._embedded[user][0] !== currentUser[0]) newArray.push(res.data._embedded[user]);
             }
-            console.log(newArray);
             setGroupOfUser(newArray);
             setLoading(false);
         })
@@ -94,7 +93,7 @@ function EditUser(props) {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setSearchNameResult(res.data._embedded);
         })
     }, [searchGroupName])
@@ -116,12 +115,10 @@ function EditUser(props) {
                     'Authorization': token,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then((res) => {
                 setRefresh(!refresh);
-                console.log(res);
             })
         } catch (e) {
-            console.log(e);
         }
     }
 
@@ -142,17 +139,15 @@ function EditUser(props) {
                     'Authorization': token,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then((res) => {
                 setRefresh(!refresh);
-                console.log(res);
             })
         }
         catch (e) {
-            console.log(e);
         }
     }
 
-    const handleSearchGroupName = event => {
+    const handleSearchGroupName = (event) => {
         setSearchName(event.target.value);
     }
 
@@ -176,7 +171,7 @@ function EditUser(props) {
                                     </TableRow>
                                 </TableHead>
                                 {groupsOfUser.length > 0 ? <TableBody>
-                                    {groupsOfUser.map(thisGroup => <TableRow>
+                                    {groupsOfUser.map((thisGroup) => <TableRow>
                                         <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                         <TableCell align="right">{thisGroup[1]}</TableCell>
                                         <TableCell align='right'><Button color="secondary" onClick={() => {removeGroupFromUser(thisGroup)}}>Remove</Button></TableCell>
@@ -203,7 +198,7 @@ function EditUser(props) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {searchGroupNameResult.map(thisGroup => <TableRow>
+                                        {searchGroupNameResult.map((thisGroup) => <TableRow>
                                             <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                             <TableCell align="right">{thisGroup[1]}</TableCell>
                                             <TableCell align='right'><Button color="secondary" onClick={() => {addGroupToUser(thisGroup)}}>Add</Button></TableCell>

@@ -160,26 +160,21 @@ function User() {
                 row_offset: (currPage - 1) * perPage,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             let sortedArray = res.data._embedded;
             sortedArray.sort();
             setUsers(sortedArray);
             setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 
     const updateContent = () => {
         server.updateUser();
-        console.log("Request updating server provider.");
         loadContent();
     }
 
     async function addUser() {
-        console.log(addUser_type);
-        console.log(addZone_name);
-        console.log(addName);
         try {
             await axios({
                 method: 'POST',
@@ -195,8 +190,7 @@ function User() {
                     arg4: addZone_name,
                     arg5: '',
                 }
-            }).then(res => {
-                console.log(res);
+            }).then((res) => {
                 setAddFormOpen(false);
                 updateContent();
                 window.location.reload();
@@ -220,28 +214,27 @@ function User() {
                     arg2: currUser[0],
                     arg3: server.zoneName[0]
                 }
-            }).then(res => {
+            }).then((res) => {
                 updateContent();
                 window.location.reload();
             })
         } catch (e) {
-            console.log(e)
         }
     }
 
-    const handleAddUserType = event => {
+    const handleAddUserType = (event) => {
         setAddUserType(event.target.value);
     }
 
-    const handleAddUserName = event => {
+    const handleAddUserName = (event) => {
         setAddName(event.target.value);
     }
 
-    const handleAddZoneName = event => {
+    const handleAddZoneName = (event) => {
         setAddZoneName(event.target.value);
     }
 
-    const handleRemoveConfirmationOpen = props => {
+    const handleRemoveConfirmationOpen = (props) => {
         setCurrUser(props);
         setRemoveConfirmation(true);
     }
@@ -262,7 +255,7 @@ function User() {
         setCurrPage(value);
     }
 
-    const handleSort = props => {
+    const handleSort = (props) => {
         const isAsc = orderBy === props && order == 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
@@ -316,7 +309,7 @@ function User() {
                                     </StylesProvider>
                                 </TableHead>
                                 <TableBody>
-                                    {users.map(this_user =>
+                                    {users.map((this_user) =>
                                         <TableRow key={this_user[0]}>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>

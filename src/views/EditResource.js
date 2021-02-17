@@ -81,8 +81,7 @@ function EditResource(props) {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
-            console.log(res.data._embedded[0])
+        }).then((res) => {
             setCurrResc(res.data._embedded[0]);
         })
     }, [isAuthenticated])
