@@ -7,7 +7,6 @@ import Cookies from 'js-cookie';
 export const ServerContext = createContext();
 
 export const ServerProvider = ({ children }) => {
-    console.log("Server Provider Visited...");
     const env = useEnvironment();
     let token = Cookies.get('token');
     const [zoneContext, setZoneContext] = useState(JSON.parse(localStorage.getItem('zoneContext')));
@@ -18,9 +17,7 @@ export const ServerProvider = ({ children }) => {
 
     useEffect(() => {
         token = Cookies.get('token')
-        console.log("ServerContext useEffect Visited...")
         if (token != null) {
-            console.log("Loading All Server Data...")
             updateZone();
             updateUser();
             updateGroup();
@@ -29,7 +26,6 @@ export const ServerProvider = ({ children }) => {
     }, [])
 
     const updateZone = async () => {
-        console.log("Zone Update in progress...")
         const zoneReportResult = await axios({
             method: 'POST',
             url: `${env.restApiLocation}/irods-rest/1.0.0/zone_report`,
@@ -37,11 +33,10 @@ export const ServerProvider = ({ children }) => {
                 'Accept': 'application/json',
                 'Authorization': Cookies.get('token')
             }
-        }).then(res => {
+        }).then((res) => {
             setZoneContext(res.data.zones);
             localStorage.setItem('zoneContext', JSON.stringify(res.data.zones));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
 
         const zoneNameResult = axios({
@@ -56,14 +51,13 @@ export const ServerProvider = ({ children }) => {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setZoneName(res.data._embedded[0]);
             localStorage.setItem('zoneName', res.data._embedded[0]);
         });
     }
 
     const updateUser = () => {
-        console.log("User Update in progress...")
         axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -76,16 +70,14 @@ export const ServerProvider = ({ children }) => {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setUserContext(res.data);
             localStorage.setItem('userContext', JSON.stringify(res.data));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 
     const updateGroup = () => {
-        console.log("Group Update in progress...")
         axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -98,16 +90,14 @@ export const ServerProvider = ({ children }) => {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setGroupContext(res.data);
             localStorage.setItem('groupContext', JSON.stringify(res.data));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 
     const updateResource = () => {
-        console.log("Resource Update in progress...")
         axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -120,11 +110,10 @@ export const ServerProvider = ({ children }) => {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setRescContext(res.data);
             localStorage.setItem('rescContext', JSON.stringify(res.data));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 
@@ -179,7 +168,7 @@ export const ServerProvider = ({ children }) => {
 
     return (
         <ServerContext.Provider value={{ zoneContext, zoneName, updateZone, userContext, updateUser, groupContext, updateGroup, rescContext, updateResource }}>
-            { children}
+            { children }
         </ServerContext.Provider>
     )
 }

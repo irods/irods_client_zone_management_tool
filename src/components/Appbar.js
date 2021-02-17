@@ -13,7 +13,6 @@ const drawerWidth = 240;
 
 function Appbar() {
     const environment = useEnvironment();
-    console.log(environment);
     const useStyles = makeStyles((theme) => ({
         appBar: {
             width: `calc(100% - ${drawerWidth}px)`,
@@ -44,21 +43,29 @@ function Appbar() {
         setZoneName(server.zoneContext[0]['icat_server']['service_account_environment']['irods_zone_name']);
     }, [])
 
-    return (
-        <div>
-            <CssBaseline />
-            <AppBar position="fixed" className={classes.appBar}>
-                <Toolbar>
-                    <a className={classes.branding}>
-                        <img className={classes.logo} src={require(`../img/${environment.appbarLogo}`)}></img>
-                        <Typography variant="h6" >{environment.brandingName}</Typography>
-                    </a>
-                    <Typography className={classes.rightToolbar} variant="h6" noWrap>
-                        {zoneName}
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-        </div>
+    return ( <
+        div >
+        <
+        CssBaseline / >
+        <
+        AppBar position = "fixed"
+        className = { classes.appBar } >
+        <
+        Toolbar >
+        <
+        a className = { classes.branding } >
+        <
+        img className = { classes.logo }
+        src = { require(`../img/${environment.appbarLogo}`) } > < /img> <
+        Typography variant = "h6" > { environment.brandingName } < /Typography> <
+        /a> <
+        Typography className = { classes.rightToolbar }
+        variant = "h6"
+        noWrap > { zoneName } <
+        /Typography> <
+        /Toolbar> <
+        /AppBar> <
+        /div>
     )
 }
 

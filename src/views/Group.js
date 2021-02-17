@@ -176,13 +176,12 @@ function Group() {
                 row_offset: (currPage - 1) * perPage,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             let sortedArray = res.data._embedded;
             sortedArray.sort();
             setGroup(sortedArray);
             setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 

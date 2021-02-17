@@ -58,15 +58,15 @@ function Authenticate() {
         navigate('/home', { replace: true });
     }
 
-    const handleUsername = event => {
+    const handleUsername = (event) => {
         setUsername(event.target.value);
     }
 
-    const handlePassword = event => {
+    const handlePassword = (event) => {
         setPassword(event.target.value);
     }
 
-    const handleKeyDown = event => {
+    const handleKeyDown = (event) => {
         if (event.keyCode == 13) handleAuthenticate();
     }
 
@@ -80,7 +80,7 @@ function Authenticate() {
                     password: password,
                     auth_type: 'native'
                 }
-            }).then(res => {
+            }).then((res) => {
                 if (res.status == 200) {
                     Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
                     server.updateZone();

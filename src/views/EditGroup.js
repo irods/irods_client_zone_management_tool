@@ -70,8 +70,7 @@ function EditGroup(props) {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
-            console.log(res.data._embedded);
+        }).then((res) => {
             setUsersInGroup(res.data._embedded);
             setLoading(false);
         })
@@ -90,7 +89,7 @@ function EditGroup(props) {
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             setSearchNameResult(res.data._embedded);
         })
     }, [searchUserName])
@@ -112,12 +111,10 @@ function EditGroup(props) {
                     'Authorization': token,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then((res) => {
                 setRefresh(!refresh);
-                console.log(res);
             })
         } catch (e) {
-            console.log(e);
         }
     }
 
@@ -138,9 +135,8 @@ function EditGroup(props) {
                     'Authorization': token,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then((res) => {
                 setRefresh(!refresh);
-                console.log(res);
             })
         }
         catch (e) {
@@ -148,7 +144,7 @@ function EditGroup(props) {
         }
     }
 
-    const handleSearchUserName = event => {
+    const handleSearchUserName = (event) => {
         setSearchName(event.target.value);
     }
 
@@ -173,7 +169,7 @@ function EditGroup(props) {
                                     </TableRow>
                                 </TableHead>
                                 {usersInGroup.length > 0 ? <TableBody>
-                                    {usersInGroup.map(thisUser => <TableRow>
+                                    {usersInGroup.map((thisUser) => <TableRow>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
                                         <TableCell align="right">{thisUser[2]}</TableCell>
@@ -202,7 +198,7 @@ function EditGroup(props) {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {searchUserNameResult.map(thisUser => <TableRow>
+                                        {searchUserNameResult.map((thisUser) => <TableRow>
                                             <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                             <TableCell align="right">{thisUser[1]}</TableCell>
                                             <TableCell align="right">{thisUser[2]}</TableCell>

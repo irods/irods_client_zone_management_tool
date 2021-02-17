@@ -183,13 +183,12 @@ function Resource() {
                 row_offset: (currPage - 1) * perPage,
                 query_type: 'general'
             }
-        }).then(res => {
+        }).then((res) => {
             let sortedArray = res.data._embedded;
             sortedArray.sort();
             setResc(sortedArray);
             setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch(e => {
-            console.log(e);
+        }).catch((e) => {
         });
     }
 
@@ -217,13 +216,11 @@ function Resource() {
                 arg5: "",
                 arg6: rescZone
             }
-        }).then(res => {
-            console.log(res);
+        }).then((res) => {
             window.location.reload();
             setAddResult("Resource created.")
             setLoading(false);
-        }).catch(e => {
-            console.log(e.response.data);
+        }).catch((e) => {
             setAddResult(`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`);
             setLoading(false);
         })
@@ -242,7 +239,7 @@ function Resource() {
         document.getElementById("add_newrow").style["display"] = "none";
     }
 
-    const handleRemoveFormOpen = props => {
+    const handleRemoveFormOpen = (props) => {
         setRescName(props[0]);
         setRemoveFormOpen(true);
     }
@@ -252,23 +249,23 @@ function Resource() {
         setRemoveResult();
     }
 
-    const handleRescNameChange = event => {
+    const handleRescNameChange = (event) => {
         setRescName(event.target.value);
     }
 
-    const handleRescTypeChange = event => {
+    const handleRescTypeChange = (event) => {
         setRescType(event.target.value);
     }
 
-    const handleRescLocationChange = event => {
+    const handleRescLocationChange = (event) => {
         console.log(encodeURI(event.target.value));
         setRescLocation(encodeURI(event.target.value));
     }
-    const handleRescZoneChange = event => {
+    const handleRescZoneChange = (event) => {
         setRescZone(event.target.value);
     }
 
-    const handleSort = props => {
+    const handleSort = (props) => {
         const isAsc = orderBy === props && order == 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
