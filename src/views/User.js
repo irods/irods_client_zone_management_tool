@@ -380,7 +380,7 @@ function User() {
                         </Dialog>
                     </div>
                 </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>}
         </div>
     );
 }

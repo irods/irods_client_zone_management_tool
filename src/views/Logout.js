@@ -15,11 +15,12 @@ const useStyles = makeStyles((theme) => ({
 
 function Logout() {
     const classes = useStyles();
+    const redirectUrl = window.location.origin
     Cookies.remove('token');
 
     return (
         <div className={classes.logout}>
-            <BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div>
+            <BlockIcon /><br /><div>Please <a href={redirectUrl}>login</a> to use the administration dashboard.</div>
         </div>
     )
 }

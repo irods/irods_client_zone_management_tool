@@ -15,6 +15,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
 
@@ -57,6 +58,7 @@ const useStyles = makeStyles((theme) => ({
 function Rows(props) {
   const { row } = props;
   const classes = useStyles();
+  const environment = useEnvironment();
 
   const [editFormOpen, setEditForm] = useState(false);
   const [editStatus, setEditStatus] = useState();
@@ -83,7 +85,7 @@ function Rows(props) {
     setEditForm(true);
     setEditStatus(`Modifying Resource ${arg} to ${value}`);
     try {
-      const result = await ModifyResourceController(name, arg, value);
+      const result = await ModifyResourceController(name, arg, value, environment.restApiLocation);
       setEditResult("Success");
       setTimeout(() => {
         window.location.reload();
@@ -95,7 +97,7 @@ function Rows(props) {
 
   const removeResource = async (name) => {
     try {
-      const result = await RemoveResourceController(name);
+      const result = await RemoveResourceController(name, environment.restApiLocation);
       window.location.reload();
     } catch (e) {
       setRemoveStatus(e.response.data);

@@ -12,6 +12,7 @@ import { FormControl, InputLabel, Select, TextField, Typography } from '@materia
 
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -67,10 +68,12 @@ function EditResource(props) {
     const token = Cookies.get('token');
     const isAuthenticated = token != null ? true : false;
 
+    const environment = useEnvironment();
+
     useEffect(() => {
         const result = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -120,7 +123,7 @@ function EditResource(props) {
     function setInfoString(info) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -134,7 +137,7 @@ function EditResource(props) {
             }
         }).then(res => {
             alert("Resource information updated.");
-            <Redirect to="http://localhost:3000/resource" push={true} />;
+            <Redirect to={window.location.origin+"/resource"} push={true} />;
             console.log(res);
         })
     }
@@ -142,7 +145,7 @@ function EditResource(props) {
     function setType(type) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -163,7 +166,7 @@ function EditResource(props) {
     function setLoc(loc) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -183,7 +186,7 @@ function EditResource(props) {
     function setFreeSpace(free_space) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -204,7 +207,7 @@ function EditResource(props) {
     function setVaultPath(path) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -225,7 +228,7 @@ function EditResource(props) {
     function setStatus(status) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -246,7 +249,7 @@ function EditResource(props) {
     function setComment(comment) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -267,7 +270,7 @@ function EditResource(props) {
     function setContext(context) {
         const result = axios({
             method: 'POST',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -417,7 +420,7 @@ function EditResource(props) {
                         </Box>
                     </div>
                 </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>
             }
         </div >
     );

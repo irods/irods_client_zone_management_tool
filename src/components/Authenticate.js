@@ -74,7 +74,7 @@ function Authenticate() {
         try {
             const authResult = await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/auth',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
                 params: {
                     user_name: username,
                     password: password,

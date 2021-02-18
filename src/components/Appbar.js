@@ -43,29 +43,16 @@ function Appbar() {
         setZoneName(server.zoneContext[0]['icat_server']['service_account_environment']['irods_zone_name']);
     }, [])
 
-    return ( <
-        div >
-        <
-        CssBaseline / >
-        <
-        AppBar position = "fixed"
-        className = { classes.appBar } >
-        <
-        Toolbar >
-        <
-        a className = { classes.branding } >
-        <
-        img className = { classes.logo }
-        src = { require(`../img/${environment.appbarLogo}`) } > < /img> <
-        Typography variant = "h6" > { environment.brandingName } < /Typography> <
-        /a> <
-        Typography className = { classes.rightToolbar }
-        variant = "h6"
-        noWrap > { zoneName } <
-        /Typography> <
-        /Toolbar> <
-        /AppBar> <
-        /div>
+    return (<div>
+        <CssBaseline />
+        <AppBar position="fixed" className={classes.appBar} >
+            <Toolbar >
+                <a className={classes.branding}>
+                    <img className={classes.logo} src={require(`../img/${environment.appbarLogo}`)}></img> <Typography variant="h6"> {environment.brandingName} </Typography> </a>
+                <Typography className={classes.rightToolbar} variant="h6" noWrap > {zoneName} </Typography>
+            </Toolbar>
+        </AppBar>
+    </div>
     )
 }
 
