@@ -1,13 +1,12 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-
 const token = Cookies.get('token');
 
-export const ModifyResourceController = async (name, arg, value) => {
+export const ModifyResourceController = async (name, arg, value, Url) => {
     const result = await axios({
         method: 'POST',
-        url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+        url: `${Url}/irods-rest/1.0.0/admin`,
         headers: {
             'Accept': 'application/json',
             'Authorization': token
@@ -24,10 +23,10 @@ export const ModifyResourceController = async (name, arg, value) => {
 }
 
 
-export const RemoveResourceController = async (name) => {
+export const RemoveResourceController = async (name,Url) => {
     const result = await axios({
         method: 'POST',
-        url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+        url: `${Url}/irods-rest/1.0.0/admin`,
         headers: {
             'Authorization': token
         },

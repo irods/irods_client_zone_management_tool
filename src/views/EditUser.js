@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +51,7 @@ function EditUser(props) {
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const isAuthenticated = token != null ? true : false;
+    const environment = useEnvironment();
 
     const [groupsOfUser, setGroupOfUser] = useState([]);
     const [searchGroupName, setSearchName] = useState();
@@ -59,7 +61,7 @@ function EditUser(props) {
         setLoading(true);
         const result = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -83,7 +85,7 @@ function EditUser(props) {
     useEffect(() => {
         const searchResult = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Authorization': token,
             },
@@ -102,7 +104,7 @@ function EditUser(props) {
         try {
             const removeUserResult = await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -128,7 +130,7 @@ function EditUser(props) {
         try {
             await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -212,7 +214,7 @@ function EditUser(props) {
                         </div>
                     </div>
                 </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>}
         </div>
     );
 }

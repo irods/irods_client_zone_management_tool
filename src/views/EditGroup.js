@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +51,7 @@ function EditGroup(props) {
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const isAuthenticated = token != null ? true : false;
+    const environment = useEnvironment();
 
     const [usersInGroup, setUsersInGroup] = useState([]);
     const [searchUserName, setSearchName] = useState();
@@ -59,7 +61,7 @@ function EditGroup(props) {
         setLoading(true);
         const result = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token
@@ -79,7 +81,7 @@ function EditGroup(props) {
     useEffect(() => {
         const searchResult = axios({
             method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
+            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Authorization': token,
             },
@@ -98,7 +100,7 @@ function EditGroup(props) {
         try {
             const removeUserResult = await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -123,7 +125,7 @@ function EditGroup(props) {
         try {
             await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',

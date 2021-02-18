@@ -24,7 +24,6 @@ class App extends Component {
           <Logout path='/logout' />
           <Authenticate path="/" />
         </Router>
-        <div>Test</div>
       </div>
     );
   }

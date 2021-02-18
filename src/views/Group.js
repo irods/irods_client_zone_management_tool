@@ -100,23 +100,16 @@ function Group() {
 
     const [errorMsg, setErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
-    const [editFormOpen, setEditFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
     const [addGroupZoneName, setAddGroupZoneName] = useState();
     const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
     const [users, setUsers] = useState([]);
-    const [userThisGroup, setUserThisGroup] = useState([]);
-    const [userNotThisGroup, setUserNotThisGroup] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
-    const [removeThisUserName, setRemoveUserName] = useState();
-    const [removeThisUserZone, setRemoveUserZone] = useState();
 
 
     const [searchGroupName, setSearchName] = useState();
     let group_id = 0;
-    let user_id = 0;
-    let user_id_edit = 0;
     const isAuthenticated = token != null ? true : false;
 
     const [zone, setZone] = useState(localStorage.getItem('zoneName'));
@@ -187,54 +180,14 @@ function Group() {
 
     const updateContent = () => {
         server.updateGroup();
-        console.log("Request updating server provider.");
         loadContent();
     }
-
-
-    // useEffect(() => {
-    //     setGroup(server.groupContext._embedded);
-    //     const zoneResult = axios({
-    //         method: 'GET',
-    //         url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-    //         headers: {
-    //             'Authorization': token
-    //         },
-    //         params: {
-    //             query_string: 'SELECT ZONE_NAME',
-    //             query_limit: 100,
-    //             row_offset: 0,
-    //             query_type: 'general'
-    //         }
-    //     }).then(res => {
-    //         setZone(res.data._embedded);
-    //     });
-    // }, [isAuthenticated, isLoading])
-
-    // useEffect(() => {
-    //     const searchResult = axios({
-    //         method: 'GET',
-    //         url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-    //         headers: {
-    //             'Authorization': token,
-    //         },
-    //         params: {
-    //             query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
-    //             query_limit: 5,
-    //             row_offset: 0,
-    //             query_type: 'general'
-    //         }
-    //     }).then(res => {
-    //         setSearchNameResult(res.data._embedded);
-    //     })
-    // }, [searchUserName])
-
 
     async function addGroup() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'add',
                     target: 'user',
@@ -258,97 +211,11 @@ function Group() {
         }
     }
 
-    async function editGroup() {
-        setLoading(true);
-        const result = axios({
-            method: 'GET',
-            url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': token
-            },
-            params: {
-                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${currGroup[0]}'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then(res => {
-            if (res.data.count !== '1') {
-                console.log(res.data._embedded)
-                let notAttachedUsers = [...users];
-                let attachedUsers = res.data._embedded.slice(1, res.data._embedded.length);
-                attachedUsers.forEach(user => {
-                    let _index = notAttachedUsers.indexOf([user[0], user[1], user[2]]);
-                    console.log(_index);
-                    notAttachedUsers.splice(_index, _index + 1);
-                    console.log(notAttachedUsers);
-                })
-                setUserThisGroup(attachedUsers);
-            }
-            else {
-                setUserThisGroup([]);
-            }
-            setLoading(false);
-        })
-    }
-    // async function removeUserFromGroup() {
-    //     try {
-    //         const removeUserResult = await axios({
-    //             method: 'POST',
-    //             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-    //             params: {
-    //                 action: 'modify',
-    //                 target: 'group',
-    //                 arg2: currGroup[0],
-    //                 arg3: 'remove',
-    //                 arg4: removeThisUserName,
-    //                 arg5: removeThisUserZone
-    //             },
-    //             headers: {
-    //                 'Authorization': token,
-    //                 'Accept': 'application/json'
-    //             }
-    //         }).then(res => {
-    //             window.location.reload();
-    //             console.log(res);
-    //         })
-    //     } catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-
-    // async function addUserToGroup(props) {
-    //     try {
-    //         await axios({
-    //             method: 'POST',
-    //             url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
-    //             params: {
-    //                 action: 'modify',
-    //                 target: 'group',
-    //                 arg2: currGroup[0],
-    //                 arg3: 'add',
-    //                 arg4: props[0],
-    //                 arg5: props[1]
-    //             },
-    //             headers: {
-    //                 'Authorization': token,
-    //                 'Accept': 'application/json'
-    //             }
-    //         }).then(res => {
-    //             console.log(res);
-    //         })
-    //     }
-    //     catch (e) {
-    //         console.log(e);
-    //     }
-    // }
-
     async function removeGroup() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: 'http://54.210.60.122:80/irods-rest/1.0.0/admin',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'rm',
                     target: 'user',
@@ -391,36 +258,12 @@ function Group() {
         }
     }
 
-    const handleremoveUserFromGroup = event => {
-        if (event.target.id !== undefined && event.target.id !== '') {
-            console.log(event.target.id);
-            setRemoveUserName(event.target.id);
-        }
-        if (event.target.name !== undefined) {
-            console.log(event.target.name);
-            setRemoveUserZone(event.target.name);
-        }
-    }
-
-    const handleSearchUserName = event => {
-        setSearchName(event.target.value);
-    }
-
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
     }
 
     const handleAddFormClose = () => {
         setAddFormOpen(false);
-    }
-
-    const handleEditFormOpen = () => {
-        editGroup();
-        setEditFormOpen(true);
-    }
-
-    const handleEditFormClose = () => {
-        setEditFormOpen(false);
     }
 
     const handleAddGroupName = event => {
@@ -530,53 +373,9 @@ function Group() {
                                 <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
                             </DialogActions>
                         </Dialog>
-                        {/* {isLoading == true ? <div><LinearProgress /></div> :
-                            <Dialog open={editFormOpen} onClose={handleEditFormClose} fullScreen="true" aria-labelledby="form-dialog-title">
-                                <DialogTitle><Button size="large" onClick={handleEditFormClose}><ArrowBackIcon /></Button>Edit Group</DialogTitle>
-                                <DialogContent>
-                                    {currGroup.length > 0 ? <DialogContentText>Group Name: {currGroup[0]}</DialogContentText> : <br />}
-                                    <form className={classes.container}>
-                                        <FormControl className={classes.formControl}>
-                                            {userThisGroup.length}
-                                            <Typography>Attached Users: </Typography>
-                                            <Table className={classes.user_table} aria-label="simple table">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <TableCell><b>User Name</b></TableCell>
-                                                        <TableCell align="right"><b>Zone</b></TableCell>
-                                                        <TableCell align="right"><b>Action</b></TableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                {userThisGroup.length > 0 ? <TableBody>
-                                                    {userThisGroup.map(userThisGroup => <TableRow>
-                                                        <TableCell component="th" scope="row">{userThisGroup[0]}</TableCell>
-                                                        <TableCell align="right">{userThisGroup[2]}</TableCell>
-                                                        <TableCell align='right'><Button id={userThisGroup[0]} name={userThisGroup[2]} color="secondary" onMouseOver={handleremoveUserFromGroup} onClick={removeUserFromGroup}>Remove</Button></TableCell>
-                                                    </TableRow>)}
-                                                </TableBody> : <br />}
-                                            </Table>
-                                            <br />
-                                            <Typography>Add Users: </Typography>
-                                            <FormControl className={classes.formControl}>
-                                                <TextField
-                                                    native
-                                                    id="searchUserName"
-                                                    label="User Name"
-                                                    onChange={handleSearchUserName}
-                                                />
-                                            </FormControl>
-                                        </FormControl>
-                                    </form>
-                                    <p className={classes.errorMsg}>{ }</p>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={addUserToGroup} color="primary">Save</Button>
-                                    <Button onClick={handleEditFormClose} color="primary">Cancel</Button>
-                                </DialogActions>
-                            </Dialog>} */}
                     </div>
                 </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
+            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>
             }
         </div >
     );

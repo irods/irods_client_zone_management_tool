@@ -117,55 +117,6 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-
-    // const userContent = axios({
-    //     method: 'GET',
-    //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-    //     headers: {
-    //         'Authorization': token
-    //     },
-    //     params: {
-    //         query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
-    //         query_limit: 100,
-    //         row_offset: 0,
-    //         query_type: 'general'
-    //     }
-    // }).catch(e => {
-    //     console.log(e);
-    // })
-
-    // const groupContent = axios({
-    //     method: 'GET',
-    //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-    //     headers: {
-    //         'Authorization': token
-    //     },
-    //     params: {
-    //         query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
-    //         query_limit: 100,
-    //         row_offset: 0,
-    //         query_type: 'general'
-    //     }
-    // }).catch(e => {
-    //     console.log(e);
-    // })
-
-    // const resourceContent = axios({
-    //     method: 'GET',
-    //     url: 'http://54.210.60.122:80/irods-rest/1.0.0/query',
-    //     headers: {
-    //         'Authorization': token
-    //     },
-    //     params: {
-    //         query_string: "SELECT RESC_NAME",
-    //         query_limit: 100,
-    //         row_offset: 0,
-    //         query_type: 'general'
-    //     }
-    // }).catch(e => {
-    //     console.log(e);
-    // });
-
     return (
         <ServerContext.Provider value={{ zoneContext, zoneName, updateZone, userContext, updateUser, groupContext, updateGroup, rescContext, updateResource }}>
             { children }
