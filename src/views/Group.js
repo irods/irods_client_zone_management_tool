@@ -148,8 +148,9 @@ function Group() {
         return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
     }
 
+    // load group content information at each render time
+
     const loadContent = async (prop) => {
-        console.log(server)
         let _query;
         if (searchGroupName == undefined) {
             _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup'`
@@ -157,7 +158,7 @@ function Group() {
         else {
             _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${searchGroupName}%'`
         }
-        const groupResult = axios({
+        const groupListResult = await axios({
             method: 'GET',
             url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
@@ -169,13 +170,35 @@ function Group() {
                 row_offset: (currPage - 1) * perPage,
                 query_type: 'general'
             }
-        }).then((res) => {
-            let sortedArray = res.data._embedded;
-            sortedArray.sort();
-            setGroup(sortedArray);
-            setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch((e) => {
         });
+        console.log(groupListResult);
+        const groupList = groupListResult.data._embedded.sort();
+        setTotalPage(groupListResult.data.total / perPage);
+
+        // iterate group name array to retrieve each group user counts
+
+        let inputArray = groupList;
+        for (let i = 0; i < inputArray.length; i++) {
+            let temName = inputArray[i][0];
+            await axios({
+                method: 'GET',
+                url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
+                headers: {
+                    'Authorization': Cookies.get('token')
+                },
+                params: {
+                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${temName}' AND USER_TYPE != 'rodsgroup'`,
+                    query_limit: 100,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                inputArray[i].push(res.data._embedded.length);
+                if (i === inputArray.length - 1) {
+                    setGroup(inputArray);
+                }
+            })
+        }
     }
 
     const updateContent = () => {
@@ -323,15 +346,17 @@ function Group() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Group Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center'}} ><b>User Counts</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {groups.map(group =>
+                                    {groups.map((group) =>
                                         <TableRow key={group_id}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{group[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
