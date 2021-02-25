@@ -39,9 +39,9 @@ function Sidebar(props) {
     const [rescCounts, setRescCounts] = useState();
 
     useEffect(() => {
-        setUserCounts(`(${server.userContext.total})`);
-        setGroupCounts(`(${server.groupContext.total})`);
-        setRescCounts(`(${server.rescContext.total})`);
+        setUserCounts(`(${localStorage.getItem("userContext")})`);
+        setGroupCounts(`(${localStorage.getItem("groupContext")})`);
+        setRescCounts(`(${localStorage.getItem("rescContext")})`);
     },[])
 
     return (

@@ -114,10 +114,11 @@ function Home() {
 
     useEffect(() => {
         setReport(server.zoneContext);
-        setUsers(server.userContext.total);
+        setUsers(server.userContext);
         setServers(server.zoneContext.length);
-        setGroups(server.groupContext.total);
-        setRescs(server.rescContext.total);
+        setGroups(server.groupContext);
+        setRescs(server.rescContext);
+        console.log(server.rescContext)
         setStatus("OK");
     }, [])
 
