@@ -267,7 +267,6 @@ function Home() {
                             </Collapse>
                         </Card>
                     ) : <div><CircularProgress /> Loading...</div>}</div></main>
-                <footer>iRODS Consortium</footer>
             </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
             }
         </div >

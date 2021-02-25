@@ -17,20 +17,14 @@ import { useServer } from '../contexts/ServerContext';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-    },
-    appBar: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: drawerWidth,
-    },
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
-        height: '90%'
     },
     drawerPaper: {
         width: drawerWidth,
+        height: '95vh',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
     }
 }));
 
@@ -59,7 +53,6 @@ function Sidebar(props) {
                 }}
                 anchor="left"
             >
-                <div className={classes.toolbar} />
                 <Divider />
                 <List>
                     <MenuItem button selected={selected == 0} component={Link} to="/home" key='home'>
