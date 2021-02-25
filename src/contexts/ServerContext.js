@@ -65,14 +65,14 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': Cookies.get('token')
             },
             params: {
-                query_string: "SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser'",
+                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then((res) => {
-            setUserContext(res.data);
-            localStorage.setItem('userContext', JSON.stringify(res.data));
+            setUserContext(res.data.total);
+            localStorage.setItem('userContext', res.data.total);
         }).catch((e) => {
         });
     }
@@ -91,8 +91,8 @@ export const ServerProvider = ({ children }) => {
                 query_type: 'general'
             }
         }).then((res) => {
-            setGroupContext(res.data);
-            localStorage.setItem('groupContext', JSON.stringify(res.data));
+            setGroupContext(res.data.total);
+            localStorage.setItem('groupContext', res.data.total);
         }).catch((e) => {
         });
     }
@@ -111,8 +111,8 @@ export const ServerProvider = ({ children }) => {
                 query_type: 'general'
             }
         }).then((res) => {
-            setRescContext(res.data);
-            localStorage.setItem('rescContext', JSON.stringify(res.data));
+            setRescContext(res.data.total);
+            localStorage.setItem('rescContext', res.data.total);
         }).catch((e) => {
         });
     }
