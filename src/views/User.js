@@ -185,12 +185,13 @@ function User() {
                     target: 'user',
                     arg2: addName,
                     arg3: addUser_type,
-                    arg4: addZone_name,
+                    arg4: zone,
                     arg5: '',
                 }
             }).then((res) => {
                 setAddFormOpen(false);
                 updateContent();
+                localStorage.setItem("userContext", users.length + 1)
                 window.location.reload();
             })
         } catch (e) {
@@ -210,10 +211,11 @@ function User() {
                     action: 'rm',
                     target: 'user',
                     arg2: currUser[0],
-                    arg3: server.zoneName[0]
+                    arg3: zone
                 }
             }).then((res) => {
                 updateContent();
+                localStorage.setItem("userContext", users.length - 1)
                 window.location.reload();
             })
         } catch (e) {
