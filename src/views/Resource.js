@@ -119,6 +119,7 @@ function Resource() {
     const [rescHostname, setRescHostname] = useState();
     const [rescLocation, setRescLocation] = useState();
     const [rescZone, setRescZone] = useState();
+    const [rescVaultPath, setRescVaultPath] = useState();
     let resc_id = 0;
 
     const [order, setOrder] = useState("asc");
@@ -212,9 +213,9 @@ function Resource() {
                 target: 'resource',
                 arg2: rescName,
                 arg3: rescType,
-                arg4: rescLocation,
+                arg4: rescLocation + ":" + rescVaultPath,
                 arg5: "",
-                arg6: rescZone
+                arg6: zone
             }
         }).then((res) => {
             window.location.reload();
@@ -261,8 +262,8 @@ function Resource() {
         console.log(encodeURI(event.target.value));
         setRescLocation(encodeURI(event.target.value));
     }
-    const handleRescZoneChange = (event) => {
-        setRescZone(event.target.value);
+    const handleRescVaultPathChange = (event) => {
+        setRescVaultPath(event.target.value);
     }
 
     const handleSort = (props) => {
@@ -356,14 +357,8 @@ function Resource() {
                                         </Select></TableCell>
                                         <TableCell><Input id="location"
                                             onChange={handleRescLocationChange}></Input></TableCell>
-                                        <TableCell><Select
-                                            native
-                                            id="zone"
-                                            onChange={handleRescZoneChange}
-                                            defaultValue={zone}
-                                        >
-                                            <option selected value={zone} selected>{zone}</option>
-                                        </Select></TableCell>
+                                        <TableCell><Input id="vault_path"
+                                            onChange={handleRescVaultPathChange}></Input></TableCell>
                                         <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                     </TableRow>
                                     {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}

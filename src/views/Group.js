@@ -216,7 +216,7 @@ function Group() {
                     target: 'user',
                     arg2: addGroupName,
                     arg3: 'rodsgroup',
-                    arg4: addGroupZoneName,
+                    arg4: zone,
                     arg5: ''
                 },
                 headers: {

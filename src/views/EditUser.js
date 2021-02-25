@@ -67,7 +67,7 @@ function EditUser(props) {
                 'Authorization': token
             },
             params: {
-                query_string: `SELECT USER_GROUP_NAME, USER_ZONE WHERE USER_NAME = '${currentUser[0]}'`,
+                query_string: `SELECT USER_NAME, USER_ZONE WHERE USER_NAME = '${currentUser[0]}' AND USER_TYPE = 'rodsgroup'`,
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
@@ -90,7 +90,7 @@ function EditUser(props) {
                 'Authorization': token,
             },
             params: {
-                query_string: `SELECT USER_GROUP_NAME, USER_ZONE WHERE USER_GROUP_NAME LIKE '%${searchGroupName}%'`,
+                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${searchGroupName}%' AND USER_TYPE = 'rodsgroup'`,
                 query_limit: 3,
                 row_offset: 0,
                 query_type: 'general'
@@ -121,7 +121,7 @@ function EditUser(props) {
                 setRefresh(!refresh);
             })
         } catch (e) {
-            alert("Error happens. Please try again.")
+            alert(e)
         }
         
     }
@@ -148,7 +148,7 @@ function EditUser(props) {
             })
         }
         catch (e) {
-            alert("Error happens. Please try again.")
+            alert(e)
         }
     }
 

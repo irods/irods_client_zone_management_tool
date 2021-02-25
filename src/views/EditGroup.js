@@ -117,7 +117,7 @@ function EditGroup(props) {
                 setRefresh(!refresh);
             })
         } catch (e) {
-            alert("Error happens. Please try again.")
+            alert(e)
         }
     }
 
@@ -143,7 +143,7 @@ function EditGroup(props) {
             })
         }
         catch (e) {
-            alert("Error happens. Please try again.")
+            alert(e)
         }
     }
 
