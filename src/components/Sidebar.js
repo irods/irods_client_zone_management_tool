@@ -59,13 +59,13 @@ function Sidebar(props) {
                         <ListItemText primary='Home' />
                     </MenuItem>
                     <MenuItem button selected={selected == 1} component={Link} to="/user" key='user'>
-                        <ListItemText>User {userCounts}</ListItemText>
+                        <ListItemText>Users {userCounts}</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 2} component={Link} to="/group" key='group'>
-                        <ListItemText>Group {groupCounts}</ListItemText>
+                        <ListItemText>Groups {groupCounts}</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 3} component={Link} to="/resource" key='resource'>
-                        <ListItemText>Resource {rescCounts}</ListItemText>
+                        <ListItemText>Resources {rescCounts}</ListItemText>
                     </MenuItem>
                 </List>
                 <Divider />
