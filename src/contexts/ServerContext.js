@@ -14,17 +14,6 @@ export const ServerProvider = ({ children }) => {
     const [userContext, setUserContext] = useState(JSON.parse(localStorage.getItem('userContext')));
     const [groupContext, setGroupContext] = useState(JSON.parse(localStorage.getItem('groupContext')));
     const [rescContext, setRescContext] = useState(JSON.parse(localStorage.getItem('rescContext')));
-
-    useEffect(() => {
-        token = Cookies.get('token')
-        if (token != null) {
-            updateZone();
-            updateUser();
-            updateGroup();
-            updateResource();
-        }
-    }, [])
-
     const updateZone = async () => {
         const zoneReportResult = await axios({
             method: 'POST',
@@ -116,6 +105,16 @@ export const ServerProvider = ({ children }) => {
         }).catch((e) => {
         });
     }
+
+    useEffect(() => {
+        token = Cookies.get('token')
+        if (token != null) {
+            updateZone();
+            updateUser();
+            updateGroup();
+            updateResource();
+        }
+    }, [])
 
     return (
         <ServerContext.Provider value={{ zoneContext, zoneName, updateZone, userContext, updateUser, groupContext, updateGroup, rescContext, updateResource }}>

@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import { Link } from '@reach/router'
-
-import { BlockIcon } from '@material-ui/icons';
-
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
+import Logout from '../views/Logout';
 import Cookies from 'js-cookie';
-import { LinearProgress } from '@material-ui/core';
-import { makeStyles, Tab, Typography } from '@material-ui/core';
-import { Button, Checkbox, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
+import { Button, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 
@@ -20,7 +14,6 @@ import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 
 import Pagination from '@material-ui/lab/Pagination';
-import { StylesProvider } from '@material-ui/core/styles';
 import '../App.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -91,26 +84,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Group() {
-    const classes = useStyles();
     const token = Cookies.get('token');
+    if (token === undefined) {
+        return <Logout />
+    }
+    const classes = useStyles();
     const server = useServer();
     const environment = useEnvironment();
-
-    const [isLoading, setLoading] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addGroupName, setAddGroupName] = useState();
-    const [addGroupZoneName, setAddGroupZoneName] = useState();
-    const [addGroupUsers, setAddGroupUsers] = useState([]);
     const [groups, setGroup] = useState([]);
-    const [users, setUsers] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
 
 
     const [searchGroupName, setSearchName] = useState();
     let group_id = 0;
-    const isAuthenticated = token != null ? true : false;
 
     const [zone, setZone] = useState(localStorage.getItem('zoneName'));
     const [currPage, setCurrPage] = useState(1);
@@ -119,7 +109,6 @@ function Group() {
 
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
-
 
     useEffect(() => {
         loadContent(currPage, perPage);
@@ -265,22 +254,6 @@ function Group() {
         }
     }
 
-    const selectUser = event => {
-        let _index = addGroupUsers.indexOf(users[event.target.id]);
-        if (_index == -1) {
-            let addArray = [...addGroupUsers];
-            addArray.push(users[event.target.id]);
-            setAddGroupUsers(addArray);
-        }
-        else {
-            const oldArray = [...addGroupUsers];
-            const newArray = oldArray.filter(user => {
-                return user[0] != users[event.target.id][0];
-            })
-            setAddGroupUsers(newArray);
-        }
-    }
-
     const handleAddFormOpen = () => {
         setAddFormOpen(true);
     }
@@ -291,10 +264,6 @@ function Group() {
 
     const handleAddGroupName = event => {
         setAddGroupName(event.target.value);
-    }
-
-    const handleAddZoneName = event => {
-        setAddGroupZoneName(event.target.value);
     }
 
     const handlePageChange = (event, value) => {
@@ -308,101 +277,97 @@ function Group() {
     }
 
     return (
-        <div>
-            {isAuthenticated == true ? <div className={classes.root}>
-                <Appbar />
-                <Sidebar menu_id="2" />
-                <main className={classes.content}>
-                    <div className={classes.toolbar} />
-                    <div className={classes.main}>
-                        <div className={classes.pagination}>
-                            <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
-                            <FormControl className={classes.itemsControl}>
-                                <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
-                                <Select
-                                    native
-                                    id="items-per-page"
-                                    label="Items Per Page"
-                                    onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                className={classes.search}
-                                id="search-term"
-                                label="Search"
-                                placeholder="Search by GroupName"
-                                onChange={(event) => setSearchName(event.target.value)}
-                            />
-                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
-                                Add New Group
+        <div className={classes.root}>
+            <Appbar />
+            <Sidebar menu_id="2" />
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <div className={classes.main}>
+                    <div className={classes.pagination}>
+                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <FormControl className={classes.itemsControl}>
+                            <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
+                            <Select
+                                native
+                                id="items-per-page"
+                                label="Items Per Page"
+                                onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            className={classes.search}
+                            id="search-term"
+                            label="Search"
+                            placeholder="Search by GroupName"
+                            onChange={(event) => setSearchName(event.target.value)}
+                        />
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                            Add New Group
                         </Button>
-                        </div>
-                        <TableContainer className={classes.tableContainer} component={Paper}>
-                            <Table className={classes.table} aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center'}} ><b>User Counts</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {groups.map((group) =>
-                                        <TableRow key={group_id}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Add New Group</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Enter your group and zone name:
-                                </DialogContentText>
-                                <form className={classes.container}>
-                                    <FormControl className={classes.formControl}>
-                                        <TextField
-                                            native
-                                            id="name"
-                                            label="Group Name"
-                                            onChange={handleAddGroupName}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="group-zone-select">Zone Name</InputLabel>
-                                        <Select
-                                            native
-                                            id="zone"
-                                            label="Zone Name"
-                                            onChange={handleAddZoneName}
-                                            defaultValue={zone}
-                                        >
-                                            <option value={zone} selected>{zone}</option>
-                                        </Select>
-                                    </FormControl>
-                                </form>
-                                <br />
-                                <p className={classes.errorMsg}>{errorMsg}</p>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={addGroup} color="primary">Save</Button>
-                                <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
-                            </DialogActions>
-                        </Dialog>
                     </div>
-                </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>
-            }
-        </div >
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                        <Table className={classes.table} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} ><b>User Counts</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {groups.map((group) =>
+                                    <TableRow key={group_id}>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Add New Group</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Enter your group and zone name:
+                                </DialogContentText>
+                            <form className={classes.container}>
+                                <FormControl className={classes.formControl}>
+                                    <TextField
+                                        native
+                                        id="name"
+                                        label="Group Name"
+                                        onChange={handleAddGroupName}
+                                    />
+                                </FormControl>
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel htmlFor="group-zone-select">Zone Name</InputLabel>
+                                    <Select
+                                        native
+                                        id="zone"
+                                        label="Zone Name"
+                                        defaultValue={zone}
+                                    >
+                                        <option value={zone} selected>{zone}</option>
+                                    </Select>
+                                </FormControl>
+                            </form>
+                            <br />
+                            <p className={classes.errorMsg}>{errorMsg}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={addGroup} color="primary">Save</Button>
+                            <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </main>
+        </div>
     );
 }
 

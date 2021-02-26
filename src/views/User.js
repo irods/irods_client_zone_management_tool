@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from '@reach/router';
 import axios from 'axios';
-
-import BlockIcon from '@material-ui/icons/Block';
-
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Cookies from 'js-cookie';
@@ -13,7 +10,7 @@ import TextField from '@material-ui/core/TextField';
 import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
-import { Select, MenuItem } from '@material-ui/core';
+import { Select } from '@material-ui/core';
 
 import Pagination from '@material-ui/lab/Pagination';
 import { StylesProvider } from '@material-ui/core/styles';
@@ -21,6 +18,8 @@ import '../App.css';
 
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
+
+import Logout from '../views/Logout';
 
 
 
@@ -88,8 +87,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function User() {
-    const classes = useStyles();
     const token = Cookies.get('token');
+    if (token === undefined) {
+        return <Logout />
+    }
+    const classes = useStyles();
     const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
@@ -102,7 +104,6 @@ function User() {
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [totalPage, setTotalPage] = useState();
-    const isAuthenticated = token != null ? true : false;
 
     const [searchUsername, setSearchName] = useState();
 
@@ -111,18 +112,6 @@ function User() {
 
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
-
-    useEffect(() => {
-        loadContent(currPage, perPage);
-    }, [currPage, perPage, searchUsername])
-
-    useEffect(() => {
-        if (users.length !== 0) {
-            const sortedArray = [...users];
-            sortedArray.sort(getComparator(order, orderBy));
-            setUsers(sortedArray);
-        }
-    }, [order, orderBy])
 
     function descendingComparator(a, b, orderBy) {
         if (b[orderBy] < a[orderBy]) {
@@ -261,128 +250,138 @@ function User() {
         setOrderBy(props);
     }
 
+    useEffect(() => {
+        loadContent(currPage, perPage);
+    }, [currPage, perPage, searchUsername])
+
+    useEffect(() => {
+        if (users.length !== 0) {
+            const sortedArray = [...users];
+            sortedArray.sort(getComparator(order, orderBy));
+            setUsers(sortedArray);
+        }
+    }, [order, orderBy])
+
 
     return (
-        <div>
-            {isAuthenticated == true ? <div className={classes.root}>
-                <Appbar />
-                <Sidebar menu_id="1" />
-                <main className={classes.content}>
-                    <div className={classes.toolbar} />
-                    <div className={classes.main}>
-                        <div className={classes.pagination}>
-                            <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
-                            <FormControl className={classes.itemsControl}>
-                                <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
-                                <Select
-                                    native
-                                    id="items-per-page"
-                                    label="Items Per Page"
-                                    onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                className={classes.search}
-                                id="search-term"
-                                label="Search"
-                                placeholder="Search by username"
-                                onChange={(event) => setSearchName(event.target.value)}
-                            />
-                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
-                                Add New User
+        <div className={classes.root}>
+            <Appbar />
+            <Sidebar menu_id="1" />
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <div className={classes.main}>
+                    <div className={classes.pagination}>
+                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <FormControl className={classes.itemsControl}>
+                            <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
+                            <Select
+                                native
+                                id="items-per-page"
+                                label="Items Per Page"
+                                onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            className={classes.search}
+                            id="search-term"
+                            label="Search"
+                            placeholder="Search by username"
+                            onChange={(event) => setSearchName(event.target.value)}
+                        />
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                            Add New User
                         </Button>
-                        </div>
-                        <TableContainer className={classes.tableContainer} component={Paper}>
-                            <Table className={classes.table} aria-label="simple table">
-                                <TableHead>
-                                    <StylesProvider injectFirst>
-                                        <TableRow>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
-                                        </TableRow>
-                                    </StylesProvider>
-                                </TableHead>
-                                <TableBody>
-                                    {users.map((this_user) =>
-                                        <TableRow key={this_user[0]}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
-                                                <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Add New User</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    You can add a new user there.
-                                </DialogContentText>
-                                <form className={classes.container}>
-                                    <FormControl className={classes.formControl}>
-                                        <TextField
-                                            native
-                                            id="name"
-                                            label="Username"
-                                            onChange={handleAddUserName}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="user-type-select">Zone Name</InputLabel>
-                                        <Select
-                                            native
-                                            id="zone"
-                                            label="Zone Name"
-                                            onChange={handleAddZoneName}
-                                            defaultValue={zone}
-                                        >
-                                            <option value={zone} selected>{zone}</option>
-                                        </Select>
-                                    </FormControl>
-                                    <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="user-type-select">User Type</InputLabel>
-                                        <Select
-                                            native
-                                            id="user-type-select"
-                                            value={addUser_type}
-                                            onChange={handleAddUserType}
-                                        >
-                                            <option aria-label="None" value="" />
-                                            <option value="rodsadmin">rodsadmin</option>
-                                            <option value="groupadmin">groupadmin</option>
-                                            <option value="rodsuser">rodsuser</option>
-                                        </Select>
-                                    </FormControl>
-                                </form>
-                                <p className={classes.errorMsg}>{addErrorMessage}</p>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={addUser} color="primary">Save</Button>
-                                <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
-                            </DialogActions>
-                        </Dialog>
-                        <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Warning</DialogTitle>
-                            <DialogContent>
-                                <Typography>Are you sure to remove <b>{currUser[0]}</b>?</Typography>
-                                <p className={classes.errorMsg}>{ }</p>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={removeUser} color="secondary">Remove</Button>
-                                <Button onClick={handleRemoveConfirmationClose} color="primary">Cancel</Button>
-                            </DialogActions>
-                        </Dialog>
                     </div>
-                </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href={window.location.origin}>login</a> to use the administration dashboard.</div></div>}
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                        <Table className={classes.table} aria-label="simple table">
+                            <TableHead>
+                                <StylesProvider injectFirst>
+                                    <TableRow>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
+                                    </TableRow>
+                                </StylesProvider>
+                            </TableHead>
+                            <TableBody>
+                                {users.map((this_user) =>
+                                    <TableRow key={this_user[0]}>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                            <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                You can add a new user there.
+                                </DialogContentText>
+                            <form className={classes.container}>
+                                <FormControl className={classes.formControl}>
+                                    <TextField
+                                        native
+                                        id="name"
+                                        label="Username"
+                                        onChange={handleAddUserName}
+                                    />
+                                </FormControl>
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel htmlFor="user-type-select">Zone Name</InputLabel>
+                                    <Select
+                                        native
+                                        id="zone"
+                                        label="Zone Name"
+                                        onChange={handleAddZoneName}
+                                        defaultValue={zone}
+                                    >
+                                        <option value={zone} selected>{zone}</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl className={classes.formControl}>
+                                    <InputLabel htmlFor="user-type-select">User Type</InputLabel>
+                                    <Select
+                                        native
+                                        id="user-type-select"
+                                        value={addUser_type}
+                                        onChange={handleAddUserType}
+                                    >
+                                        <option aria-label="None" value="" />
+                                        <option value="rodsadmin">rodsadmin</option>
+                                        <option value="groupadmin">groupadmin</option>
+                                        <option value="rodsuser">rodsuser</option>
+                                    </Select>
+                                </FormControl>
+                            </form>
+                            <p className={classes.errorMsg}>{addErrorMessage}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={addUser} color="primary">Save</Button>
+                            <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Warning</DialogTitle>
+                        <DialogContent>
+                            <Typography>Are you sure to remove <b>{currUser[0]}</b>?</Typography>
+                            <p className={classes.errorMsg}>{ }</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={removeUser} color="secondary">Remove</Button>
+                            <Button onClick={handleRemoveConfirmationClose} color="primary">Cancel</Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </main>
         </div>
     );
 }

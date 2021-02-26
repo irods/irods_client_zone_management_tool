@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from 'react';
-
-
 import axios from 'axios';
 import { Link } from '@reach/router';
-
-import BlockIcon from '@material-ui/icons/Block';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
+import Logout from '../views/Logout';
 import Cookies from 'js-cookie';
 import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 
 
@@ -45,12 +39,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function EditGroup(props) {
+    const token = Cookies.get('token');
+    if (token === undefined) {
+        return <Logout />
+    }
     const currentGroup = props.location.state.groupInfo;
     const classes = useStyles();
-    const token = Cookies.get('token');
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const isAuthenticated = token != null ? true : false;
     const environment = useEnvironment();
 
     const [usersInGroup, setUsersInGroup] = useState([]);
@@ -76,7 +72,7 @@ function EditGroup(props) {
             setUsersInGroup(res.data._embedded);
             setLoading(false);
         })
-    }, [isAuthenticated, refresh])
+    }, [refresh])
 
     useEffect(() => {
         const searchResult = axios({
@@ -152,16 +148,44 @@ function EditGroup(props) {
     }
 
     return (
-        <div>
-            {isAuthenticated == true ? <div className={classes.root}>
-                <Appbar />
-                <Sidebar />
-                <main className={classes.content}>
-                    <div className={classes.toolbar} />
-                    <div className={classes.main}>
-                        <Link to="/group" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
-                        {currentGroup[0]}
-                        <div>
+        <div className={classes.root}>
+            <Appbar />
+            <Sidebar />
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <div className={classes.main}>
+                    <Link to="/group" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
+                    {currentGroup[0]}
+                    <div>
+                        <Table className={classes.user_table} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><b>User Name</b></TableCell>
+                                    <TableCell align="right"><b>Type</b></TableCell>
+                                    <TableCell align="right"><b>Zone</b></TableCell>
+                                    <TableCell align="right"><b>Action</b></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            {usersInGroup.length > 0 ? <TableBody>
+                                {usersInGroup.map((thisUser) => <TableRow>
+                                    <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
+                                    <TableCell align="right">{thisUser[1]}</TableCell>
+                                    <TableCell align="right">{thisUser[2]}</TableCell>
+                                    <TableCell align='right'><Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button></TableCell>
+                                </TableRow>)}
+                            </TableBody> : <br />}
+                        </Table>
+                        <br />
+                        <FormControl className={classes.formControl}>
+                            <Typography>Add Users: </Typography>
+                            <TextField
+                                native
+                                id="searchUserName"
+                                label="User Name"
+                                onChange={handleSearchUserName}
+                            />
+                        </FormControl>
+                        {searchUserNameResult.length > 0 ?
                             <Table className={classes.user_table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -171,49 +195,19 @@ function EditGroup(props) {
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {usersInGroup.length > 0 ? <TableBody>
-                                    {usersInGroup.map((thisUser) => <TableRow>
+                                <TableBody>
+                                    {searchUserNameResult.map((thisUser) => <TableRow>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
                                         <TableCell align="right">{thisUser[2]}</TableCell>
-                                        <TableCell align='right'><Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button></TableCell>
+                                        <TableCell align='right'><Button color="secondary" onClick={() => { addUserToGroup(thisUser) }}>Add</Button></TableCell>
                                     </TableRow>)}
-                                </TableBody> : <br />}
-                            </Table>
-                            <br />
-                            <FormControl className={classes.formControl}>
-                                <Typography>Add Users: </Typography>
-                                <TextField
-                                    native
-                                    id="searchUserName"
-                                    label="User Name"
-                                    onChange={handleSearchUserName}
-                                />
-                            </FormControl>
-                            {searchUserNameResult.length > 0 ?
-                                <Table className={classes.user_table} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell><b>User Name</b></TableCell>
-                                            <TableCell align="right"><b>Type</b></TableCell>
-                                            <TableCell align="right"><b>Zone</b></TableCell>
-                                            <TableCell align="right"><b>Action</b></TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {searchUserNameResult.map((thisUser) => <TableRow>
-                                            <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
-                                            <TableCell align="right">{thisUser[1]}</TableCell>
-                                            <TableCell align="right">{thisUser[2]}</TableCell>
-                                            <TableCell align='right'><Button color="secondary" onClick={() => { addUserToGroup(thisUser) }}>Add</Button></TableCell>
-                                        </TableRow>)}
-                                    </TableBody>
-                                </Table> : <br />}
-                            {isLoading == true ? <div><LinearProgress /></div> : <div />}
-                        </div>
+                                </TableBody>
+                            </Table> : <br />}
+                        {isLoading == true ? <div><LinearProgress /></div> : <div />}
                     </div>
-                </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+                </div>
+            </main>
         </div>
     );
 }
