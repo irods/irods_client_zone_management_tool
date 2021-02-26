@@ -11,6 +11,7 @@ import Logout from './views/Logout';
 import Home from './views/Home';
 import './App.css';
 import logo from './img/iRODS-logo.png';
+import { version } from '../package.json';
 
 class App extends Component {
   render() {
@@ -29,7 +30,7 @@ class App extends Component {
           </Router>
         </div>
         <hr />
-        <div className="app_footer"><div><img className="app_footer_logo" src={logo}></img>iRODS Consortium © 2021</div><div>Zone Management Tool Version: 0.1.0, {process.env.REACT_APP_GIT_SHA.substring(0,7)}</div></div>
+        <div className="app_footer"><div><img className="app_footer_logo" src={logo}></img><a href="https://irods.org" className="app_footer_text">iRODS Consortium © 2021</a></div><div>Zone Management Tool Version: {version}, {process.env.REACT_APP_GIT_SHA.substring(0,7)}</div></div>
       </div>
     );
   }

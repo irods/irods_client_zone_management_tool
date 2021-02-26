@@ -23,6 +23,14 @@
     margin-right: 5px;
 }
 
+.app_footer_text{
+    text-decoration: none;
+}
+
+.app_footer_text:visited{
+    color: black;
+}
+
 .app_wrap {
     flex-grow: 1;
 }
