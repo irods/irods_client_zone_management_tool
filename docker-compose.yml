@@ -12,5 +12,5 @@ services:
         - ./:/usr/src/app
         - /usr/src/app/node_modules
       ports: 
-        - $REACT_PORT:3000
+        - $LISTEN_PORT:3000
       
