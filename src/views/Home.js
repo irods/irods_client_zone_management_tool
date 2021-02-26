@@ -118,7 +118,6 @@ function Home() {
         setServers(server.zoneContext.length);
         setGroups(server.groupContext);
         setRescs(server.rescContext);
-        console.log(server.rescContext)
         setStatus("OK");
     }, [])
 
@@ -210,7 +209,7 @@ function Home() {
                     </Container>
                     <br />
                     <Pagination count={1} /><br />{zone_reports.length > 0 ? zone_reports.map((zone_report) =>
-                        <Card className={classes.server_card} id={zone_id}>
+                        <Card key={zone_id} className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={
                                     <img className={classes.server} id={zone_id} src={ServerIcon}></img>

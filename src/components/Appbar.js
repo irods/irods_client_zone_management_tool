@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Link from '@material-ui/core/Link'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { CssBaseline } from '@material-ui/core';
-import { makeStyles, useTheme, withTheme } from '@material-ui/core/styles';
-import Cookies from 'js-cookie';
+import { makeStyles } from '@material-ui/core/styles';
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 

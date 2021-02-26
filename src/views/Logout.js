@@ -1,6 +1,7 @@
 import React from 'react';
 import BlockIcon from '@material-ui/icons/Block';
 import Cookies from 'js-cookie';
+import { Link } from '@reach/router';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -15,12 +16,13 @@ const useStyles = makeStyles((theme) => ({
 
 function Logout() {
     const classes = useStyles();
-    const redirectUrl = window.location.origin
+    console.log(window.location.host);
+    const redirectUrl = window.location.host
     Cookies.remove('token');
 
     return (
         <div className={classes.logout}>
-            <BlockIcon /><br /><div>Please <a href={redirectUrl}>login</a> to use the administration dashboard.</div>
+            <BlockIcon /><br /><div>Please <Link to="/" replace>login</Link> to use the administration dashboard.</div>
         </div>
     )
 }

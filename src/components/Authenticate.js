@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
-
 import Cookies from 'js-cookie';
-
 import axios from 'axios';
-
-import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import '../App.css';
-import { red } from '@material-ui/core/colors';
 
 import { useNavigate } from '@reach/router';
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
-import { requirePropFactory } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {

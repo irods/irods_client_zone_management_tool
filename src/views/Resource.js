@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-import BlockIcon from '@material-ui/icons/Block';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
+import Logout from '../views/Logout';
 import Cookies from 'js-cookie';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import { FormControl, Input, InputLabel, Typography } from '@material-ui/core';
+import { FormControl, Input, InputLabel } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { StylesProvider } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
-import { Collapse, IconButton } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Pagination from '@material-ui/lab/Pagination';
@@ -101,12 +97,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Resource() {
-    const classes = useStyles();
     const token = Cookies.get('token');
-    const isAuthenticated = token != null ? true : false;
-
+    if (token === undefined) {
+        return <Logout />
+    }
+    const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
-    const [rescView, setRescView] = useState('list');
     const [resc, setResc] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
@@ -120,8 +116,6 @@ function Resource() {
     const [rescLocation, setRescLocation] = useState();
     const [rescZone, setRescZone] = useState();
     const [rescVaultPath, setRescVaultPath] = useState();
-    let resc_id = 0;
-
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
 
@@ -278,110 +272,108 @@ function Resource() {
 
 
     return (
-        <div>
-            {isAuthenticated == true ? <div className={classes.root}>
-                <Appbar />
-                <Sidebar menu_id="3" />
-                <main className={classes.content}>
-                    <div className={classes.toolbar} />
-                    <div className={classes.main}>
-                        <div className={classes.pagination}>
-                            <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
-                            <FormControl className={classes.itemsControl}>
-                                <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
-                                <Select
-                                    native
-                                    id="items-per-page"
-                                    label="Items Per Page"
-                                    onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
-                                >
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </Select>
-                            </FormControl>
-                            <TextField
-                                className={classes.search}
-                                id="search-term"
-                                label="Search"
-                                placeholder="Search by ResourceName"
-                                onChange={(event) => setSearchName(event.target.value)}
-                            />
-                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
-                                Add New Resource
+        <div className={classes.root}>
+            <Appbar />
+            <Sidebar menu_id="3" />
+            <main className={classes.content}>
+                <div className={classes.toolbar} />
+                <div className={classes.main}>
+                    <div className={classes.pagination}>
+                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <FormControl className={classes.itemsControl}>
+                            <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
+                            <Select
+                                native
+                                id="items-per-page"
+                                label="Items Per Page"
+                                onChange={(event) => { setPerPage(event.target.value); setCurrPage(1); }}
+                            >
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </Select>
+                        </FormControl>
+                        <TextField
+                            className={classes.search}
+                            id="search-term"
+                            label="Search"
+                            placeholder="Search by ResourceName"
+                            onChange={(event) => setSearchName(event.target.value)}
+                        />
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
+                            Add New Resource
                         </Button>
-                        </div>
-                        <br />
-                        <TableContainer className={classes.tableContainer} component={Paper}>
-                            <Table className={classes.table} aria-label="simple table">
-                                <TableHead>
-                                    <StylesProvider injectFirst>
-                                        <TableRow>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 4 ? order : 'asc'} onClick={() => { handleSort(4) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
-                                        </TableRow>
-                                    </StylesProvider>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow id="add_newrow" className={classes.add_hidden}>
-                                        <TableCell><Input id="name"
-                                            onChange={handleRescNameChange}></Input></TableCell>
-                                        <TableCell><Select
-                                            native
-                                            id="zone-type-select"
-                                            placeholder="Resource Type"
-                                            onChange={handleRescTypeChange}
-                                        >
-                                            <option aria-label="None" value="" />
-                                            <option value="compound">Compound</option>
-                                            <option value="load_balance">Load Balance</option>
-                                            <option value="passthru">Passthru</option>
-                                            <option value="random">Random</option>
-                                            <option value="replication">Replication</option>
-                                            <option value="round_robin">Round Robin</option>
-                                            <option value="deferred">Deferred</option>
-                                            <option value="emc_ecs">EMC ECS</option>
-                                            <option value="emc_isilon">EMC Isilon</option>
-                                            <option value="mockarchive">Mockarchive</option>
-                                            <option value="mso">MSO</option>
-                                            <option value="mssofile">MSSOFile</option>
-                                            <option value="non_blocking">Non-blocking</option>
-                                            <option value="struct_file">Struct file</option>
-                                            <option value="universal_mass_storage">Universal Mass Storage</option>
-                                            <option value="unixfilesystem">Unix File System</option>
-                                            <option value="wos">WOS</option>
-                                        </Select></TableCell>
-                                        <TableCell><Input id="location"
-                                            onChange={handleRescLocationChange}></Input></TableCell>
-                                        <TableCell><Input id="vault_path"
-                                            onChange={handleRescVaultPathChange}></Input></TableCell>
-                                        <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                    </div>
+                    <br />
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                        <Table className={classes.table} aria-label="simple table">
+                            <TableHead>
+                                <StylesProvider injectFirst>
+                                    <TableRow>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 4 ? order : 'asc'} onClick={() => { handleSort(4) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
                                     </TableRow>
-                                    {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Add New Resource</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Resource Name: {rescName}<br />
+                                </StylesProvider>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow id="add_newrow" className={classes.add_hidden}>
+                                    <TableCell><Input id="name"
+                                        onChange={handleRescNameChange}></Input></TableCell>
+                                    <TableCell><Select
+                                        native
+                                        id="zone-type-select"
+                                        placeholder="Resource Type"
+                                        onChange={handleRescTypeChange}
+                                    >
+                                        <option aria-label="None" value="" />
+                                        <option value="compound">Compound</option>
+                                        <option value="load_balance">Load Balance</option>
+                                        <option value="passthru">Passthru</option>
+                                        <option value="random">Random</option>
+                                        <option value="replication">Replication</option>
+                                        <option value="round_robin">Round Robin</option>
+                                        <option value="deferred">Deferred</option>
+                                        <option value="emc_ecs">EMC ECS</option>
+                                        <option value="emc_isilon">EMC Isilon</option>
+                                        <option value="mockarchive">Mockarchive</option>
+                                        <option value="mso">MSO</option>
+                                        <option value="mssofile">MSSOFile</option>
+                                        <option value="non_blocking">Non-blocking</option>
+                                        <option value="struct_file">Struct file</option>
+                                        <option value="universal_mass_storage">Universal Mass Storage</option>
+                                        <option value="unixfilesystem">Unix File System</option>
+                                        <option value="wos">WOS</option>
+                                    </Select></TableCell>
+                                    <TableCell><Input id="location"
+                                        onChange={handleRescLocationChange}></Input></TableCell>
+                                    <TableCell><Input id="vault_path"
+                                        onChange={handleRescVaultPathChange}></Input></TableCell>
+                                    <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                </TableRow>
+                                {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Add New Resource</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Resource Name: {rescName}<br />
                                     Type: {rescType}<br />
                                     Vault Path: {rescLocation}<br />
                                     Zone: {rescZone}
-                                </DialogContentText>
-                                {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
-                            </DialogContent>
-                            <DialogActions className={classes.dialog_action}>
-                            </DialogActions>
-                        </Dialog>
-                    </div>
-                </main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>}
+                            </DialogContentText>
+                            {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
+                        </DialogContent>
+                        <DialogActions className={classes.dialog_action}>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </main>
         </div>
     );
 }
