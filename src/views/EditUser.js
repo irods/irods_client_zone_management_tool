@@ -161,7 +161,7 @@ function EditUser(props) {
     return (
         <div className={classes.root}>
             <Appbar />
-            <Sidebar />
+            <Sidebar menu_id="1"/>
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
