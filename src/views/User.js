@@ -158,13 +158,13 @@ function User() {
     }
 
     const updateContent = () => {
+        console.log("updating content")
         server.updateUser();
         loadContent();
     }
 
     async function addUser() {
         try {
-            console.log("addUser")
             await axios({
                 method: 'POST',
                 url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
@@ -185,8 +185,9 @@ function User() {
                 window.location.reload();
             })
         } catch (e) {
+            console.log(e);
             setAddFormOpen(true);
-            setAddError("Error when adding new user. Please check the input.")
+            setAddError(`Error when adding new user. ${e.message}`)
         }
     }
 
@@ -230,6 +231,11 @@ function User() {
         document.getElementById('add-user-row').style["display"] = "none";
         document.getElementById('add-user-name').value = "";
         document.getElementById('add-user-type').value = "rodsuser";
+    }
+    
+    const handleAddFormClose = () => {
+        handleAddRowClose();
+        setAddFormOpen(false);
     }
 
     const handlePageChange = (event, value) => {
@@ -301,7 +307,7 @@ function User() {
                                 </StylesProvider>
                             </TableHead>
                             <TableBody>
-                                <TableRow id="add-user-row" className="hidden">
+                                <TableRow id="add-user-row" style={{ display: 'none' }}>
                                     <TableCell><Input id="add-user-name" placeholder="Enter new username" /></TableCell>
                                     <TableCell align="right"><Select
                                         native
@@ -322,16 +328,16 @@ function User() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <Dialog open={addFormOpen} onClose={() => setAddFormOpen(false)} aria-labelledby="form-dialog-title">
+                    <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                         <DialogTitle>Adding New User</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Result
+                                Error Message:
                                 </DialogContentText>
                             <p className={classes.errorMsg}>{addErrorMessage}</p>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => setAddFormOpen(false)} color="primary">Close</Button>
+                            <Button onClick={handleAddFormClose} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
