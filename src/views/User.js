@@ -9,8 +9,11 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, InputLabel, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
+import { Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import { Select } from '@material-ui/core';
+import SaveIcon from '@material-ui/icons/Save';
+import CloseIcon from '@material-ui/icons/Close';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import Pagination from '@material-ui/lab/Pagination';
 import { StylesProvider } from '@material-ui/core/styles';
@@ -96,9 +99,7 @@ function User() {
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addErrorMessage, setAddError] = useState();
-    const [addName, setAddName] = useState();
-    const [addUser_type, setAddUserType] = useState();
-    const [addZone_name, setAddZoneName] = useState();
+    const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [zone, setZone] = useState(localStorage.getItem('zoneName'));
     const [currPage, setCurrPage] = useState(1);
@@ -163,6 +164,7 @@ function User() {
 
     async function addUser() {
         try {
+            console.log("addUser")
             await axios({
                 method: 'POST',
                 url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
@@ -172,18 +174,18 @@ function User() {
                 params: {
                     action: 'add',
                     target: 'user',
-                    arg2: addName,
-                    arg3: addUser_type,
+                    arg2: document.getElementById('add-user-name').value,
+                    arg3: document.getElementById('add-user-type').value,
                     arg4: zone,
                     arg5: '',
                 }
             }).then((res) => {
-                setAddFormOpen(false);
                 updateContent();
                 localStorage.setItem("userContext", users.length + 1)
                 window.location.reload();
             })
         } catch (e) {
+            setAddFormOpen(true);
             setAddError("Error when adding new user. Please check the input.")
         }
     }
@@ -211,18 +213,6 @@ function User() {
         }
     }
 
-    const handleAddUserType = (event) => {
-        setAddUserType(event.target.value);
-    }
-
-    const handleAddUserName = (event) => {
-        setAddName(event.target.value);
-    }
-
-    const handleAddZoneName = (event) => {
-        setAddZoneName(event.target.value);
-    }
-
     const handleRemoveConfirmationOpen = (props) => {
         setCurrUser(props);
         setRemoveConfirmation(true);
@@ -232,12 +222,14 @@ function User() {
         setRemoveConfirmation(false);
     }
 
-    const handleAddFormOpen = () => {
-        setAddFormOpen(true);
+    const handleAddRowOpen = () => {
+        document.getElementById('add-user-row').style["display"] = "contents";
     }
 
-    const handleAddFormClose = () => {
-        setAddFormOpen(false);
+    const handleAddRowClose = () => {
+        document.getElementById('add-user-row').style["display"] = "none";
+        document.getElementById('add-user-name').value = "";
+        document.getElementById('add-user-type').value = "rodsuser";
     }
 
     const handlePageChange = (event, value) => {
@@ -293,7 +285,7 @@ function User() {
                             placeholder="Search by username"
                             onChange={(event) => setSearchName(event.target.value)}
                         />
-                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New User
                         </Button>
                     </div>
@@ -309,6 +301,16 @@ function User() {
                                 </StylesProvider>
                             </TableHead>
                             <TableBody>
+                                <TableRow id="add-user-row" className="hidden">
+                                    <TableCell><Input id="add-user-name" placeholder="Enter new username" /></TableCell>
+                                    <TableCell align="right"><Select
+                                        native
+                                        id="add-user-type"
+                                    >
+                                        {userTypes.map(this_user_type => <option key={this_user_type} value={this_user_type}>{this_user_type}</option>)}
+                                    </Select></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                </TableRow>
                                 {users.map((this_user) =>
                                     <TableRow key={this_user[0]}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
@@ -320,53 +322,16 @@ function User() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
-                        <DialogTitle>Add New User</DialogTitle>
+                    <Dialog open={addFormOpen} onClose={() => setAddFormOpen(false)} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Adding New User</DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                You can add a new user there.
+                                Result
                                 </DialogContentText>
-                            <form className={classes.container}>
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="name"
-                                        label="Username"
-                                        onChange={handleAddUserName}
-                                    />
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="user-type-select">Zone Name</InputLabel>
-                                    <Select
-                                        native
-                                        id="zone"
-                                        label="Zone Name"
-                                        onChange={handleAddZoneName}
-                                        defaultValue={zone}
-                                    >
-                                        <option value={zone} selected>{zone}</option>
-                                    </Select>
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="user-type-select">User Type</InputLabel>
-                                    <Select
-                                        native
-                                        id="user-type-select"
-                                        value={addUser_type}
-                                        onChange={handleAddUserType}
-                                    >
-                                        <option aria-label="None" value="" />
-                                        <option value="rodsadmin">rodsadmin</option>
-                                        <option value="groupadmin">groupadmin</option>
-                                        <option value="rodsuser">rodsuser</option>
-                                    </Select>
-                                </FormControl>
-                            </form>
                             <p className={classes.errorMsg}>{addErrorMessage}</p>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={addUser} color="primary">Save</Button>
-                            <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
+                            <Button onClick={() => setAddFormOpen(false)} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={removeConfirmation} onClose={handleRemoveConfirmationClose} aria-labelledby="form-dialog-title">
