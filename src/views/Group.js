@@ -6,9 +6,12 @@ import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
-import { Button, FormControl, TextField, InputLabel, Select } from '@material-ui/core';
+import { Button, FormControl, TextField, Input, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
+import SaveIcon from '@material-ui/icons/Save';
+import CloseIcon from '@material-ui/icons/Close';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
@@ -160,7 +163,6 @@ function Group() {
                 query_type: 'general'
             }
         });
-        console.log(groupListResult);
         const groupList = groupListResult.data._embedded.sort();
         setTotalPage(groupListResult.data.total / perPage);
 
@@ -203,7 +205,7 @@ function Group() {
                 params: {
                     action: 'add',
                     target: 'user',
-                    arg2: addGroupName,
+                    arg2: document.getElementById('add-group-name'),
                     arg3: 'rodsgroup',
                     arg4: zone,
                     arg5: ''
@@ -213,13 +215,14 @@ function Group() {
                     'Accept': 'application/json'
                 }
             }).then(res => {
+                localStorage.setItem("groupContext", groups.length + 1)
                 window.location.reload();
-                console.log(res);
             })
         }
         catch (e) {
-            setErrorMsg("Cannot add new group. Please check your group name or zone name.")
             console.log(e);
+            setAddFormOpen(true);
+            setErrorMsg(`Cannot add new group. ${e.mssage}`)
         }
     }
 
@@ -239,7 +242,7 @@ function Group() {
                     'Accept': 'application/json'
                 }
             }).then(res => {
-                console.log(res);
+                localStorage.setItem("groupContext", groups.length - 1)
                 window.location.reload();
             })
         } catch (e) {
@@ -254,16 +257,18 @@ function Group() {
         }
     }
 
-    const handleAddFormOpen = () => {
-        setAddFormOpen(true);
+    const handleAddRowOpen = () => {
+        document.getElementById('add-group-row').style["display"] = "contents";
+    }
+
+    const handleAddRowClose = () => {
+        document.getElementById('add-group-row').style["display"] = "none";
+        document.getElementById('add-group-name').value = '';
     }
 
     const handleAddFormClose = () => {
+        handleAddRowClose();
         setAddFormOpen(false);
-    }
-
-    const handleAddGroupName = event => {
-        setAddGroupName(event.target.value);
     }
 
     const handlePageChange = (event, value) => {
@@ -306,7 +311,7 @@ function Group() {
                             placeholder="Search by GroupName"
                             onChange={(event) => setSearchName(event.target.value)}
                         />
-                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddFormOpen}>
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New Group
                         </Button>
                     </div>
@@ -320,6 +325,11 @@ function Group() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                                <TableRow id="add-group-row" style={{ display: 'none' }}>
+                                    <TableCell><Input placeholder="Enter new groupname"id="add-group-name" /></TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                </TableRow>
                                 {groups.map((group) =>
                                     <TableRow key={group_id}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
@@ -330,39 +340,16 @@ function Group() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <Dialog open={addFormOpen} className={classes.formContainer} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
-                        <DialogTitle>Add New Group</DialogTitle>
+                    <Dialog open={addFormOpen} className={classes.formContainer} onClick={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Adding New Group</DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
-                                Enter your group and zone name:
+                        <DialogContentText>
+                                Error Message:
                                 </DialogContentText>
-                            <form className={classes.container}>
-                                <FormControl className={classes.formControl}>
-                                    <TextField
-                                        native
-                                        id="name"
-                                        label="Group Name"
-                                        onChange={handleAddGroupName}
-                                    />
-                                </FormControl>
-                                <FormControl className={classes.formControl}>
-                                    <InputLabel htmlFor="group-zone-select">Zone Name</InputLabel>
-                                    <Select
-                                        native
-                                        id="zone"
-                                        label="Zone Name"
-                                        defaultValue={zone}
-                                    >
-                                        <option value={zone} selected>{zone}</option>
-                                    </Select>
-                                </FormControl>
-                            </form>
-                            <br />
                             <p className={classes.errorMsg}>{errorMsg}</p>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={addGroup} color="primary">Save</Button>
-                            <Button onClick={handleAddFormClose} color="primary">Cancel</Button>
+                            <Button onClick={handleAddFormClose} color="primary">Close</Button>
                         </DialogActions>
                     </Dialog>
                 </div>
