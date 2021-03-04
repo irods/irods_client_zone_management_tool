@@ -6,7 +6,7 @@ import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
 import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
-import { Button, FormControl, TextField, Input, InputLabel, Select } from '@material-ui/core';
+import { Button, FormControl, TextField, Input, InputLabel, Select, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
@@ -95,9 +95,10 @@ function Group() {
     const server = useServer();
     const environment = useEnvironment();
 
-    const [errorMsg, setErrorMsg] = useState();
+    const [addErrorMsg, setAddErrorMsg] = useState();
+    const [removeErrorMsg, setRemoveErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
-    const [addGroupName, setAddGroupName] = useState();
+    const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [groups, setGroup] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
 
@@ -222,7 +223,7 @@ function Group() {
         catch (e) {
             console.log(e);
             setAddFormOpen(true);
-            setErrorMsg(`Cannot add new group. ${e.mssage}`)
+            setAddErrorMsg(`Cannot add new group. ${e.message}`)
         }
     }
 
@@ -247,15 +248,16 @@ function Group() {
             })
         } catch (e) {
             console.log(e);
+            setRemoveErrorMsg(`Cannot remove group. ${e.message}`)
         }
     }
 
-    const handlecurrentGroup = event => {
-        if (event.target.id !== '') {
-            setCurrGroup(groups[event.target.id]);
-            console.log(groups[event.target.id]);
-        }
-    }
+    // const handlecurrentGroup = event => {
+    //     if (event.target.id !== '') {
+    //         setCurrGroup(groups[event.target.id]);
+    //         console.log(groups[event.target.id]);
+    //     }
+    // }
 
     const handleAddRowOpen = () => {
         document.getElementById('add-group-row').style["display"] = "contents";
@@ -279,6 +281,16 @@ function Group() {
         const isAsc = orderBy === props && order == 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
+    }
+
+    const handleRemoveAction = group => {
+        setCurrGroup(group);
+        setRemoveFormOpen(true);
+    }
+
+    const handleRemoveFormClose = () => {
+        setRemoveFormOpen(false);
+        setRemoveErrorMsg();
     }
 
     return (
@@ -326,7 +338,7 @@ function Group() {
                             </TableHead>
                             <TableBody>
                                 <TableRow id="add-group-row" style={{ display: 'none' }}>
-                                    <TableCell><Input placeholder="Enter new groupname"id="add-group-name" /></TableCell>
+                                    <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
                                     <TableCell></TableCell>
                                     <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
@@ -334,7 +346,7 @@ function Group() {
                                     <TableRow key={group_id}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onMouseOver={handlecurrentGroup} onClick={removeGroup}>Remove</Button>}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -343,13 +355,24 @@ function Group() {
                     <Dialog open={addFormOpen} className={classes.formContainer} onClick={handleAddFormClose} aria-labelledby="form-dialog-title">
                         <DialogTitle>Adding New Group</DialogTitle>
                         <DialogContent>
-                        <DialogContentText>
+                            <DialogContentText>
                                 Error Message:
                                 </DialogContentText>
-                            <p className={classes.errorMsg}>{errorMsg}</p>
+                            <p className={classes.errorMsg}>{addErrorMsg}</p>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleAddFormClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={removeFormOpen} className={classes.formContainer} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Warning</DialogTitle>
+                        <DialogContent>
+                            <Typography>Are you sure to remove <b>{currGroup[0]}</b>?</Typography>
+                            <p className={classes.errorMsg}>{removeErrorMsg}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={removeGroup} color="secondary">Remove</Button>
+                            <Button onClick={handleRemoveFormClose} color="primary">Cancel</Button>
                         </DialogActions>
                     </Dialog>
                 </div>
