@@ -98,7 +98,8 @@ function User() {
     const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
-    const [addErrorMessage, setAddError] = useState();
+    const [addErrorMsg, setAddErrorMsg] = useState();
+    const [removeErrorMsg, setRemoveErrorMsg] = useState();
     const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [zone, setZone] = useState(localStorage.getItem('zoneName'));
@@ -131,10 +132,10 @@ function User() {
     const loadContent = async (prop) => {
         let _query;
         if (searchUsername == undefined) {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser'`
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`
         }
         else {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsuser' and USER_NAME LIKE '%${searchUsername}%'`
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${searchUsername}%'`
         }
         const userResult = axios({
             method: 'GET',
@@ -187,7 +188,7 @@ function User() {
         } catch (e) {
             console.log(e);
             setAddFormOpen(true);
-            setAddError(`Error when adding new user. ${e.message}`)
+            setAddErrorMsg(`Error when adding new user. ${e.message}`)
         }
     }
 
@@ -211,6 +212,7 @@ function User() {
                 window.location.reload();
             })
         } catch (e) {
+            setRemoveErrorMsg("Failed to remove user: "+ e.message)
         }
     }
 
@@ -232,7 +234,7 @@ function User() {
         document.getElementById('add-user-name').value = "";
         document.getElementById('add-user-type').value = "rodsuser";
     }
-    
+
     const handleAddFormClose = () => {
         handleAddRowClose();
         setAddFormOpen(false);
@@ -334,7 +336,7 @@ function User() {
                             <DialogContentText>
                                 Error Message:
                                 </DialogContentText>
-                            <p className={classes.errorMsg}>{addErrorMessage}</p>
+                            <p className={classes.errorMsg}>{addErrorMsg}</p>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleAddFormClose} color="primary">Close</Button>
@@ -344,7 +346,7 @@ function User() {
                         <DialogTitle>Warning</DialogTitle>
                         <DialogContent>
                             <Typography>Are you sure to remove <b>{currUser[0]}</b>?</Typography>
-                            <p className={classes.errorMsg}>{ }</p>
+                            <p className={classes.errorMsg}>{removeErrorMsg}</p>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={removeUser} color="secondary">Remove</Button>

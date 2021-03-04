@@ -54,7 +54,7 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': Cookies.get('token')
             },
             params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsuser'",
+                query_string: "SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup'",
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
