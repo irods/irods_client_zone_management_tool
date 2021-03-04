@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Rows(props) {
+function ResourceRows(props) {
   const { row } = props;
   const classes = useStyles();
   const environment = useEnvironment();
@@ -74,7 +74,7 @@ function Rows(props) {
   const [context, setContext] = useState(row[9]);
 
   const [removeFormOpen, setRemoveForm] = useState(false);
-  const [removeStatus, setRemoveStatus] = useState();
+  const [removeErrorMsg, setRemoveErrorMsg] = useState();
 
   const editResource = async (name, arg, value) => {
     setEditForm(true);
@@ -95,8 +95,13 @@ function Rows(props) {
       const result = await RemoveResourceController(name, environment.restApiLocation);
       window.location.reload();
     } catch (e) {
-      setRemoveStatus(e.response.data);
+      setRemoveErrorMsg("Error: " + e.message);
     }
+  }
+
+  const removeFormClose = () => {
+    setRemoveForm(false);
+    setRemoveErrorMsg();
   }
 
   return (
@@ -138,10 +143,10 @@ function Rows(props) {
           </Collapse>
         </TableCell>
       </TableRow>
-      <Dialog open={removeFormOpen} onClose={() => { setRemoveForm(false) }} aria-labelledby="form-dialog-title">
+      <Dialog open={removeFormOpen} onClose={removeFormClose} aria-labelledby="form-dialog-title">
         <DialogContent className={classes.dialog_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
-        {removeStatus !== undefined ? <DialogContentText className={classes.remove_result}>Error Code {removeStatus.error_code}: {removeStatus.error_message}</DialogContentText> : <span />}
-        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={() => setRemoveForm(false)}>Cancel</Button></DialogActions>
+        <DialogContentText className={classes.remove_result}>{removeErrorMsg}</DialogContentText>
+        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
       </Dialog>
       <Dialog open={editFormOpen} onClose={() => { setEditForm(false) }} aria-labelledby="form-dialog-title">
         <DialogContent className={classes.dialog_content}>Modify Resource</DialogContent>
@@ -151,4 +156,4 @@ function Rows(props) {
   );
 }
 
-export default Rows;
+export default ResourceRows;

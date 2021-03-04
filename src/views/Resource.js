@@ -20,7 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { useServer } from '../contexts/ServerContext';
 
 import '../App.css';
-import Rows from '../components/Rows';
+import ResourceRows from '../components/ResourceRows';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -354,7 +354,7 @@ function Resource() {
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
                                     <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {resc.map(this_resc => <Rows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
+                                {resc.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                             </TableBody>
                         </Table>
                     </TableContainer>
