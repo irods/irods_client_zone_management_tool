@@ -35,7 +35,33 @@
     flex-grow: 1;
 }
 
+.connection_container {
+    display: flex;
+    padding: 10px 10px;
+}
+
+.green_dot {
+    height: 15px;
+    width: 15px;
+    background-color: #00ff00;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
 .hidden {
     display: none;
 }
 
+.red_dot {
+    height: 15px;
+    width: 15px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.pointer {
+    cursor: pointer;
+}
