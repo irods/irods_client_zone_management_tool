@@ -57,6 +57,8 @@ function Authenticate() {
         navigate('/home', { replace: true });
     }
 
+    // test each endpoint connection, show error if a 500 status code is returned
+
     const testAuthConnection = async () => {
         await axios({
             url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
@@ -110,12 +112,14 @@ function Authenticate() {
         })
     }
 
+    // check each endpoint per render
     useEffect(() => {
         testAuthConnection();
         testZoneReportConnection();
         testAdminConnection();
         testQueryConnection();
     }, [])
+    
     const handleUsername = (event) => {
         setUsername(event.target.value);
     }
@@ -126,10 +130,6 @@ function Authenticate() {
 
     const handleKeyDown = (event) => {
         if (event.keyCode === 13) handleAuthenticate();
-    }
-
-    const expandConnection = () => {
-        console.log("1")
     }
 
     async function handleAuthenticate() {
