@@ -1,5 +1,5 @@
 import React from 'react';
-import Authenticate from '../components/Authenticate';
+import Authenticate from '../views/Authenticate';
 import Home from '../views/Home';
 import Cookies from 'js-cookie';
 
