@@ -7,7 +7,6 @@ import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 
 import '../App.css';
 
@@ -41,12 +40,6 @@ function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [incorrect, setIncorrect] = useState(false);
-    const [connection, setConnection] = useState(true);
-    const [authConnection, setAuthConnection] = useState(true);
-    const [zoneReportConnection, setZoneReportConnection] = useState(true);
-    const [adminConnection, setAdminConnection] = useState(true);
-    const [queryConnection, setQueryConnection] = useState(true);
-    const [connectionForm, setConnectionForm] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
     const server = useServer();
@@ -57,69 +50,6 @@ function Authenticate() {
         navigate('/home', { replace: true });
     }
 
-    // test each endpoint connection, show error if a 500 status code is returned
-
-    const testAuthConnection = async () => {
-        await axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
-            method: 'POST',
-            params: {
-                user_name: 'test',
-                password: 'test',
-                auth_type: 'native'
-            }
-        }).catch(e => {
-            if (e.response.status >= 500) {
-                setAuthConnection(false);
-                setConnection(false);
-            }
-        })
-    }
-
-    const testZoneReportConnection = async () => {
-        await axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/zone_report`,
-            method: 'POST'
-        }).catch(e => {
-            if (e.response.status >= 500) {
-                setZoneReportConnection(false);
-                setConnection(false);
-            }
-        })
-    }
-
-    const testAdminConnection = async () => {
-        await axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
-            method: 'POST'
-        }).catch(e => {
-            if (e.response.status >= 500) {
-                setAdminConnection(false);
-                setConnection(false);
-            }
-        })
-    }
-
-    const testQueryConnection = async () => {
-        await axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-            method: 'GET'
-        }).catch(e => {
-            if (e.response.status >= 500) {
-                setQueryConnection(false);
-                setConnection(false);
-            }
-        })
-    }
-
-    // check each endpoint per render
-    useEffect(() => {
-        testAuthConnection();
-        testZoneReportConnection();
-        testAdminConnection();
-        testQueryConnection();
-    }, [])
-    
     const handleUsername = (event) => {
         setUsername(event.target.value);
     }
@@ -189,21 +119,8 @@ function Authenticate() {
                     className={classes.login_button}
                     onClick={handleAuthenticate}>Login</Button>
                 <br />
-                <Dialog open={connectionForm} onClose={() => setConnectionForm(false)}>
-                    <DialogTitle>
-                        Endpoint Connection
-                    </DialogTitle>
-                    <DialogContent>
-                        <div className="connection_container">
-                            <div>/auth: {authConnection ? <div className="green_dot"></div> : <div className="red_dot"></div>}<Button variant="outlined" color="primary" onClick={testAuthConnection}>Retry</Button></div>
-                            <div>/zone_report: {zoneReportConnection ? <div className="green_dot"></div> : <div className="red_dot"></div>}<Button variant="outlined" color="primary" onClick={testZoneReportConnection}>Retry</Button></div>
-                            <div>/admin: {adminConnection ? <div className="green_dot"></div> : <div className="red_dot"></div>}<Button variant="outlined" color="primary" onClick={testAdminConnection}>Retry</Button></div>
-                            <div>/query: {queryConnection ? <div className="green_dot"></div> : <div className="red_dot"></div>}<Button variant="outlined" color="primary" onClick={testQueryConnection}>Retry</Button></div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
                 <Box mt={8}>
-                    {connection ? <div className="green_dot"></div> : <div className="red_dot"></div>} <a className="pointer" onClick={() => setConnectionForm(true)}>iRODS Client REST API Connection</a>
+                    Copyright © iRODS Consortium 2021
                 </Box>
             </div>
         </Container>
