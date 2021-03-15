@@ -19,12 +19,13 @@ function Footer() {
                     </DialogTitle>
                 <DialogContent>
                     <div className="connection_container">
-                        <div className="connection_text_status">/admin: {connection.adminConnection === undefined ? <span>Loading</span> : <span>{connection.adminConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>Error</span>}</span>}</div>
-                        <div className="connection_text_status">/auth: {connection.authConnection === undefined ? <span>Loading</span> : <span>{connection.authConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>Error</span>}</span>}</div>
-                        <div className="connection_text_status">/query: {connection.queryConnection === undefined ? <span>Loading</span> : <span>{connection.queryConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>Error</span>}</span>}</div>
-                        <div className="connection_text_status">/zone_report: {connection.zoneReportConnection === undefined ? <span>Loading</span> : <span>{connection.zoneReportConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>Error</span>}</span>}</div>
+                        <div className="connection_title">Rest API URL: {environment.restApiLocation}/irods-rest/1.0.0</div>
+                        <div className="connection_text_status">/admin: {connection.adminConnection === undefined ? <span>Loading</span> : <span>{connection.adminConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
+                        <div className="connection_text_status">/auth: {connection.authConnection === undefined ? <span>Loading</span> : <span>{connection.authConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
+                        <div className="connection_text_status">/query: {connection.queryConnection === undefined ? <span>Loading</span> : <span>{connection.queryConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
+                        <div className="connection_text_status">/zone_report: {connection.zoneReportConnection === undefined ? <span>Loading</span> : <span>{connection.zoneReportConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
                     </div>
-                    <div className="connection_timestamp">Last checked: <br />{connection.timeStamp}</div>
+                    <div className="connection_timestamp">Last checked: {connection.timeStamp}</div>
                     <div className="connection_timestamp">
                         <Button variant="outlined" fullWidth="true" color="primary" onClick={() => connection.testConnection()}>Test Connection</Button>
                     </div>
