@@ -47,6 +47,10 @@
     justify-content: space-between;
 }
 
+.connection_title {
+    padding-bottom: 20px;
+}
+
 .connection_timestamp {
     padding: 5px;
 }

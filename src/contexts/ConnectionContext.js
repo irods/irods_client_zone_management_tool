@@ -24,13 +24,14 @@ export const ConnectionProvider = ({ children }) => {
 
         // check each endpoint connection, if no response, return false;
         setTimeout(() => {
+            console.log(authConnection);
             authConnection === undefined ? setAuthConnection(false) : authConnection;
             zoneReportConnection === undefined ? setZoneReportConnection(false) : zoneReportConnection;
             adminConnection === undefined ? setAdminConnection(false) : adminConnection;
             queryConnection === undefined ? setQueryConnection(false) : queryConnection;
             setConnection(false);
         }, environment.restApiTimeout * 1000)
-        setTimeStamp(new Date().toString())
+        setTimeStamp(new Date().toUTCString())
         setAuthConnection();
         setZoneReportConnection();
         setAdminConnection();
