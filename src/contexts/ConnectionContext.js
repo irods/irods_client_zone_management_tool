@@ -5,7 +5,7 @@ import { useEnvironment } from './EnvironmentContext';
 export const ConnectionContext = createContext({});
 
 export const ConnectionProvider = ({ children }) => {
-    const [connection, setConnection] = useState();
+    const [connection, setConnection] = useState(true);
     const [authConnection, setAuthConnection] = useState();
     const [zoneReportConnection, setZoneReportConnection] = useState();
     const [adminConnection, setAdminConnection] = useState();
@@ -23,36 +23,27 @@ export const ConnectionProvider = ({ children }) => {
     const testConnection = async () => {
 
         // check each endpoint connection, if no response, return false;
-        setTimeout(() => {
-            console.log(authConnection);
-            authConnection === undefined ? setAuthConnection(false) : authConnection;
-            zoneReportConnection === undefined ? setZoneReportConnection(false) : zoneReportConnection;
-            adminConnection === undefined ? setAdminConnection(false) : adminConnection;
-            queryConnection === undefined ? setQueryConnection(false) : queryConnection;
-            setConnection(false);
-        }, environment.restApiTimeout * 1000)
         setTimeStamp(new Date().toUTCString())
         setAuthConnection();
         setZoneReportConnection();
         setAdminConnection();
         setQueryConnection();
-        await testAuthConnection();
-        await testZoneReportConnection();
+
+        // test endpoint connection in order
         await testAdminConnection();
+        await testAuthConnection();
         await testQueryConnection();
+        await testZoneReportConnection();
     }
 
     const testAuthConnection = () => {
-        axios({
+        return axios({
             url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
             method: 'POST',
-            params: {
-                user_name: 'test',
-                password: 'test',
-                auth_type: 'native'
-            }
+            // set timeout value
+            timeout: environment.restApiTimeout * 1000
         }).catch(e => {
-            if (e.response.status >= 500) {
+            if (!e.response || e.response.status >= 500) {
                 setAuthConnection(false);
                 setConnection(false);
             }
@@ -63,11 +54,12 @@ export const ConnectionProvider = ({ children }) => {
     }
 
     const testZoneReportConnection = () => {
-        axios({
+        return axios({
             url: `${environment.restApiLocation}/irods-rest/1.0.0/zone_report`,
-            method: 'POST'
+            method: 'POST',
+            timeout: environment.restApiTimeout * 1000
         }).catch(e => {
-            if (e.response.status >= 500) {
+            if (!e.response || e.response.status >= 500) {
                 setZoneReportConnection(false);
                 setConnection(false);
             }
@@ -78,29 +70,28 @@ export const ConnectionProvider = ({ children }) => {
     }
 
     const testAdminConnection = () => {
-        axios({
+        return axios({
             url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
-            method: 'POST'
-        }).
-            then(res => {
+            method: 'POST',
+            timeout: environment.restApiTimeout * 1000
+        }).catch(e => {
+            if (!e.response || e.response.status >= 500) {
+                setAdminConnection(false);
+                setConnection(false);
+            } else {
                 setAdminConnection(true);
-            }).catch(e => {
-                if (e.response.status >= 500) {
-                    setAdminConnection(false);
-                    setConnection(false);
-                } else {
-                    setAdminConnection(true);
-                }
+            }
 
-            })
+        })
     }
 
     const testQueryConnection = () => {
-        axios({
+        return axios({
             url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-            method: 'GET'
+            method: 'GET',
+            timeout: environment.restApiTimeout * 1000
         }).catch(e => {
-            if (e.response.status >= 500) {
+            if (!e.response || e.response.status >= 500) {
                 setQueryConnection(false);
                 setConnection(false);
             }
