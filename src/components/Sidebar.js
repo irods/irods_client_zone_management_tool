@@ -37,12 +37,7 @@ function Sidebar(props) {
     const [userCounts, setUserCounts] = useState();
     const [groupCounts, setGroupCounts] = useState();
     const [rescCounts, setRescCounts] = useState();
-
-    useEffect(() => {
-        setUserCounts(`(${localStorage.getItem("userContext")})`);
-        setGroupCounts(`(${localStorage.getItem("groupContext")})`);
-        setRescCounts(`(${localStorage.getItem("rescContext")})`);
-    },[])
+    const { userContext, groupContext, rescContext} = useServer();
 
     return (
             <Drawer
@@ -59,13 +54,13 @@ function Sidebar(props) {
                         <ListItemText primary='Home' />
                     </MenuItem>
                     <MenuItem button selected={selected == 1} component={Link} to="/user" key='user'>
-                        <ListItemText>Users {userCounts}</ListItemText>
+                        <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 2} component={Link} to="/group" key='group'>
-                        <ListItemText>Groups {groupCounts}</ListItemText>
+                        <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
                     </MenuItem>
                     <MenuItem button selected={selected == 3} component={Link} to="/resource" key='resource'>
-                        <ListItemText>Resources {rescCounts}</ListItemText>
+                        <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
                     </MenuItem>
                 </List>
                 <Divider />
