@@ -2,37 +2,93 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useEnvironment } from './EnvironmentContext';
 
-import Cookies from 'js-cookie';
-
 export const ServerContext = createContext();
 
 export const ServerProvider = ({ children }) => {
+    console.log("server provider")
     const env = useEnvironment();
-    let token = Cookies.get('token');
-    const [zoneContext, setZoneContext] = useState(JSON.parse(localStorage.getItem('zoneContext')));
+    const [zoneContext, setZoneContext] = useState();
     const [zoneName, setZoneName] = useState();
-    const [userContext, setUserContext] = useState(JSON.parse(localStorage.getItem('userContext')));
-    const [groupContext, setGroupContext] = useState(JSON.parse(localStorage.getItem('groupContext')));
-    const [rescContext, setRescContext] = useState(JSON.parse(localStorage.getItem('rescContext')));
-    const updateZone = async () => {
-        const zoneReportResult = await axios({
+    const [userContext, setUserContext] = useState();
+    const [groupContext, setGroupContext] = useState();
+    const [rescContext, setRescContext] = useState();
+
+    const loadUser = (offset, limit) => {
+        axios({
+            method: 'GET',
+            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            headers: {
+                'Authorization': env.auth
+            },
+            params: {
+                query_string: "SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup'",
+                query_limit: limit,
+                row_offset: offset,
+                query_type: 'general'
+            }
+        }).then((res) => {
+            setUserContext(res.data);
+        }).catch((e) => {
+        });
+    }
+
+    const loadGroup = (offset, limit) => {
+        axios({
+            method: 'GET',
+            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            headers: {
+                'Authorization': env.auth
+            },
+            params: {
+                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
+                query_limit: limit,
+                row_offset: offset,
+                query_type: 'general'
+            }
+        }).then((res) => {
+            setGroupContext(res.data);
+        }).catch((e) => {
+        });
+    }
+
+
+    const loadResource = () => {
+        axios({
+            method: 'GET',
+            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            headers: {
+                'Authorization': env.auth
+            },
+            params: {
+                query_string: "SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT",
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then((res) => {
+            setRescContext(res.data);
+        }).catch((e) => {
+        });
+    }
+
+    const loadZone = async () => {
+        axios({
             method: 'POST',
             url: `${env.restApiLocation}/irods-rest/1.0.0/zone_report`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': Cookies.get('token')
+                'Authorization': env.auth
             }
         }).then((res) => {
             setZoneContext(res.data.zones);
-            localStorage.setItem('zoneContext', JSON.stringify(res.data.zones));
         }).catch((e) => {
         });
 
-        const zoneNameResult = axios({
+        axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
-                'Authorization': Cookies.get('token')
+                'Authorization': env.auth
             },
             params: {
                 query_string: 'SELECT ZONE_NAME',
@@ -42,83 +98,30 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setZoneName(res.data._embedded[0]);
-            localStorage.setItem('zoneName', res.data._embedded[0]);
         });
     }
 
-    const updateUser = () => {
-        axios({
-            method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            setUserContext(res.data.total);
-            localStorage.setItem('userContext', res.data.total);
-        }).catch((e) => {
-        });
-    }
-
-    const updateGroup = () => {
-        axios({
-            method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            setGroupContext(res.data.total);
-            localStorage.setItem('groupContext', res.data.total);
-        }).catch((e) => {
-        });
-    }
-
-    const updateResource = () => {
-        axios({
-            method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: "SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT",
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            setRescContext(res.data.total);
-            localStorage.setItem('rescContext', res.data.total);
-        }).catch((e) => {
-        });
-    }
+    // reload zone, user, group, resource on page refresh
 
     useEffect(() => {
-        token = Cookies.get('token')
-        if (token != null) {
-            updateZone();
-            updateUser();
-            updateGroup();
-            updateResource();
+        if (env.auth != null) {
+            console.log("Server Context Loading...")
+            loadZone();
+            loadUser(0, 100);
+            loadGroup(0,100);
+            loadResource();
+            
         }
     }, [])
 
     return (
-        <ServerContext.Provider value={{ zoneContext, zoneName, updateZone, userContext, updateUser, groupContext, updateGroup, rescContext, updateResource }}>
-            { children }
+        <ServerContext.Provider value={{
+            zoneContext, zoneName, loadZone, 
+            userContext, loadUser, 
+            groupContext, loadGroup, 
+            rescContext, loadResource,
+        }}>
+            { children}
         </ServerContext.Provider>
     )
 }
