@@ -43,6 +43,7 @@ export const ConnectionProvider = ({ children }) => {
             // set timeout value
             timeout: environment.restApiTimeout * 1000
         }).catch(e => {
+            // timeout will result in an undefined error response which will be handled here
             if (!e.response || e.response.status >= 500) {
                 setAuthConnection(false);
                 setConnection(false);
