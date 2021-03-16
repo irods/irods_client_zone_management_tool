@@ -40,6 +40,7 @@ function Authenticate() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [incorrect, setIncorrect] = useState(false);
+    const [serverError, setServerError] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
     const server = useServer();
@@ -59,22 +60,24 @@ function Authenticate() {
     }
 
     const handleKeyDown = (event) => {
-        if (event.keyCode === 13) handleAuthenticate();
+        if (event.keyCode === 13) {
+            handleAuthenticate();
+        }
     }
 
     async function handleAuthenticate() {
         try {
+            setServerError(false);
+            setIncorrect(false);
             const authResult = await axios({
                 method: 'POST',
                 url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
-                params: {
-                    user_name: username,
-                    password: password,
-                    auth_type: 'native'
+                headers: {
+                    Authorization: `BASIC ${btoa(username + ":" + password)}`
                 }
             }).then((res) => {
                 if (res.status == 200) {
-                    Cookies.set('token', res.data, { expires: new Date().getTime() + 60 * 60 * 1000 });
+                    Cookies.set('token', res.data, { expires: 60 * 60 * 1000 });
                     server.updateZone();
                     server.updateUser();
                     server.updateGroup();
@@ -83,7 +86,8 @@ function Authenticate() {
                 }
             })
         } catch (err) {
-            setIncorrect(true);
+            if (err.response.status >= 500) setServerError(true);
+            else setIncorrect(true);
         }
     }
 
@@ -110,6 +114,7 @@ function Authenticate() {
                     required
                     onKeyDown={handleKeyDown}
                     onChange={handlePassword} />
+                {serverError == false ? <br /> : <Typography className={classes.error}>Server error. Please check the Client REST API Connection.</Typography>}
                 {incorrect == false ? <br /> : <Typography className={classes.error}>Incorrect username or password. Please try again.</Typography>}
                 <Button
                     variant="contained"
