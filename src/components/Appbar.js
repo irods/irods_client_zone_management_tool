@@ -11,6 +11,7 @@ const drawerWidth = 240;
 
 function Appbar() {
     const environment = useEnvironment();
+    const { zoneName } = useServer();
     const useStyles = makeStyles((theme) => ({
         appBar: {
             width: `calc(100% - ${drawerWidth}px)`,
@@ -34,12 +35,6 @@ function Appbar() {
         }
     }));
     const classes = useStyles();
-    const [zoneName, setZoneName] = useState();
-    const server = useServer();
-
-    useEffect(() => {
-        setZoneName(server.zoneContext[0]['icat_server']['service_account_environment']['irods_zone_name']);
-    }, [])
 
     return (<div>
         <CssBaseline />
