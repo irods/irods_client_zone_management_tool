@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import Cookies from 'js-cookie';
 
 export const EnvironmentContext = createContext();
 
 export const EnvironmentProvider = ({ children }) => {
     console.log("EnvironmentProvider")
-    const [timestamp, setTimestamp] = useState(new Date().toString());
+    const [auth, setAuth] = useState(Cookies.get('token'));
 
     return (
         <EnvironmentContext.Provider value={{
@@ -15,6 +15,7 @@ export const EnvironmentProvider = ({ children }) => {
             appbarLogo: process.env.REACT_APP_APPBAR_LOGO,
             loginLogo: process.env.REACT_APP_LOGIN_LOGO,
             brandingName: process.env.REACT_APP_BRANDING_NAME,
+            auth
         }}>
             {children}
         </EnvironmentContext.Provider>
