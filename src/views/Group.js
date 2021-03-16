@@ -165,7 +165,7 @@ function Group() {
             }
         });
         const groupList = groupListResult.data._embedded.sort();
-        setTotalPage(groupListResult.data.total / perPage);
+        setTotalPage(Math.ceil(groupListResult.data.total / perPage));
 
         // iterate group name array to retrieve each group user counts
 
