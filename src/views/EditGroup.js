@@ -37,10 +37,6 @@ const useStyles = makeStyles((theme) => ({
     link_button: {
         textDecoration: 'none'
     },
-    user_table: {
-        height: '10vh',
-        overflowY: 'scroll'
-    },
     search_textfield: {
         marginLeft: '2vw'
     },
@@ -62,7 +58,7 @@ function EditGroup(props) {
     const [refresh, setRefresh] = useState(false);
     const environment = useEnvironment();
 
-    const [usersInGroup, setUsersInGroup] = useState();
+    const [usersInGroup, setUsersInGroup] = useState([]);
     const [searchUserName, setSearchName] = useState('');
     const [searchUserNameResult, setSearchNameResult] = useState([]);
 
@@ -193,6 +189,7 @@ function EditGroup(props) {
                             onChange={handleSearchUserName}
                         />
                     </div>
+                    <br />
                     <div className="edit_container">
                         {searchUserNameResult.length > 0 ?
                             <Table className={classes.user_table} aria-label="simple table">
@@ -208,7 +205,7 @@ function EditGroup(props) {
                                     {searchUserNameResult.map((thisUser) => <TableRow>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
-                                        <TableCell align="right">{checkUser(thisUser) ? `In ${currentGroup[0]}` : 'Not in group'}</TableCell>
+                                        <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>
                                         <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser) }}>Add</Button>}</TableCell>
                                     </TableRow>)}
                                 </TableBody>
