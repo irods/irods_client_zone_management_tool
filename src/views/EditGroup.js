@@ -10,6 +10,7 @@ import { Button, FormControl, LinearProgress, TextField, Typography } from '@mat
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { useEnvironment } from '../contexts/EnvironmentContext';
+import { useServer } from '../contexts/ServerContext';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,6 +36,16 @@ const useStyles = makeStyles((theme) => ({
     },
     link_button: {
         textDecoration: 'none'
+    },
+    user_table: {
+        height: '10vh',
+        overflowY: 'scroll'
+    },
+    search_textfield: {
+        marginLeft: '2vw'
+    },
+    add_button: {
+        color: '#04bdaf'
     }
 }));
 
@@ -43,14 +54,16 @@ function EditGroup(props) {
     if (token === undefined) {
         return <Logout />
     }
+
+    const { zoneName } = useServer();
     const currentGroup = props.location.state.groupInfo;
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const environment = useEnvironment();
 
-    const [usersInGroup, setUsersInGroup] = useState([]);
-    const [searchUserName, setSearchName] = useState();
+    const [usersInGroup, setUsersInGroup] = useState();
+    const [searchUserName, setSearchName] = useState('');
     const [searchUserNameResult, setSearchNameResult] = useState([]);
 
     useEffect(() => {
@@ -63,7 +76,7 @@ function EditGroup(props) {
                 'Authorization': token
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
+                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
@@ -75,6 +88,7 @@ function EditGroup(props) {
     }, [refresh])
 
     useEffect(() => {
+        setLoading(true);
         const searchResult = axios({
             method: 'GET',
             url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
@@ -82,15 +96,18 @@ function EditGroup(props) {
                 'Authorization': token,
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE = 'rodsuser'`,
-                query_limit: 3,
+                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE != 'rodsgroup'`,
+                query_limit: 10,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then((res) => {
             setSearchNameResult(res.data._embedded);
+            setLoading(false);
         })
     }, [searchUserName])
+
+
 
     async function removeUserFromGroup(props) {
         try {
@@ -103,7 +120,7 @@ function EditGroup(props) {
                     arg2: currentGroup[0],
                     arg3: 'remove',
                     arg4: props[0],
-                    arg5: props[2]
+                    arg5: zoneName
                 },
                 headers: {
                     'Authorization': token,
@@ -128,7 +145,7 @@ function EditGroup(props) {
                     arg2: currentGroup[0],
                     arg3: 'add',
                     arg4: props[0],
-                    arg5: props[2]
+                    arg5: zoneName
                 },
                 headers: {
                     'Authorization': token,
@@ -143,6 +160,15 @@ function EditGroup(props) {
         }
     }
 
+    const checkUser = (user) => {
+        for (let i = 0; i < usersInGroup.length; i++) {
+            if (usersInGroup[i][0] == user[0] && usersInGroup[i][1] == user[1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     const handleSearchUserName = (event) => {
         setSearchName(event.target.value);
     }
@@ -150,48 +176,31 @@ function EditGroup(props) {
     return (
         <div className={classes.root}>
             <Appbar />
-            <Sidebar menu_id="2"/>
+            <Sidebar menu_id="2" />
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
                     <Link to="/group" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
                     {currentGroup[0]}
-                    <div>
-                        <Table className={classes.user_table} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><b>User Name</b></TableCell>
-                                    <TableCell align="right"><b>Type</b></TableCell>
-                                    <TableCell align="right"><b>Zone</b></TableCell>
-                                    <TableCell align="right"><b>Action</b></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            {usersInGroup.length > 0 ? <TableBody>
-                                {usersInGroup.map((thisUser) => <TableRow>
-                                    <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
-                                    <TableCell align="right">{thisUser[1]}</TableCell>
-                                    <TableCell align="right">{thisUser[2]}</TableCell>
-                                    <TableCell align='right'><Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button></TableCell>
-                                </TableRow>)}
-                            </TableBody> : <br />}
-                        </Table>
-                        <br />
-                        <FormControl className={classes.formControl}>
-                            <Typography>Add Users: </Typography>
-                            <TextField
-                                native
-                                id="searchUserName"
-                                label="User Name"
-                                onChange={handleSearchUserName}
-                            />
-                        </FormControl>
+                    <br />
+                    <div className="edit_search_bar">
+                        <Typography>Find User</Typography>
+                        <TextField
+                            native
+                            id="searchUserName"
+                            label="Search Username"
+                            className={classes.search_textfield}
+                            onChange={handleSearchUserName}
+                        />
+                    </div>
+                    <div className="edit_container">
                         {searchUserNameResult.length > 0 ?
                             <Table className={classes.user_table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
                                         <TableCell><b>User Name</b></TableCell>
                                         <TableCell align="right"><b>Type</b></TableCell>
-                                        <TableCell align="right"><b>Zone</b></TableCell>
+                                        <TableCell align="right"><b>Status</b></TableCell>
                                         <TableCell align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -199,13 +208,13 @@ function EditGroup(props) {
                                     {searchUserNameResult.map((thisUser) => <TableRow>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
-                                        <TableCell align="right">{thisUser[2]}</TableCell>
-                                        <TableCell align='right'><Button color="secondary" onClick={() => { addUserToGroup(thisUser) }}>Add</Button></TableCell>
+                                        <TableCell align="right">{checkUser(thisUser) ? `In ${currentGroup[0]}` : 'Not in group'}</TableCell>
+                                        <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser) }}>Add</Button>}</TableCell>
                                     </TableRow>)}
                                 </TableBody>
                             </Table> : <br />}
-                        {isLoading == true ? <div><LinearProgress /></div> : <div />}
                     </div>
+                    {isLoading == true ? <div><LinearProgress /></div> : <div />}
                 </div>
             </main>
         </div>

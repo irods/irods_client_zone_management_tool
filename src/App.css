@@ -80,3 +80,14 @@
 .pointer {
     cursor: pointer;
 }
+
+
+.edit_container {
+    overflow-y: scroll;
+}
+
+.edit_search_bar{
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
