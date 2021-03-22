@@ -92,7 +92,7 @@ function Group() {
         return <Logout />
     }
     const classes = useStyles();
-    const server = useServer();
+    const { groupContext, loadGroup } = useServer();
     const environment = useEnvironment();
 
     const [addErrorMsg, setAddErrorMsg] = useState();
@@ -114,8 +114,11 @@ function Group() {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(0);
 
+
+    //
+
     useEffect(() => {
-        loadContent(currPage, perPage);
+        loadGroup(perPage * (currPage - 1), perPage, searchGroupName);
     }, [currPage, perPage, searchGroupName])
 
     useEffect(() => {
@@ -140,64 +143,7 @@ function Group() {
     function getComparator(order, orderBy) {
         return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
     }
-
-    // load group content information at each render time
-
-    const loadContent = async (prop) => {
-        let _query;
-        if (searchGroupName == undefined) {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup'`
-        }
-        else {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${searchGroupName}%'`
-        }
-        const groupListResult = await axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: _query,
-                query_limit: perPage,
-                row_offset: (currPage - 1) * perPage,
-                query_type: 'general'
-            }
-        });
-        const groupList = groupListResult.data._embedded.sort();
-        setTotalPage(Math.ceil(groupListResult.data.total / perPage));
-
-        // iterate group name array to retrieve each group user counts
-
-        let inputArray = groupList;
-        for (let i = 0; i < inputArray.length; i++) {
-            let temName = inputArray[i][0];
-            await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-                headers: {
-                    'Authorization': Cookies.get('token')
-                },
-                params: {
-                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${temName}' AND USER_TYPE != 'rodsgroup'`,
-                    query_limit: 100,
-                    row_offset: 0,
-                    query_type: 'general'
-                }
-            }).then((res) => {
-                inputArray[i].push(res.data._embedded.length);
-                if (i === inputArray.length - 1) {
-                    setGroup(inputArray);
-                }
-            })
-        }
-    }
-
-    const updateContent = () => {
-        server.updateGroup();
-        loadContent();
-    }
-
+    
     async function addGroup() {
         try {
             const addGroupResult = await axios({
@@ -206,7 +152,7 @@ function Group() {
                 params: {
                     action: 'add',
                     target: 'user',
-                    arg2: document.getElementById('add-group-name'),
+                    arg2: document.getElementById('add-group-name').value,
                     arg3: 'rodsgroup',
                     arg4: zone,
                     arg5: ''
@@ -340,9 +286,9 @@ function Group() {
                                 <TableRow id="add-group-row" style={{ display: 'none' }}>
                                     <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
                                     <TableCell></TableCell>
-                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {groups.map((group) =>
+                                {groupContext._embedded.map((group) =>
                                     <TableRow key={group_id}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>

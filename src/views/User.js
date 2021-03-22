@@ -110,6 +110,7 @@ function User() {
     const [searchUsername, setSearchName] = useState();
 
     const server = useServer();
+    const { userContext, loadUser } = useServer();
     const environment = useEnvironment();
 
     const [order, setOrder] = useState("asc");
@@ -124,6 +125,7 @@ function User() {
         }
         return 0;
     }
+
 
     function getComparator(order, orderBy) {
         return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
@@ -158,12 +160,6 @@ function User() {
         });
     }
 
-    const updateContent = () => {
-        console.log("updating content")
-        server.updateUser();
-        loadContent();
-    }
-
     async function addUser() {
         try {
             await axios({
@@ -181,8 +177,7 @@ function User() {
                     arg5: '',
                 }
             }).then((res) => {
-                updateContent();
-                localStorage.setItem("userContext", users.length + 1)
+                loadUser(0, 100, `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`);
                 window.location.reload();
             })
         } catch (e) {
@@ -207,12 +202,11 @@ function User() {
                     arg3: zone
                 }
             }).then((res) => {
-                updateContent();
-                localStorage.setItem("userContext", users.length - 1)
+                loadUser(0, 100, `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`);
                 window.location.reload();
             })
         } catch (e) {
-            setRemoveErrorMsg("Failed to remove user: "+ e.message)
+            setRemoveErrorMsg("Failed to remove user: " + e.message)
         }
     }
 
@@ -250,13 +244,22 @@ function User() {
         setOrderBy(props);
     }
 
+    const loadContext = async () => {
+        if (searchUsername == undefined) {
+            await loadUser(perPage * (currPage - 1), perPage, 'all')
+        }
+        else {
+            await loadUser(perPage * (currPage - 1), perPage, searchUsername)
+        }
+    }
+
     useEffect(() => {
-        loadContent(currPage, perPage);
+        loadContext()
     }, [currPage, perPage, searchUsername])
 
     useEffect(() => {
-        if (users.length !== 0) {
-            const sortedArray = [...users];
+        if (userContext !== undefined && userContext._embedded.length !== 0) {
+            const sortedArray = [...userContext._embedded];
             sortedArray.sort(getComparator(order, orderBy));
             setUsers(sortedArray);
         }
@@ -271,7 +274,7 @@ function User() {
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
                     <div className={classes.pagination}>
-                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <Pagination className={classes.pagination_item} count={userContext !== undefined ? Math.ceil(userContext.total / perPage) : 0} onChange={handlePageChange} />
                         <FormControl className={classes.itemsControl}>
                             <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
                             <Select
@@ -319,14 +322,14 @@ function User() {
                                     </Select></TableCell>
                                     <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {users.map((this_user) =>
+                                {userContext !== undefined ? userContext._embedded.map((this_user) =>
                                     <TableRow key={this_user[0]}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                             <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                     </TableRow>
-                                )}
+                                ) : <span />}
                             </TableBody>
                         </Table>
                     </TableContainer>
