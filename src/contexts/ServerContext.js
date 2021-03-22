@@ -4,24 +4,34 @@ import { useEnvironment } from './EnvironmentContext';
 
 export const ServerContext = createContext();
 
+const initialState = {
+    _embedded: [],
+    count: 0,
+    total: 0
+}
+
 export const ServerProvider = ({ children }) => {
-    console.log("server provider")
     const env = useEnvironment();
     const [zoneContext, setZoneContext] = useState();
     const [zoneName, setZoneName] = useState();
-    const [userContext, setUserContext] = useState();
-    const [groupContext, setGroupContext] = useState();
-    const [rescContext, setRescContext] = useState();
+    const [userContext, setUserContext] = useState(initialState);
+    const [groupContext, setGroupContext] = useState(initialState);
+    const [rescContext, setRescContext] = useState(initialState);
 
-    const loadUser = (offset, limit) => {
-        axios({
+    const loadUser = (offset, limit, name) => {
+        console.log("loading user content...")
+        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`;
+        if (name !== 'all') {
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${name}%'`
+        }
+        return axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Authorization': env.auth
             },
             params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup'",
+                query_string: _query,
                 query_limit: limit,
                 row_offset: offset,
                 query_type: 'general'
@@ -32,37 +42,65 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-    const loadGroup = (offset, limit) => {
-        axios({
+    const loadGroup = async (offset, limit, name) => {
+        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup'`;
+        if (name !== 'all') {
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
+        }
+        const groupResult = await axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Authorization': env.auth
             },
             params: {
-                query_string: "SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'",
+                query_string: _query,
                 query_limit: limit,
                 row_offset: offset,
                 query_type: 'general'
             }
-        }).then((res) => {
-            setGroupContext(res.data);
         }).catch((e) => {
         });
+        let inputArray = groupResult.data;
+        for (let i = 0; i < inputArray._embedded.length; i++) {
+            let thisGroupName = inputArray._embedded[i][0];
+            await axios({
+                method: 'GET',
+                url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+                headers: {
+                    'Authorization': env.auth
+                },
+                params: {
+                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
+                    query_limit: 100,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                inputArray._embedded[i].push(res.data._embedded.length);
+                if (i === inputArray._embedded.length - 1) {
+                    setGroupContext(inputArray);
+                }
+            })
+        }
     }
 
 
-    const loadResource = () => {
-        axios({
+    const loadResource = (offset, limit, name) => {
+        let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
+        if(name != 'all'){
+            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT WHERE RESC_NAME LIKE '%${name}%'`
+        }
+        return axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
             headers: {
                 'Authorization': env.auth
             },
             params: {
-                query_string: "SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT",
-                query_limit: 100,
-                row_offset: 0,
+                query_string: _query,
+                query_limit: limit,
+                row_offset: offset,
                 query_type: 'general'
             }
         }).then((res) => {
@@ -97,29 +135,32 @@ export const ServerProvider = ({ children }) => {
                 query_type: 'general'
             }
         }).then((res) => {
-            setZoneName(res.data._embedded[0]);
+            setZoneName(res.data._embedded[0][0]);
         });
+    }
+
+    const loadData = () => {
+        loadZone();
+        loadUser(0, 10, 'all');
+        loadGroup(0, 10, 'all');
+        loadResource(0,10,'all');
     }
 
     // reload zone, user, group, resource on page refresh
 
     useEffect(() => {
         if (env.auth != null) {
-            console.log("Server Context Loading...")
-            loadZone();
-            loadUser(0, 100);
-            loadGroup(0,100);
-            loadResource();
-            
+            loadData()
         }
     }, [])
 
     return (
         <ServerContext.Provider value={{
-            zoneContext, zoneName, loadZone, 
-            userContext, loadUser, 
-            groupContext, loadGroup, 
+            zoneContext, zoneName, loadZone,
+            userContext, loadUser,
+            groupContext, loadGroup,
             rescContext, loadResource,
+            loadData
         }}>
             { children}
         </ServerContext.Provider>
