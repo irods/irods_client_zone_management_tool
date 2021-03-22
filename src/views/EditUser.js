@@ -182,7 +182,7 @@ function EditUser(props) {
                             id="searchGroupName"
                             label="Search Groupname"
                             className={classes.search_textfield}
-                            onChange={() => setSearchName(event.target.value)}
+                            onChange={(e) => setSearchName(event.target.value)}
                         />
                     </div>
                     <br />
