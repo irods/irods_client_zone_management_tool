@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
 import Appbar from '../components/Appbar';
-import axios from 'axios';
-import Cookies from 'js-cookie';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import ServerIcon from '../img/servers-logo.png';
@@ -17,6 +15,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 
 import { useServer } from '../contexts/ServerContext';
+import { useEnvironment } from '../contexts/EnvironmentContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -89,13 +88,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
-    const token = Cookies.get('token');
+    const token = useEnvironment().auth;
 
     let server = useServer();
-
-    // const zoneContent = server.zone;
-    // console.log(zoneContent);
-
+    const { userContext, groupContext, rescContext, zoneContext, loadData } = useServer();
     const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
     const [details, setDetails] = useState(false);
@@ -113,11 +109,7 @@ function Home() {
     const [rescs, setRescs] = useState();
 
     useEffect(() => {
-        setReport(server.zoneContext);
-        setUsers(server.userContext);
-        setServers(server.zoneContext.length);
-        setGroups(server.groupContext);
-        setRescs(server.rescContext);
+        loadData()
         setStatus("OK");
     }, [])
 
@@ -179,7 +171,7 @@ function Home() {
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Servers</Typography>
-                                <Typography className={classes.paper_content}>{servers}</Typography>
+                                <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext.length}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
@@ -191,24 +183,24 @@ function Home() {
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Users</Typography>
-                                <Typography className={classes.paper_content}>{users}</Typography>
+                                <Typography className={classes.paper_content}>{userContext === undefined ? 0 : userContext.total}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Groups</Typography>
-                                <Typography className={classes.paper_content}>{groups}</Typography>
+                                <Typography className={classes.paper_content}>{groupContext === undefined ? 0 : groupContext.total}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Resources</Typography>
-                                <Typography className={classes.paper_content}>{rescs}</Typography>
+                                <Typography className={classes.paper_content}>{rescContext === undefined ? 0 : rescContext.total}</Typography>
                             </Paper>
                         </Grid>
                     </Container>
                     <br />
-                    <Pagination count={1} /><br />{zone_reports.length > 0 ? zone_reports.map((zone_report) =>
+                    <Pagination count={1} /><br />{zoneContext !== undefined ? zoneContext.map((zone_report) =>
                         <Card key={zone_id} className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={
