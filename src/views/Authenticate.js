@@ -43,7 +43,7 @@ function Authenticate() {
     const [serverError, setServerError] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
-    const server = useServer();
+    const { loadUser, loadGroup, loadResource, loadZone } = useServer();
     const token = Cookies.get('token');
     const environment = useEnvironment();
 
@@ -78,14 +78,15 @@ function Authenticate() {
             }).then((res) => {
                 if (res.status == 200) {
                     Cookies.set('token', res.data, { expires: 60 * 60 * 1000 });
-                    server.updateZone();
-                    server.updateUser();
-                    server.updateGroup();
-                    server.updateResource();
+                    loadZone();
+                    loadUser(0,100,'all');
+                    loadGroup(0,100,'all');
+                    loadResource();
                     navigate('/home', { replace: true });
                 }
             })
         } catch (err) {
+            console.log(err)
             if (err.response.status >= 500) setServerError(true);
             else setIncorrect(true);
         }
