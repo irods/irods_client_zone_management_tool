@@ -127,11 +127,11 @@ function Resource() {
     const [searchRescName, setSearchName] = useState();
 
 
-    const server = useServer();
+    const { rescContext, loadResource } = useServer();
     const environment = useEnvironment();
 
     useEffect(() => {
-        loadContent(currPage, perPage);
+        loadContent(currPage, perPage, searchRescName);
     }, [currPage, perPage, searchRescName])
 
     useEffect(() => {
@@ -158,7 +158,6 @@ function Resource() {
     }
 
     const loadContent = async (prop) => {
-        console.log(server)
         let _query;
         if (searchRescName == undefined) {
             _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
@@ -185,12 +184,6 @@ function Resource() {
             setTotalPage(Math.ceil(res.data.total / perPage));
         }).catch((e) => {
         });
-    }
-
-    const updateContent = () => {
-        server.updateResource();
-        console.log("Request updating server provider.");
-        loadContent();
     }
 
     async function addResource() {
@@ -354,7 +347,7 @@ function Resource() {
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
                                     <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {resc.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
+                                {rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                             </TableBody>
                         </Table>
                     </TableContainer>
