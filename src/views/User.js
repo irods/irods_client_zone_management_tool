@@ -90,100 +90,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function User() {
-    const token = Cookies.get('token');
-    if (token === undefined) {
+    const { auth, restApiLocation } = useEnvironment();
+    if (auth === undefined) {
         return <Logout />
     }
     const classes = useStyles();
-    const [users, setUsers] = useState([]);
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addErrorMsg, setAddErrorMsg] = useState();
     const [removeErrorMsg, setRemoveErrorMsg] = useState();
     const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
-    const [zone, setZone] = useState(localStorage.getItem('zoneName'));
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [totalPage, setTotalPage] = useState();
-
-    const [searchUsername, setSearchName] = useState();
-
-    const server = useServer();
-    const { userContext, loadUser } = useServer();
-    const environment = useEnvironment();
+    const [searchUsername, setSearchName] = useState('');
+    const { zoneName, userContext, loadUser } = useServer();
 
     const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState(0);
-
-    function descendingComparator(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) {
-            return -1;
-        }
-        if (b[orderBy] > a[orderBy]) {
-            return 1;
-        }
-        return 0;
-    }
-
-
-    function getComparator(order, orderBy) {
-        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
-    }
-
-    const loadContent = async (prop) => {
-        let _query;
-        if (searchUsername == undefined) {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`
-        }
-        else {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${searchUsername}%'`
-        }
-        const userResult = axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: _query,
-                query_limit: perPage,
-                row_offset: (currPage - 1) * perPage,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            let sortedArray = res.data._embedded;
-            sortedArray.sort();
-            setUsers(sortedArray);
-            setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch((e) => {
-        });
-    }
+    const [orderBy, setOrderBy] = useState("USER_NAME");
 
     async function addUser() {
         try {
             await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
                 headers: {
-                    'Authorization': Cookies.get('token')
+                    'Authorization': auth
                 },
                 params: {
                     action: 'add',
                     target: 'user',
                     arg2: document.getElementById('add-user-name').value,
                     arg3: document.getElementById('add-user-type').value,
-                    arg4: zone,
+                    arg4: zoneName,
                     arg5: '',
                 }
             }).then((res) => {
-                loadUser(0, 100, `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`);
                 window.location.reload();
             })
         } catch (e) {
-            console.log(e);
             setAddFormOpen(true);
-            setAddErrorMsg(`Error when adding new user. ${e.message}`)
+            setAddErrorMsg("Failed to add user " + e.response.data.error_code + ":" + e.response.data.error_message)
         }
     }
 
@@ -191,22 +138,21 @@ function User() {
         try {
             await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
                 headers: {
-                    'Authorization': Cookies.get('token')
+                    'Authorization': auth
                 },
                 params: {
                     action: 'rm',
                     target: 'user',
                     arg2: currUser[0],
-                    arg3: zone
+                    arg3: zoneName
                 }
             }).then((res) => {
-                loadUser(0, 100, `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`);
                 window.location.reload();
             })
         } catch (e) {
-            setRemoveErrorMsg("Failed to remove user: " + e.message)
+            setRemoveErrorMsg("Failed to remove user " + e.response.data.error_code + ":" + e.response.data.error_message)
         }
     }
 
@@ -244,26 +190,11 @@ function User() {
         setOrderBy(props);
     }
 
-    const loadContext = async () => {
-        if (searchUsername == undefined) {
-            await loadUser(perPage * (currPage - 1), perPage, 'all')
-        }
-        else {
-            await loadUser(perPage * (currPage - 1), perPage, searchUsername)
-        }
-    }
-
     useEffect(() => {
-        loadContext()
-    }, [currPage, perPage, searchUsername])
+        loadUser(perPage * (currPage - 1), perPage, searchUsername, order, orderBy)
 
-    useEffect(() => {
-        if (userContext !== undefined && userContext._embedded.length !== 0) {
-            const sortedArray = [...userContext._embedded];
-            sortedArray.sort(getComparator(order, orderBy));
-            setUsers(sortedArray);
-        }
-    }, [order, orderBy])
+    }, [currPage, perPage, searchUsername, order, orderBy])
+
 
 
     return (
@@ -305,8 +236,8 @@ function User() {
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }} /></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </StylesProvider>

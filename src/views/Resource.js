@@ -97,13 +97,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Resource() {
-    const token = Cookies.get('token');
-    if (token === undefined) {
+    const { auth, restApiLocation } = useEnvironment();
+    if (auth === undefined) {
         return <Logout />
     }
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
-    const [resc, setResc] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
 
@@ -112,88 +111,30 @@ function Resource() {
 
     const [rescName, setRescName] = useState();
     const [rescType, setRescType] = useState();
-    const [rescHostname, setRescHostname] = useState();
     const [rescLocation, setRescLocation] = useState();
-    const [rescZone, setRescZone] = useState();
     const [rescVaultPath, setRescVaultPath] = useState();
     const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState(0);
-
-    const [zone, setZone] = useState(localStorage.getItem('zoneName'));
-    const [currPage, setCurrPage] = useState(1);
+    const [orderBy, setOrderBy] = useState("RESC_NAME");
+    const [currPage, setCurrPage] = useState(0);
     const [perPage, setPerPage] = useState(10);
-    const [totalPage, setTotalPage] = useState();
 
-    const [searchRescName, setSearchName] = useState();
+    const [searchRescName, setSearchName] = useState('');
 
 
-    const { rescContext, loadResource } = useServer();
-    const environment = useEnvironment();
+    const { zoneName, rescContext, loadResource } = useServer();
 
     useEffect(() => {
-        loadContent(currPage, perPage, searchRescName);
-    }, [currPage, perPage, searchRescName])
-
-    useEffect(() => {
-        if (resc.length !== 0) {
-            const sortedArray = [...resc];
-            sortedArray.sort(getComparator(order, orderBy));
-            setResc(sortedArray);
-            console.log(sortedArray);
-        }
-    }, [order, orderBy])
-
-    function descendingComparator(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) {
-            return -1;
-        }
-        if (b[orderBy] > a[orderBy]) {
-            return 1;
-        }
-        return 0;
-    }
-
-    function getComparator(order, orderBy) {
-        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
-    }
-
-    const loadContent = async (prop) => {
-        let _query;
-        if (searchRescName == undefined) {
-            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
-        }
-        else {
-            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT WHERE RESC_NAME LIKE '%${searchRescName}%'`
-        }
-        const groupResult = axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
-            headers: {
-                'Authorization': Cookies.get('token')
-            },
-            params: {
-                query_string: _query,
-                query_limit: perPage,
-                row_offset: (currPage - 1) * perPage,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            let sortedArray = res.data._embedded;
-            sortedArray.sort();
-            setResc(sortedArray);
-            setTotalPage(Math.ceil(res.data.total / perPage));
-        }).catch((e) => {
-        });
-    }
+        loadResource(currPage, perPage, searchRescName, order, orderBy);
+    }, [currPage, perPage, searchRescName, order, orderBy])
 
     async function addResource() {
         setAddFormOpen(true);
         setLoading(true);
         const rescAddResult = await axios({
             method: 'POST',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+            url: `${restApiLocation}/irods-rest/1.0.0/admin`,
             headers: {
-                'Authorization': token
+                'Authorization': auth
             },
             params: {
                 action: 'add',
@@ -202,7 +143,7 @@ function Resource() {
                 arg3: rescType,
                 arg4: rescLocation + ":" + rescVaultPath,
                 arg5: "",
-                arg6: zone
+                arg6: zoneName
             }
         }).then((res) => {
             window.location.reload();
@@ -215,7 +156,6 @@ function Resource() {
     }
 
     const handleAddRowOpen = () => {
-        // setAddFormOpen(true);
         document.getElementById("add_newrow").style["display"] = "contents";
     }
 
@@ -246,7 +186,6 @@ function Resource() {
     }
 
     const handleRescLocationChange = (event) => {
-        console.log(encodeURI(event.target.value));
         setRescLocation(encodeURI(event.target.value));
     }
     const handleRescVaultPathChange = (event) => {
@@ -272,7 +211,7 @@ function Resource() {
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
                     <div className={classes.pagination}>
-                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <Pagination className={classes.pagination_item} count={Math.ceil(rescContext.total / perPage)} onChange={handlePageChange} />
                         <FormControl className={classes.itemsControl}>
                             <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
                             <Select
@@ -304,11 +243,11 @@ function Resource() {
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 1} direction={orderBy === 1 ? order : 'asc'} onClick={() => { handleSort(1) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 4 ? order : 'asc'} onClick={() => { handleSort(4) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 3 ? order : 'asc'} onClick={() => { handleSort(3) }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="2" align="left"><b>Zone</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0"><b>Resource Name</b><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><b>Type</b><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '15%' }} key="8" align="left"><b>Hostname</b><TableSortLabel active={orderBy === 4} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><b>Vault Path</b><TableSortLabel active={orderBy === 3} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} key="2" align="left"><b>Zone</b></TableCell>
                                     </TableRow>
                                 </StylesProvider>
                             </TableHead>
@@ -347,6 +286,7 @@ function Resource() {
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
                                     <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
+                                {console.log(rescContext)}
                                 {rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                             </TableBody>
                         </Table>
@@ -358,7 +298,7 @@ function Resource() {
                                 Resource Name: {rescName}<br />
                                     Type: {rescType}<br />
                                     Vault Path: {rescLocation}<br />
-                                    Zone: {rescZone}
+                                    Zone: {zoneName}
                             </DialogContentText>
                             {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                         </DialogContent>
