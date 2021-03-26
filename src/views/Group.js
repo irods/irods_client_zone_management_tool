@@ -87,13 +87,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Group() {
-    const token = Cookies.get('token');
-    if (token === undefined) {
+    const { auth, restApiLocation } = useEnvironment();
+    if (auth === undefined) {
         return <Logout />
     }
     const classes = useStyles();
-    const { groupContext, loadGroup } = useServer();
-    const environment = useEnvironment();
+    const { zoneName, groupContext, loadGroup } = useServer();
 
     const [addErrorMsg, setAddErrorMsg] = useState();
     const [removeErrorMsg, setRemoveErrorMsg] = useState();
@@ -103,73 +102,48 @@ function Group() {
     const [currGroup, setCurrGroup] = useState([]);
 
 
-    const [searchGroupName, setSearchName] = useState();
+    const [searchGroupName, setSearchName] = useState('');
     let group_id = 0;
 
-    const [zone, setZone] = useState(localStorage.getItem('zoneName'));
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [totalPage, setTotalPage] = useState();
 
     const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState(0);
+    const [orderBy, setOrderBy] = useState("USER_NAME");
 
 
-    //
-
-    useEffect(() => {
-        loadGroup(perPage * (currPage - 1), perPage, searchGroupName);
-    }, [currPage, perPage, searchGroupName])
+    // load group from context provider,
+    // pass in perPage, currentPage, searchname('' by default), order, orderBy
 
     useEffect(() => {
-        if (groups.length !== 0) {
-            const sortedArray = [...groups];
-            sortedArray.sort(getComparator(order, orderBy));
-            setGroup(sortedArray);
-            console.log(sortedArray);
-        }
-    }, [order, orderBy])
+        loadGroup(perPage * (currPage - 1), perPage, searchGroupName, order, "USER_NAME");
+    }, [currPage, perPage, searchGroupName, order, orderBy])
 
-    function descendingComparator(a, b, orderBy) {
-        if (b[orderBy] < a[orderBy]) {
-            return -1;
-        }
-        if (b[orderBy] > a[orderBy]) {
-            return 1;
-        }
-        return 0;
-    }
-
-    function getComparator(order, orderBy) {
-        return order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
-    }
-    
     async function addGroup() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'add',
                     target: 'user',
                     arg2: document.getElementById('add-group-name').value,
                     arg3: 'rodsgroup',
-                    arg4: zone,
+                    arg4: zoneName,
                     arg5: ''
                 },
                 headers: {
-                    'Authorization': token,
+                    'Authorization': auth,
                     'Accept': 'application/json'
                 }
             }).then(res => {
-                localStorage.setItem("groupContext", groups.length + 1)
                 window.location.reload();
             })
         }
         catch (e) {
             console.log(e);
             setAddFormOpen(true);
-            setAddErrorMsg(`Cannot add new group. ${e.message}`)
+            setAddErrorMsg("Failed to add group " + e.response.error + ":" + e.response.data.error_message)
         }
     }
 
@@ -177,33 +151,25 @@ function Group() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
                 params: {
                     action: 'rm',
                     target: 'user',
                     arg2: currGroup[0],
-                    arg3: zone,
+                    arg3: zoneName,
                 },
                 headers: {
-                    'Authorization': token,
+                    'Authorization': auth,
                     'Accept': 'application/json'
                 }
             }).then(res => {
-                localStorage.setItem("groupContext", groups.length - 1)
                 window.location.reload();
             })
         } catch (e) {
             console.log(e);
-            setRemoveErrorMsg(`Cannot remove group. ${e.message}`)
+            setRemoveErrorMsg("Failed to remove group " + e.response.error + ":" + e.response.data.error_message)
         }
     }
-
-    // const handlecurrentGroup = event => {
-    //     if (event.target.id !== '') {
-    //         setCurrGroup(groups[event.target.id]);
-    //         console.log(groups[event.target.id]);
-    //     }
-    // }
 
     const handleAddRowOpen = () => {
         document.getElementById('add-group-row').style["display"] = "contents";
@@ -247,7 +213,7 @@ function Group() {
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
                     <div className={classes.pagination}>
-                        <Pagination className={classes.pagination_item} count={totalPage} onChange={handlePageChange} />
+                        <Pagination className={classes.pagination_item} count={Math.ceil(groupContext.total / perPage)} onChange={handlePageChange} />
                         <FormControl className={classes.itemsControl}>
                             <InputLabel htmlFor="items-per-page">Items Per Page</InputLabel>
                             <Select
@@ -277,8 +243,8 @@ function Group() {
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === 0} direction={orderBy === 0 ? order : 'asc'} onClick={() => { handleSort(0) }} /></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} ><b>User Counts</b><TableSortLabel active={orderBy === 2} direction={orderBy === 2 ? order : 'asc'} onClick={() => { handleSort(2) }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} ><b>User Counts</b></TableCell>
                                     <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -291,7 +257,7 @@ function Group() {
                                 {groupContext._embedded.map((group) =>
                                     <TableRow key={group_id}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[2]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[1]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                     </TableRow>
                                 )}
