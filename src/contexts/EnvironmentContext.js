@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 export const EnvironmentContext = createContext();
 
 export const EnvironmentProvider = ({ children }) => {
-    console.log("EnvironmentProvider")
     const [auth, setAuth] = useState(Cookies.get('token'));
 
     return (
