@@ -10,6 +10,11 @@ const initialState = {
     total: 0
 }
 
+const queryGenerator = (_query, order, orderBy) => {
+    const orderSyntax = order === 'desc' ? 'order_desc' : 'order';
+    return _query.replace(orderBy, orderSyntax + '(' + orderBy + ')');
+}
+
 export const ServerProvider = ({ children }) => {
     const env = useEnvironment();
     const [zoneContext, setZoneContext] = useState();
@@ -18,12 +23,12 @@ export const ServerProvider = ({ children }) => {
     const [groupContext, setGroupContext] = useState(initialState);
     const [rescContext, setRescContext] = useState(initialState);
 
-    const loadUser = (offset, limit, name) => {
-        console.log("loading user content...")
+    const loadUser = (offset, limit, name, order, orderBy) => {
         let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`;
-        if (name !== 'all') {
+        if (name !== '') {
             _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${name}%'`
         }
+        _query = queryGenerator(_query, order, orderBy);
         return axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -42,11 +47,12 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-    const loadGroup = async (offset, limit, name) => {
-        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup'`;
-        if (name !== 'all') {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
+    const loadGroup = async (offset, limit, name, order, orderBy) => {
+        let _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'`;
+        if (name !== '') {
+            _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
         }
+        _query = queryGenerator(_query, order, orderBy);
         const groupResult = await axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -80,17 +86,19 @@ export const ServerProvider = ({ children }) => {
                 inputArray._embedded[i].push(res.data._embedded.length);
                 if (i === inputArray._embedded.length - 1) {
                     setGroupContext(inputArray);
+                    console.log(inputArray)
                 }
             })
         }
     }
 
 
-    const loadResource = (offset, limit, name) => {
+    const loadResource = (offset, limit, name, order, orderBy) => {
         let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
-        if(name != 'all'){
+        if (name != '') {
             _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT WHERE RESC_NAME LIKE '%${name}%'`
         }
+        _query = queryGenerator(_query, order, orderBy);
         return axios({
             method: 'GET',
             url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
@@ -141,9 +149,9 @@ export const ServerProvider = ({ children }) => {
 
     const loadData = () => {
         loadZone();
-        loadUser(0, 10, 'all');
-        loadGroup(0, 10, 'all');
-        loadResource(0,10,'all');
+        loadUser(0, 10, '', 'asc', 'USER_NAME');
+        loadGroup(0, 10, '', 'asc', 'USER_NAME');
+        loadResource(0, 10, '', 'asc', 'RESC_NAME');
     }
 
     // reload zone, user, group, resource on page refresh
