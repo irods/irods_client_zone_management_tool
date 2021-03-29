@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
 import Appbar from '../components/Appbar';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-
 import ServerIcon from '../img/servers-logo.png';
-import BlockIcon from '@material-ui/icons/Block';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Pagination from '@material-ui/lab/Pagination';
@@ -13,9 +11,8 @@ import { CssBaseline, Typography, CircularProgress, Container } from '@material-
 import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
-
 import { useServer } from '../contexts/ServerContext';
-import { useEnvironment } from '../contexts/EnvironmentContext';
+import Logout from './Logout';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -88,28 +85,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
-    const token = useEnvironment().auth;
-
-    let server = useServer();
+    const auth = localStorage.getItem('zmt-token')
+    if (auth === null) {
+        return <Logout />
+    }
     const { userContext, groupContext, rescContext, zoneContext, loadData } = useServer();
     const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
     const [details, setDetails] = useState(false);
     const [expanded, setExpanded] = useState(false);
-    const isAuthenticated = token != null ? true : false;
     const [tabValue, setTab] = useState(0);
     const classes = useStyles();
     const theme = useTheme();
     let zone_id = 0;
 
-    const [servers, setServers] = useState();
     const [status, setStatus] = useState()
-    const [users, setUsers] = useState();
-    const [groups, setGroups] = useState();
-    const [rescs, setRescs] = useState();
 
     useEffect(() => {
-        loadData()
+        loadData();
         setStatus("OK");
     }, [])
 
@@ -165,7 +158,7 @@ function Home() {
 
     return (
         <div>
-            {isAuthenticated == true ? <div className={classes.root}><Appbar /><Sidebar menu_id="0" /><main className={classes.content}><div className={classes.toolbar} />
+            <div className={classes.root}><Appbar /><Sidebar menu_id="0" /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>
                     <Container className={classes.status_box}>
                         <Grid item xs={12} md={8} lg={9}>
@@ -259,8 +252,7 @@ function Home() {
                             </Collapse>
                         </Card>
                     ) : <div><CircularProgress /> Loading...</div>}</div></main>
-            </div> : <div className={classes.logout}><BlockIcon /><br /><div>Please <a href="http://localhost:3000/">login</a> to use the administration dashboard.</div></div>
-            }
+            </div>
         </div >
     );
 }
