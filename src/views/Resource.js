@@ -97,8 +97,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Resource() {
-    const { auth, restApiLocation } = useEnvironment();
-    if (auth === undefined) {
+    const { restApiLocation } = useEnvironment();
+    const auth = localStorage.getItem('zmt-token');
+    if (auth === null) {
         return <Logout />
     }
     const classes = useStyles();
@@ -132,7 +133,7 @@ function Resource() {
         setLoading(true);
         const rescAddResult = await axios({
             method: 'POST',
-            url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+            url: `${restApiLocation}/admin`,
             headers: {
                 'Authorization': auth
             },

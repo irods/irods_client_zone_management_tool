@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react';
-
-
 import axios from 'axios';
 import { Link } from '@reach/router';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import Cookies from 'js-cookie';
 import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
@@ -51,16 +45,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function EditUser(props) {
-    console.log(props);
-    const token = Cookies.get('token');
-    if (token === undefined) {
+    const auth = localStorage.getItem('zmt-token');
+    if (auth === null) {
         return <Logout />
     }
     const currentUser = props.location.state.userInfo;
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const { restApiLocation, auth } = useEnvironment();
+    const { restApiLocation } = useEnvironment();
     const { zoneName } = useServer();
     const [groupsOfUser, setGroupOfUser] = useState([]);
     const [searchGroupName, setSearchName] = useState('');
@@ -70,7 +63,7 @@ function EditUser(props) {
         setLoading(true);
         const result = axios({
             method: 'GET',
-            url: `${restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': auth
@@ -90,7 +83,7 @@ function EditUser(props) {
     useEffect(() => {
         const searchResult = axios({
             method: 'GET',
-            url: `${restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
                 'Authorization': auth,
             },
@@ -109,7 +102,7 @@ function EditUser(props) {
         try {
             const removeUserResult = await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -135,7 +128,7 @@ function EditUser(props) {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',

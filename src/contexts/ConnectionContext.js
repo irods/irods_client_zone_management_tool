@@ -11,7 +11,7 @@ export const ConnectionProvider = ({ children }) => {
     const [adminConnection, setAdminConnection] = useState();
     const [queryConnection, setQueryConnection] = useState();
     const [timeStamp, setTimeStamp] = useState();
-    const environment = useEnvironment();
+    const { restApiLocation, restApiTimeout } = useEnvironment();
 
     // run connection test on initial load
     useEffect(() => {
@@ -38,10 +38,10 @@ export const ConnectionProvider = ({ children }) => {
 
     const testAuthConnection = () => {
         return axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
+            url: `${restApiLocation}/auth`,
             method: 'POST',
             // set timeout value
-            timeout: environment.restApiTimeout * 1000
+            timeout: restApiTimeout * 1000
         }).catch(e => {
             // timeout will result in an undefined error response which will be handled here
             if (!e.response || e.response.status >= 500) {
@@ -56,9 +56,9 @@ export const ConnectionProvider = ({ children }) => {
 
     const testZoneReportConnection = () => {
         return axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/zone_report`,
+            url: `${restApiLocation}/zone_report`,
             method: 'POST',
-            timeout: environment.restApiTimeout * 1000
+            timeout: restApiTimeout * 1000
         }).catch(e => {
             if (!e.response || e.response.status >= 500) {
                 setZoneReportConnection(false);
@@ -72,9 +72,9 @@ export const ConnectionProvider = ({ children }) => {
 
     const testAdminConnection = () => {
         return axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+            url: `${restApiLocation}/admin`,
             method: 'POST',
-            timeout: environment.restApiTimeout * 1000
+            timeout: restApiTimeout * 1000
         }).catch(e => {
             if (!e.response || e.response.status >= 500) {
                 setAdminConnection(false);
@@ -88,9 +88,9 @@ export const ConnectionProvider = ({ children }) => {
 
     const testQueryConnection = () => {
         return axios({
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             method: 'GET',
-            timeout: environment.restApiTimeout * 1000
+            timeout: restApiTimeout * 1000
         }).catch(e => {
             if (!e.response || e.response.status >= 500) {
                 setQueryConnection(false);

@@ -43,9 +43,8 @@ function Authenticate() {
     const [serverError, setServerError] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
-    const { loadUser, loadGroup, loadResource, loadZone } = useServer();
-    const token = Cookies.get('token');
-    const environment = useEnvironment();
+    const token = localStorage.getItem('zmt-token');
+    const { restApiLocation, loginLogo, brandingName } = useEnvironment();
 
     if (token != null) {
         navigate('/home', { replace: true });
@@ -71,22 +70,17 @@ function Authenticate() {
             setIncorrect(false);
             const authResult = await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/auth`,
+                url: `${restApiLocation}/auth`,
                 headers: {
                     Authorization: `BASIC ${btoa(username + ":" + password)}`
                 }
             }).then((res) => {
                 if (res.status == 200) {
-                    Cookies.set('token', res.data, { expires: 60 * 60 * 1000 });
-                    loadZone();
-                    loadUser(0,100,'all');
-                    loadGroup(0,100,'all');
-                    loadResource();
+                    localStorage.setItem('zmt-token', res.data);
                     navigate('/home', { replace: true });
                 }
             })
         } catch (err) {
-            console.log(err)
             if (err.response.status >= 500) setServerError(true);
             else setIncorrect(true);
         }
@@ -95,9 +89,9 @@ function Authenticate() {
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
-                <img className={classes.logo} src={require(`../img/${environment.loginLogo}`)}></img>
+                <img className={classes.logo} src={require(`../img/${loginLogo}`)}></img>
                 <br />
-                <Typography component="h4" variant="h5">{environment.brandingName}</Typography>
+                <Typography component="h4" variant="h5">{brandingName}</Typography>
                 <TextField
                     variant="outlined"
                     margin="normal"

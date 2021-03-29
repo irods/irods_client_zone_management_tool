@@ -19,7 +19,7 @@ function Footer() {
                     </DialogTitle>
                 <DialogContent>
                     <div className="connection_container">
-                        <div className="connection_title">Rest API URL: {environment.restApiLocation}/irods-rest/1.0.0</div>
+                        <div className="connection_title">Rest API URL: {environment.restApiLocation}</div>
                         <div className="connection_text_status">/admin: {connection.adminConnection === undefined ? <span>Loading</span> : <span>{connection.adminConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
                         <div className="connection_text_status">/auth: {connection.authConnection === undefined ? <span>Loading</span> : <span>{connection.authConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>
                         <div className="connection_text_status">/query: {connection.queryConnection === undefined ? <span>Loading</span> : <span>{connection.queryConnection ? <span><div className="green_dot" />OK</span> : <span><div className="red_dot"></div>ERROR</span>}</span>}</div>

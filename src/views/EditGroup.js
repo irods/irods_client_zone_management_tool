@@ -5,7 +5,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import Cookies from 'js-cookie';
 import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
@@ -46,8 +45,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function EditGroup(props) {
-    const token = Cookies.get('token');
-    if (token === undefined) {
+    const auth = localStorage.getItem('zmt-token');
+    if (auth === null) {
         return <Logout />
     }
 
@@ -56,7 +55,7 @@ function EditGroup(props) {
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const environment = useEnvironment();
+    const { restApiLocation } = useEnvironment();
 
     const [usersInGroup, setUsersInGroup] = useState([]);
     const [searchUserName, setSearchName] = useState('');
@@ -66,10 +65,10 @@ function EditGroup(props) {
         setLoading(true);
         const result = axios({
             method: 'GET',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': token
+                'Authorization': auth
             },
             params: {
                 query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
@@ -87,9 +86,9 @@ function EditGroup(props) {
         setLoading(true);
         const searchResult = axios({
             method: 'GET',
-            url: `${environment.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': token,
+                'Authorization': auth,
             },
             params: {
                 query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE != 'rodsgroup'`,
@@ -109,7 +108,7 @@ function EditGroup(props) {
         try {
             const removeUserResult = await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -119,7 +118,7 @@ function EditGroup(props) {
                     arg5: zoneName
                 },
                 headers: {
-                    'Authorization': token,
+                    'Authorization': auth,
                     'Accept': 'application/json'
                 }
             }).then((res) => {
@@ -134,7 +133,7 @@ function EditGroup(props) {
         try {
             await axios({
                 method: 'POST',
-                url: `${environment.restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'modify',
                     target: 'group',
@@ -144,7 +143,7 @@ function EditGroup(props) {
                     arg5: zoneName
                 },
                 headers: {
-                    'Authorization': token,
+                    'Authorization': auth,
                     'Accept': 'application/json'
                 }
             }).then((res) => {

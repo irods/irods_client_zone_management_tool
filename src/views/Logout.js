@@ -16,9 +16,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Logout() {
     const classes = useStyles();
-    console.log(window.location.host);
-    const redirectUrl = window.location.host
-    Cookies.remove('token');
+    localStorage.removeItem('zmt-token');
 
     return (
         <div className={classes.logout}>
