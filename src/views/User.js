@@ -90,8 +90,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function User() {
-    const { auth, restApiLocation } = useEnvironment();
-    if (auth === undefined) {
+    const { restApiLocation } = useEnvironment();
+    const auth = localStorage.getItem('zmt-token');
+    if (auth === null) {
         return <Logout />
     }
     const classes = useStyles();
@@ -113,7 +114,7 @@ function User() {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 headers: {
                     'Authorization': auth
                 },
@@ -130,7 +131,7 @@ function User() {
             })
         } catch (e) {
             setAddFormOpen(true);
-            setAddErrorMsg("Failed to add user " + e.response.data.error_code + ":" + e.response.data.error_message)
+            setAddErrorMsg("Failed to add user " + e.response.data.error_code + ": " + e.response.data.error_message)
         }
     }
 
@@ -138,7 +139,7 @@ function User() {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 headers: {
                     'Authorization': auth
                 },
@@ -152,7 +153,7 @@ function User() {
                 window.location.reload();
             })
         } catch (e) {
-            setRemoveErrorMsg("Failed to remove user " + e.response.data.error_code + ":" + e.response.data.error_message)
+            setRemoveErrorMsg("Failed to remove user " + e.response.data.error_code + ": " + e.response.data.error_message)
         }
     }
 

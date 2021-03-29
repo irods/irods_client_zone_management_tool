@@ -87,8 +87,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Group() {
-    const { auth, restApiLocation } = useEnvironment();
-    if (auth === undefined) {
+    const { restApiLocation } = useEnvironment();
+    const auth = localStorage.getItem('zmt-token');
+    if (auth === null) {
         return <Logout />
     }
     const classes = useStyles();
@@ -123,7 +124,7 @@ function Group() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'add',
                     target: 'user',
@@ -141,9 +142,8 @@ function Group() {
             })
         }
         catch (e) {
-            console.log(e);
             setAddFormOpen(true);
-            setAddErrorMsg("Failed to add group " + e.response.error + ":" + e.response.data.error_message)
+            setAddErrorMsg("Failed to add group " + e.response.data.error_code + ": " + e.response.data.error_message)
         }
     }
 
@@ -151,7 +151,7 @@ function Group() {
         try {
             const addGroupResult = await axios({
                 method: 'POST',
-                url: `${restApiLocation}/irods-rest/1.0.0/admin`,
+                url: `${restApiLocation}/admin`,
                 params: {
                     action: 'rm',
                     target: 'user',

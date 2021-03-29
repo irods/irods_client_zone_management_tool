@@ -1,15 +1,12 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
-const token = Cookies.get('token');
-
-export const ModifyResourceController = async (name, arg, value, Url) => {
-    const result = await axios({
+export const ModifyResourceController = (name, arg, value, restApiLocation) => {
+    return axios({
         method: 'POST',
-        url: `${Url}/irods-rest/1.0.0/admin`,
+        url: `${restApiLocation}/admin`,
         headers: {
             'Accept': 'application/json',
-            'Authorization': token
+            'Authorization': localStorage.getItem('zmt-token')
         },
         params: {
             action: 'modify',
@@ -19,16 +16,15 @@ export const ModifyResourceController = async (name, arg, value, Url) => {
             arg4: value
         }
     })
-    return result;
 }
 
 
-export const RemoveResourceController = async (name,Url) => {
-    const result = await axios({
+export const RemoveResourceController = async (name, restApiLocation) => {
+    return axios({
         method: 'POST',
-        url: `${Url}/irods-rest/1.0.0/admin`,
+        url: `${restApiLocation}/admin`,
         headers: {
-            'Authorization': token
+            'Authorization': localStorage.getItem('zmt-token')
         },
         params: {
             action: 'rm',
@@ -37,5 +33,4 @@ export const RemoveResourceController = async (name,Url) => {
             arg3: ''
         }
     })
-    return result;
 }

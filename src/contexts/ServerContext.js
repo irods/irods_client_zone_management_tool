@@ -16,7 +16,7 @@ const queryGenerator = (_query, order, orderBy) => {
 }
 
 export const ServerProvider = ({ children }) => {
-    const env = useEnvironment();
+    const { restApiLocation } = useEnvironment();
     const [zoneContext, setZoneContext] = useState();
     const [zoneName, setZoneName] = useState();
     const [userContext, setUserContext] = useState(initialState);
@@ -31,9 +31,9 @@ export const ServerProvider = ({ children }) => {
         _query = queryGenerator(_query, order, orderBy);
         return axios({
             method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': env.auth
+                'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
                 query_string: _query,
@@ -55,9 +55,9 @@ export const ServerProvider = ({ children }) => {
         _query = queryGenerator(_query, order, orderBy);
         const groupResult = await axios({
             method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': env.auth
+                'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
                 query_string: _query,
@@ -67,14 +67,16 @@ export const ServerProvider = ({ children }) => {
             }
         }).catch((e) => {
         });
+
+        // iterate through group result to retrieve user counts
         let inputArray = groupResult.data;
         for (let i = 0; i < inputArray._embedded.length; i++) {
             let thisGroupName = inputArray._embedded[i][0];
             await axios({
                 method: 'GET',
-                url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+                url: `${restApiLocation}/query`,
                 headers: {
-                    'Authorization': env.auth
+                    'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
                     query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
@@ -86,7 +88,6 @@ export const ServerProvider = ({ children }) => {
                 inputArray._embedded[i].push(res.data._embedded.length);
                 if (i === inputArray._embedded.length - 1) {
                     setGroupContext(inputArray);
-                    console.log(inputArray)
                 }
             })
         }
@@ -101,9 +102,9 @@ export const ServerProvider = ({ children }) => {
         _query = queryGenerator(_query, order, orderBy);
         return axios({
             method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': env.auth
+                'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
                 query_string: _query,
@@ -120,10 +121,10 @@ export const ServerProvider = ({ children }) => {
     const loadZone = async () => {
         axios({
             method: 'POST',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/zone_report`,
+            url: `${restApiLocation}/zone_report`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': env.auth
+                'Authorization': localStorage.getItem('zmt-token')
             }
         }).then((res) => {
             setZoneContext(res.data.zones);
@@ -132,9 +133,9 @@ export const ServerProvider = ({ children }) => {
 
         axios({
             method: 'GET',
-            url: `${env.restApiLocation}/irods-rest/1.0.0/query`,
+            url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': env.auth
+                'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
                 query_string: 'SELECT ZONE_NAME',
@@ -157,7 +158,7 @@ export const ServerProvider = ({ children }) => {
     // reload zone, user, group, resource on page refresh
 
     useEffect(() => {
-        if (env.auth != null) {
+        if (localStorage.getItem('zmt-token') !== null) {
             loadData()
         }
     }, [])

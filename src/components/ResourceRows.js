@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 function ResourceRows(props) {
   const { row } = props;
   const classes = useStyles();
-  const environment = useEnvironment();
+  const { restApiLocation } = useEnvironment();
 
   const [editFormOpen, setEditForm] = useState(false);
   const [editStatus, setEditStatus] = useState();
@@ -80,7 +80,7 @@ function ResourceRows(props) {
     setEditForm(true);
     setEditStatus(`Modifying Resource ${arg} to ${value}`);
     try {
-      const result = await ModifyResourceController(name, arg, value, environment.restApiLocation);
+      const result = await ModifyResourceController(name, arg, value, restApiLocation);
       setEditResult("Success");
       setTimeout(() => {
         window.location.reload();
@@ -92,7 +92,7 @@ function ResourceRows(props) {
 
   const removeResource = async (name) => {
     try {
-      const result = await RemoveResourceController(name, environment.restApiLocation);
+      const result = await RemoveResourceController(name, restApiLocation);
       window.location.reload();
     } catch (e) {
       setRemoveErrorMsg("Error: " + e.message);
@@ -114,9 +114,6 @@ function ResourceRows(props) {
         <TableCell className={classes.cell} align="left">{row[2]}<IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton></TableCell>
-        {/* <TableCell align="right">
-          
-        </TableCell> */}
       </TableRow>
       <TableRow hover={true}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -131,7 +128,7 @@ function ResourceRows(props) {
                   <TableCell className={classes.table_cell}>Status: {row[8]}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.table_cell}>{isEditingInformation ? <span>Information: <input style={{ fontSize: 15 }} defaultValue={row[5]} onChange={(event) => { setInformation(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'information', information) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingInformation(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Information: {row[5]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingInformation(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}><span>Information: {row[5]}</span></TableCell>
                   <TableCell className={classes.table_cell}>{isEditingFreespace ? <span>Freespace: <input style={{ fontSize: 15 }} defaultValue={row[6]} onChange={(event) => { setFreespace(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'freespace', freespace) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingFreespace(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Freespace: {row[6]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingFreespace(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
                 <TableRow>
