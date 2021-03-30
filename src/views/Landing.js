@@ -1,14 +1,11 @@
+import { Redirect } from '@reach/router';
 import React from 'react';
 import Authenticate from '../views/Authenticate';
-import Home from '../views/Home';
-import Cookies from 'js-cookie';
 
 function Landing() {
-    const token = Cookies.get('token');
-    if (token !== undefined) {
-        return (
-            <Home />
-        )
+    const auth = localStorage.getItem('zmt-token');
+    if (auth !== null) {
+        return <Redirect to='/home' />
     }
     else return (
         <Authenticate />

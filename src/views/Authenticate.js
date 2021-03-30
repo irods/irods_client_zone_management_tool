@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
+import React, { useState } from 'react';
 import axios from 'axios';
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button';
@@ -11,7 +10,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
 
 import { useNavigate } from '@reach/router';
-import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,12 +41,8 @@ function Authenticate() {
     const [serverError, setServerError] = useState(false);
     const classes = useStyles();
     const navigate = useNavigate();
-    const token = localStorage.getItem('zmt-token');
     const { restApiLocation, loginLogo, brandingName } = useEnvironment();
 
-    if (token != null) {
-        navigate('/home', { replace: true });
-    }
 
     const handleUsername = (event) => {
         setUsername(event.target.value);
@@ -68,14 +62,14 @@ function Authenticate() {
         try {
             setServerError(false);
             setIncorrect(false);
-            const authResult = await axios({
+            await axios({
                 method: 'POST',
                 url: `${restApiLocation}/auth`,
                 headers: {
                     Authorization: `BASIC ${btoa(username + ":" + password)}`
                 }
             }).then((res) => {
-                if (res.status == 200) {
+                if (res.status === 200) {
                     localStorage.setItem('zmt-token', res.data);
                     navigate('/home', { replace: true });
                 }
@@ -89,7 +83,7 @@ function Authenticate() {
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
-                <img className={classes.logo} src={require(`../img/${loginLogo}`)}></img>
+                <img alt="iRODS Logo" className={classes.logo} src={require(`../img/${loginLogo}`)}></img>
                 <br />
                 <Typography component="h4" variant="h5">{brandingName}</Typography>
                 <TextField
@@ -109,8 +103,8 @@ function Authenticate() {
                     required
                     onKeyDown={handleKeyDown}
                     onChange={handlePassword} />
-                {serverError == false ? <br /> : <Typography className={classes.error}>Server error. Please check the Client REST API Connection.</Typography>}
-                {incorrect == false ? <br /> : <Typography className={classes.error}>Incorrect username or password. Please try again.</Typography>}
+                {serverError === false ? <br /> : <Typography className={classes.error}>Server error. Please check the Client REST API Connection.</Typography>}
+                {incorrect === false ? <br /> : <Typography className={classes.error}>Incorrect username or password. Please try again.</Typography>}
                 <Button
                     variant="contained"
                     color="primary"
