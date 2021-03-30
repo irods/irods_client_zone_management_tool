@@ -9,8 +9,6 @@ import Logout from './views/Logout';
 import Home from './views/Home';
 import Landing from './views/Landing';
 import './App.css';
-import logo from './img/iRODS-logo.png';
-import { version } from '../package.json';
 import Footer from './components/Footer';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { ConnectionProvider } from './contexts/ConnectionContext';

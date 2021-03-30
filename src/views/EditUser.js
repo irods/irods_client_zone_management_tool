@@ -5,9 +5,9 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
+import { Button, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { useServer } from '../contexts/ServerContext';
 
@@ -61,7 +61,7 @@ function EditUser(props) {
 
     useEffect(() => {
         setLoading(true);
-        const result = axios({
+        axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -81,7 +81,7 @@ function EditUser(props) {
     }, [refresh])
 
     useEffect(() => {
-        const searchResult = axios({
+        axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -100,7 +100,7 @@ function EditUser(props) {
 
     async function removeGroupFromUser(props) {
         try {
-            const removeUserResult = await axios({
+            await axios({
                 method: 'POST',
                 url: `${restApiLocation}/admin`,
                 params: {
@@ -152,7 +152,7 @@ function EditUser(props) {
 
     const checkGroup = (group) => {
         for (let i = 0; i < groupsOfUser.length; i++) {
-            if (groupsOfUser[i][0] == group[0]) {
+            if (groupsOfUser[i][0] === group[0]) {
                 return true;
             }
         }
@@ -171,11 +171,10 @@ function EditUser(props) {
                     <div className="edit_search_bar">
                         <Typography>Find Group</Typography>
                         <TextField
-                            native
                             id="searchGroupName"
                             label="Search Groupname"
                             className={classes.search_textfield}
-                            onChange={(e) => setSearchName(event.target.value)}
+                            onChange={(e) => setSearchName(e.target.value)}
                         />
                     </div>
                     <br />
@@ -190,7 +189,7 @@ function EditUser(props) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {searchGroupNameResult.map((thisGroup) => <TableRow>
+                                    {searchGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
                                         <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                         <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
                                         <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
@@ -198,7 +197,7 @@ function EditUser(props) {
                                 </TableBody>
                             </Table> : <br />}
                     </div>
-                    {isLoading == true ? <div><LinearProgress /></div> : <div />}
+                    {isLoading === true ? <div><LinearProgress /></div> : <div />}
                 </div>
             </main>
         </div>

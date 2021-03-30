@@ -14,7 +14,7 @@ import { useEnvironment } from '../contexts/EnvironmentContext';
 
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
 
-import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -56,19 +56,11 @@ function ResourceRows(props) {
   const { restApiLocation } = useEnvironment();
 
   const [editFormOpen, setEditForm] = useState(false);
-  const [editStatus, setEditStatus] = useState();
   const [editResult, setEditResult] = useState();
-
-  const [isEditingVaultPath, setEditingVaultPath] = useState(false);
-  const [isEditingInformation, setEditingInformation] = useState(false);
   const [isEditingFreespace, setEditingFreespace] = useState(false);
   const [isEditingComment, setEditingComment] = useState(false);
   const [isEditingContext, setEditingContext] = useState(false);
-
   const [open, setOpen] = useState(false);
-
-  const [vaultPath, setVaultPath] = useState(row[3]);
-  const [information, setInformation] = useState(row[5]);
   const [freespace, setFreespace] = useState(row[6]);
   const [comment, setComment] = useState(row[7]);
   const [context, setContext] = useState(row[9]);
@@ -78,9 +70,8 @@ function ResourceRows(props) {
 
   const editResource = async (name, arg, value) => {
     setEditForm(true);
-    setEditStatus(`Modifying Resource ${arg} to ${value}`);
     try {
-      const result = await ModifyResourceController(name, arg, value, restApiLocation);
+      await ModifyResourceController(name, arg, value, restApiLocation);
       setEditResult("Success");
       setTimeout(() => {
         window.location.reload();
@@ -92,7 +83,7 @@ function ResourceRows(props) {
 
   const removeResource = async (name) => {
     try {
-      const result = await RemoveResourceController(name, restApiLocation);
+      await RemoveResourceController(name, restApiLocation);
       window.location.reload();
     } catch (e) {
       setRemoveErrorMsg("Error: " + e.message);
@@ -129,11 +120,11 @@ function ResourceRows(props) {
                 </TableRow>
                 <TableRow>
                   <TableCell className={classes.table_cell}><span>Information: {row[5]}</span></TableCell>
-                  <TableCell className={classes.table_cell}>{isEditingFreespace ? <span>Freespace: <input style={{ fontSize: 15 }} defaultValue={row[6]} onChange={(event) => { setFreespace(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'freespace', freespace) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingFreespace(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Freespace: {row[6]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingFreespace(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditingFreespace ? <span>Freespace: <input style={{ fontSize: 15 }} defaultValue={row[6]} onChange={(event) => { setFreespace(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'freespace', freespace) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingFreespace(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Freespace: {row[6]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingFreespace(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.table_cell}>{isEditingComment ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingComment(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingComment(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
-                  <TableCell className={classes.table_cell}>{isEditingContext ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton onClick={() => { setEditingContext(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton onClick={() => { setEditingContext(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditingComment ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingComment(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingComment(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
+                  <TableCell className={classes.table_cell}>{isEditingContext ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingContext(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingContext(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

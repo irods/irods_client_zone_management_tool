@@ -13,29 +13,6 @@ export const ConnectionProvider = ({ children }) => {
     const [timeStamp, setTimeStamp] = useState();
     const { restApiLocation, restApiTimeout } = useEnvironment();
 
-    // run connection test on initial load
-    useEffect(() => {
-        testConnection();
-    }, [])
-
-
-    // reset connection status and test connection
-    const testConnection = async () => {
-
-        // check each endpoint connection, if no response, return false;
-        setTimeStamp(new Date().toUTCString())
-        setAuthConnection();
-        setZoneReportConnection();
-        setAdminConnection();
-        setQueryConnection();
-
-        // test endpoint connection in order
-        await testAdminConnection();
-        await testAuthConnection();
-        await testQueryConnection();
-        await testZoneReportConnection();
-    }
-
     const testAuthConnection = () => {
         return axios({
             url: `${restApiLocation}/auth`,
@@ -101,6 +78,28 @@ export const ConnectionProvider = ({ children }) => {
             }
         })
     }
+
+    // reset connection status and test connection
+    const testConnection = async () => {
+
+        // check each endpoint connection, if no response, return false;
+        setTimeStamp(new Date().toUTCString())
+        setAuthConnection();
+        setZoneReportConnection();
+        setAdminConnection();
+        setQueryConnection();
+
+        // test endpoint connection in order
+        await testAdminConnection();
+        await testAuthConnection();
+        await testQueryConnection();
+        await testZoneReportConnection();
+    }
+
+    // run connection test on initial load
+    useEffect(() => {
+        testConnection();
+    }, [])
 
     return (
         <ConnectionContext.Provider value={{

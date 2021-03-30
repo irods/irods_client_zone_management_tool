@@ -5,7 +5,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import { Button, FormControl, LinearProgress, TextField, Typography } from '@material-ui/core';
+import { Button, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import { useEnvironment } from '../contexts/EnvironmentContext';
@@ -63,7 +63,7 @@ function EditGroup(props) {
 
     useEffect(() => {
         setLoading(true);
-        const result = axios({
+        axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -84,7 +84,7 @@ function EditGroup(props) {
 
     useEffect(() => {
         setLoading(true);
-        const searchResult = axios({
+        axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -106,7 +106,7 @@ function EditGroup(props) {
 
     async function removeUserFromGroup(props) {
         try {
-            const removeUserResult = await axios({
+            await axios({
                 method: 'POST',
                 url: `${restApiLocation}/admin`,
                 params: {
@@ -157,7 +157,7 @@ function EditGroup(props) {
 
     const checkUser = (user) => {
         for (let i = 0; i < usersInGroup.length; i++) {
-            if (usersInGroup[i][0] == user[0] && usersInGroup[i][1] == user[1]) {
+            if (usersInGroup[i][0] === user[0] && usersInGroup[i][1] === user[1]) {
                 return true;
             }
         }
@@ -181,7 +181,6 @@ function EditGroup(props) {
                     <div className="edit_search_bar">
                         <Typography>Find User</Typography>
                         <TextField
-                            native
                             id="searchUserName"
                             label="Search Username"
                             className={classes.search_textfield}
@@ -201,7 +200,7 @@ function EditGroup(props) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {searchUserNameResult.map((thisUser) => <TableRow>
+                                    {searchUserNameResult.map((thisUser) => <TableRow key={thisUser[0]}>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
                                         <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>
@@ -210,7 +209,7 @@ function EditGroup(props) {
                                 </TableBody>
                             </Table> : <br />}
                     </div>
-                    {isLoading == true ? <div><LinearProgress /></div> : <div />}
+                    {isLoading === true ? <div><LinearProgress /></div> : <div />}
                 </div>
             </main>
         </div>

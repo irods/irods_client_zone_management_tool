@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from '@reach/router';
-import Cookies from 'js-cookie';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-
+import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
@@ -29,14 +24,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Sidebar(props) {
-    const token = Cookies.get('token');
-    const isAuthenticated = token != null ? true : false;
     const classes = useStyles();
-    const server = useServer();
     const selected = props.menu_id;
-    const [userCounts, setUserCounts] = useState();
-    const [groupCounts, setGroupCounts] = useState();
-    const [rescCounts, setRescCounts] = useState();
     const { userContext, groupContext, rescContext} = useServer();
 
     return (
@@ -50,16 +39,16 @@ function Sidebar(props) {
             >
                 <Divider />
                 <List>
-                    <MenuItem button selected={selected == 0} component={Link} to="/home" key='home'>
+                    <MenuItem button selected={selected === 0} component={Link} to="/home" key='home'>
                         <ListItemText primary='Home' />
                     </MenuItem>
-                    <MenuItem button selected={selected == 1} component={Link} to="/user" key='user'>
+                    <MenuItem button selected={selected === 1} component={Link} to="/user" key='user'>
                         <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
                     </MenuItem>
-                    <MenuItem button selected={selected == 2} component={Link} to="/group" key='group'>
+                    <MenuItem button selected={selected === 2} component={Link} to="/group" key='group'>
                         <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
                     </MenuItem>
-                    <MenuItem button selected={selected == 3} component={Link} to="/resource" key='resource'>
+                    <MenuItem button selected={selected === 3} component={Link} to="/resource" key='resource'>
                         <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
                     </MenuItem>
                 </List>

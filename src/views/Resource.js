@@ -4,7 +4,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import Cookies from 'js-cookie';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, Input, InputLabel } from '@material-ui/core';
@@ -106,10 +105,6 @@ function Resource() {
     const [isLoading, setLoading] = useState(false);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
-
-    const [removeFormOpen, setRemoveFormOpen] = useState(false);
-    const [removeResult, setRemoveResult] = useState();
-
     const [rescName, setRescName] = useState();
     const [rescType, setRescType] = useState();
     const [rescLocation, setRescLocation] = useState();
@@ -131,7 +126,7 @@ function Resource() {
     async function addResource() {
         setAddFormOpen(true);
         setLoading(true);
-        const rescAddResult = await axios({
+        await axios({
             method: 'POST',
             url: `${restApiLocation}/admin`,
             headers: {
@@ -170,12 +165,6 @@ function Resource() {
 
     const handleRemoveFormOpen = (props) => {
         setRescName(props[0]);
-        setRemoveFormOpen(true);
-    }
-
-    const handleRemoveFormClose = () => {
-        setRemoveFormOpen(false);
-        setRemoveResult();
     }
 
     const handleRescNameChange = (event) => {
@@ -194,7 +183,7 @@ function Resource() {
     }
 
     const handleSort = (props) => {
-        const isAsc = orderBy === props && order == 'desc';
+        const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
     }
@@ -285,9 +274,8 @@ function Resource() {
                                         onChange={handleRescLocationChange}></Input></TableCell>
                                     <TableCell><Input id="vault_path"
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
-                                    <TableCell><ToggleButtonGroup size="small"><ToggleButton onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    <TableCell><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {console.log(rescContext)}
                                 {rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
                             </TableBody>
                         </Table>
@@ -301,7 +289,7 @@ function Resource() {
                                     Vault Path: {rescLocation}<br />
                                     Zone: {zoneName}
                             </DialogContentText>
-                            {isLoading == true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
+                            {isLoading === true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                         </DialogContent>
                         <DialogActions className={classes.dialog_action}>
                         </DialogActions>
