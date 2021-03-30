@@ -4,7 +4,6 @@ import { Link } from '@reach/router'
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import Logout from '../views/Logout';
-import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
 import { Button, FormControl, TextField, Input, InputLabel, Select, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
@@ -99,10 +98,7 @@ function Group() {
     const [removeErrorMsg, setRemoveErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
-    const [groups, setGroup] = useState([]);
     const [currGroup, setCurrGroup] = useState([]);
-
-
     const [searchGroupName, setSearchName] = useState('');
     let group_id = 0;
 
@@ -122,7 +118,7 @@ function Group() {
 
     async function addGroup() {
         try {
-            const addGroupResult = await axios({
+            await axios({
                 method: 'POST',
                 url: `${restApiLocation}/admin`,
                 params: {
@@ -149,7 +145,7 @@ function Group() {
 
     async function removeGroup() {
         try {
-            const addGroupResult = await axios({
+            await axios({
                 method: 'POST',
                 url: `${restApiLocation}/admin`,
                 params: {
@@ -190,7 +186,7 @@ function Group() {
     }
 
     const handleSort = props => {
-        const isAsc = orderBy === props && order == 'desc';
+        const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
     }
@@ -252,13 +248,13 @@ function Group() {
                                 <TableRow id="add-group-row" style={{ display: 'none' }}>
                                     <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
                                     <TableCell></TableCell>
-                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
                                 {groupContext._embedded.map((group) =>
                                     <TableRow key={group_id}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[1]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] == 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/group/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

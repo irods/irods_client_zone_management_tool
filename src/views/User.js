@@ -3,7 +3,6 @@ import { Link } from '@reach/router';
 import axios from 'axios';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
-import Cookies from 'js-cookie';
 import { makeStyles } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -186,7 +185,7 @@ function User() {
     }
 
     const handleSort = (props) => {
-        const isAsc = orderBy === props && order == 'desc';
+        const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
     }
@@ -252,13 +251,13 @@ function User() {
                                     >
                                         {userTypes.map(this_user_type => <option key={this_user_type} value={this_user_type}>{this_user_type}</option>)}
                                     </Select></TableCell>
-                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
                                 {userContext !== undefined ? userContext._embedded.map((this_user) =>
                                     <TableRow key={this_user[0]}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] == 'rods' || this_user[0] == 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/user/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                             <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                     </TableRow>
                                 ) : <span />}

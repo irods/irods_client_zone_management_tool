@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
+import React, { createContext, useContext } from 'react';
 
 export const EnvironmentContext = createContext();
 

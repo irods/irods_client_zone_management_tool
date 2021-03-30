@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -41,7 +41,7 @@ function Appbar() {
         <AppBar position="fixed" className={classes.appBar} >
             <Toolbar >
                 <a className={classes.branding}>
-                    <img className={classes.logo} src={require(`../img/${environment.appbarLogo}`)}></img> <Typography variant="h6"> {environment.brandingName} </Typography> </a>
+                    <img alt="Branding Icon" className={classes.logo} src={require(`../img/${environment.appbarLogo}`)}></img> <Typography variant="h6"> {environment.brandingName} </Typography> </a>
                 <Typography className={classes.rightToolbar} variant="h6" noWrap > {zoneName} </Typography>
             </Toolbar>
         </AppBar>

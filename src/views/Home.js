@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
 import Appbar from '../components/Appbar';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import ServerIcon from '../img/servers-logo.png';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Pagination from '@material-ui/lab/Pagination';
-import { CssBaseline, Typography, CircularProgress, Container } from '@material-ui/core';
-import { Avatar, Button, Card, CardHeader, CardActions, CardContent, Collapse } from '@material-ui/core';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { Typography, CircularProgress, Container } from '@material-ui/core';
+import { Button, Card, CardHeader, CardContent, Collapse } from '@material-ui/core';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
 import { useServer } from '../contexts/ServerContext';
 import Logout from './Logout';
@@ -90,13 +90,11 @@ function Home() {
         return <Logout />
     }
     const { userContext, groupContext, rescContext, zoneContext, loadData } = useServer();
-    const [zone_reports, setReport] = useState([]);
     const [curr_zone, setCurrZone] = useState();
     const [details, setDetails] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [tabValue, setTab] = useState(0);
     const classes = useStyles();
-    const theme = useTheme();
     let zone_id = 0;
 
     const [status, setStatus] = useState()
@@ -115,7 +113,7 @@ function Home() {
     }
 
     const viewDetails = (event) => {
-        setCurrZone(zone_reports[document.getElementsByClassName(classes.server_card)[0].id]['icat_server']);
+        setCurrZone(zoneContext[document.getElementsByClassName(classes.server_card)[0].id]['icat_server']);
         setDetails(true);
     }
 
@@ -197,7 +195,7 @@ function Home() {
                         <Card key={zone_id} className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={
-                                    <img className={classes.server} id={zone_id} src={ServerIcon}></img>
+                                    <img alt="Zone Icon" className={classes.server} id={zone_id} src={ServerIcon}></img>
                                 }
                                 title="Server"
                                 subheader="iCAT Server"
@@ -215,7 +213,7 @@ function Home() {
                                     <Typography paragraph>OS Distribution Version: {zone_report['icat_server']['host_system_information']['os_distribution_version']}</Typography>
                                     <Button onClick={viewDetails} color="primary">Details</Button>
                                 </CardContent>
-                                {details == true ? <Dialog open={details} className={classes.dialog} onClose={closeDetails}>
+                                {details === true ? <Dialog open={details} className={classes.dialog} onClose={closeDetails}>
                                     <DialogTitle>Server Details</DialogTitle>
                                     <DialogContent className={classes.server_details}>
                                         <Tabs orientation="vertical" variant="scrollable" value={tabValue} className={classes.tabs} onChange={handleTabChange} aria-label="vertical tabs example">
@@ -224,28 +222,27 @@ function Home() {
                                             <Tab className={classes.tab} label="Plugin" {...a11yProps(2)} />
                                         </Tabs>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={0}>
-                                            <Typography className={classes.info}>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
-                                            <Typography className={classes.info}>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
-                                            <Typography className={classes.info}>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
-                                            <Typography className={classes.info}>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
-                                            <Typography className={classes.info}>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
-                                            <Typography className={classes.info}>Installation Time: {curr_zone['version']['installation_time']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Installation Time: {curr_zone['version']['installation_time']}</Typography>
                                         </TabPanel>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={1}>
-                                            <Typography className={classes.info}>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
-                                            <Typography className={classes.info}>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
-                                            <Typography className={classes.info}>iRODS Connection Refresh Time: {curr_zone['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</Typography>
-                                            <Typography className={classes.info}>iRODS CWD: {curr_zone['service_account_environment']['irods_cwd']}</Typography>
-                                            <Typography className={classes.info}>iRODS Default Hash Scheme: {curr_zone['service_account_environment']['irods_default_hash_scheme']}</Typography>
-                                            <Typography className={classes.info}>iRODS Default Resource: {curr_zone['service_account_environment']['irods_default_resource']}</Typography>
-                                            <Typography className={classes.info}>iRODS Encryption Algorithm: {curr_zone['service_account_environment']['irods_encryption_algorithm']}</Typography>
-                                            <Typography className={classes.info}>iRODS Encryption Key Size: {curr_zone['service_account_environment']['irods_encryption_key_size']}</Typography>
-                                            <Typography className={classes.info}>iRODS Encryption Hash Rounds: {curr_zone['service_account_environment']['irods_encryption_num_hash_rounds']}</Typography>
-                                            <Typography className={classes.info}>iRODS Encryption Salt Size: {curr_zone['service_account_environment']['irods_encryption_salt_size']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Connection Refresh Time: {curr_zone['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS CWD: {curr_zone['service_account_environment']['irods_cwd']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Default Hash Scheme: {curr_zone['service_account_environment']['irods_default_hash_scheme']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Default Resource: {curr_zone['service_account_environment']['irods_default_resource']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Algorithm: {curr_zone['service_account_environment']['irods_encryption_algorithm']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Key Size: {curr_zone['service_account_environment']['irods_encryption_key_size']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Hash Rounds: {curr_zone['service_account_environment']['irods_encryption_num_hash_rounds']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Salt Size: {curr_zone['service_account_environment']['irods_encryption_salt_size']}</Typography>
                                         </TabPanel>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
-                                            <Typography className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
-                                            {/* <Typography className={classes.info}>{curr_zone['plugins']['0']['name']}</Typography> */}
+                                            <Typography component={'span'} className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
                                         </TabPanel>
                                     </DialogContent>
                                 </Dialog> : <span />}

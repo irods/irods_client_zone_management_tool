@@ -96,7 +96,7 @@ export const ServerProvider = ({ children }) => {
 
     const loadResource = (offset, limit, name, order, orderBy) => {
         let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT`
-        if (name != '') {
+        if (name !== '') {
             _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT WHERE RESC_NAME LIKE '%${name}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
