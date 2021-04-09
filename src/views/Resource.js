@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     pagination_item: {
         transitionDuration: '1.5s'
     },
-    search: {
+    filter: {
         marginLeft: 30,
         width: 200
     },
@@ -114,14 +114,14 @@ function Resource() {
     const [currPage, setCurrPage] = useState(0);
     const [perPage, setPerPage] = useState(10);
 
-    const [searchRescName, setSearchName] = useState('');
+    const [filterRescName, setFilterName] = useState('');
 
 
     const { zoneName, rescContext, loadResource } = useServer();
 
     useEffect(() => {
-        loadResource(currPage, perPage, searchRescName, order, orderBy);
-    }, [currPage, perPage, searchRescName, order, orderBy])
+        loadResource(currPage, perPage, filterRescName, order, orderBy);
+    }, [currPage, perPage, filterRescName, order, orderBy])
 
     async function addResource() {
         setAddFormOpen(true);
@@ -217,11 +217,11 @@ function Resource() {
                             </Select>
                         </FormControl>
                         <TextField
-                            className={classes.search}
-                            id="search-term"
-                            label="Search"
-                            placeholder="Search by ResourceName"
-                            onChange={(event) => setSearchName(event.target.value)}
+                            className={classes.filter}
+                            id="filter-term"
+                            label="Filter"
+                            placeholder="Filter by ResourceName"
+                            onChange={(event) => setFilterName(event.target.value)}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New Resource

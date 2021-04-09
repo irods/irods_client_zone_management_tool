@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     link_button: {
         textDecoration: "none"
     },
-    search_textfield: {
+    filter_textfield: {
         marginLeft: '2vw'
     },
     add_button: {
@@ -56,8 +56,8 @@ function EditUser(props) {
     const { restApiLocation } = useEnvironment();
     const { zoneName } = useServer();
     const [groupsOfUser, setGroupOfUser] = useState([]);
-    const [searchGroupName, setSearchName] = useState('');
-    const [searchGroupNameResult, setSearchNameResult] = useState([]);
+    const [filterGroupName, setFilterName] = useState('');
+    const [filterGroupNameResult, setFilterNameResult] = useState([]);
 
     useEffect(() => {
         setLoading(true);
@@ -88,15 +88,15 @@ function EditUser(props) {
                 'Authorization': auth,
             },
             params: {
-                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${searchGroupName}%' AND USER_TYPE = 'rodsgroup'`,
+                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName}%' AND USER_TYPE = 'rodsgroup'`,
                 query_limit: 100,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then((res) => {
-            setSearchNameResult(res.data._embedded);
+            setFilterNameResult(res.data._embedded);
         })
-    }, [searchGroupName])
+    }, [filterGroupName])
 
     async function removeGroupFromUser(props) {
         try {
@@ -168,18 +168,18 @@ function EditUser(props) {
                 <div className={classes.main}>
                     <Link to="/user" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
                     {currentUser[0]}
-                    <div className="edit_search_bar">
+                    <div className="edit_filter_bar">
                         <Typography>Find Group</Typography>
                         <TextField
-                            id="searchGroupName"
-                            label="Search Groupname"
-                            className={classes.search_textfield}
-                            onChange={(e) => setSearchName(e.target.value)}
+                            id="filterGroupName"
+                            label="Filter GroupName"
+                            className={classes.filter_textfield}
+                            onChange={(e) => setFilterName(e.target.value)}
                         />
                     </div>
                     <br />
                     <div className="edit_container">
-                        {searchGroupNameResult.length > 0 ?
+                        {filterGroupNameResult.length > 0 ?
                             <Table className={classes.user_table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -189,7 +189,7 @@ function EditUser(props) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {searchGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
+                                    {filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
                                         <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                         <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
                                         <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>

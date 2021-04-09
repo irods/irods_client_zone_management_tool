@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
     pagination_item: {
         transitionDuration: '1.5s'
     },
-    search: {
+    filter: {
         marginLeft: 30
     },
     add_button: {
@@ -103,7 +103,7 @@ function User() {
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [searchUsername, setSearchName] = useState('');
+    const [filterUsername, setFilterName] = useState('');
     const { zoneName, userContext, loadUser } = useServer();
 
     const [order, setOrder] = useState("asc");
@@ -191,9 +191,9 @@ function User() {
     }
 
     useEffect(() => {
-        loadUser(perPage * (currPage - 1), perPage, searchUsername, order, orderBy)
+        loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
 
-    }, [currPage, perPage, searchUsername, order, orderBy])
+    }, [currPage, perPage, filterUsername, order, orderBy])
 
 
 
@@ -221,11 +221,11 @@ function User() {
                             </Select>
                         </FormControl>
                         <TextField
-                            className={classes.search}
-                            id="search-term"
-                            label="Search"
-                            placeholder="Search by username"
-                            onChange={(event) => setSearchName(event.target.value)}
+                            className={classes.filter}
+                            id="filter-term"
+                            label="Filter"
+                            placeholder="Filter by UserName"
+                            onChange={(event) => setFilterName(event.target.value)}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New User

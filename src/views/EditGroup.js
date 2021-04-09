@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     link_button: {
         textDecoration: 'none'
     },
-    search_textfield: {
+    filter_textfield: {
         marginLeft: '2vw'
     },
     add_button: {
@@ -58,8 +58,8 @@ function EditGroup(props) {
     const { restApiLocation } = useEnvironment();
 
     const [usersInGroup, setUsersInGroup] = useState([]);
-    const [searchUserName, setSearchName] = useState('');
-    const [searchUserNameResult, setSearchNameResult] = useState([]);
+    const [filterUserName, setFilterName] = useState('');
+    const [filterUserNameResult, setFilterNameResult] = useState([]);
 
     useEffect(() => {
         setLoading(true);
@@ -91,16 +91,16 @@ function EditGroup(props) {
                 'Authorization': auth,
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${searchUserName}%' AND USER_TYPE != 'rodsgroup'`,
+                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName}%' AND USER_TYPE != 'rodsgroup'`,
                 query_limit: 10,
                 row_offset: 0,
                 query_type: 'general'
             }
         }).then((res) => {
-            setSearchNameResult(res.data._embedded);
+            setFilterNameResult(res.data._embedded);
             setLoading(false);
         })
-    }, [searchUserName])
+    }, [filterUserName])
 
 
 
@@ -164,8 +164,8 @@ function EditGroup(props) {
         return false;
     }
 
-    const handleSearchUserName = (event) => {
-        setSearchName(event.target.value);
+    const handleFilterUserName = (event) => {
+        setFilterName(event.target.value);
     }
 
     return (
@@ -178,18 +178,18 @@ function EditGroup(props) {
                     <Link to="/group" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
                     {currentGroup[0]}
                     <br />
-                    <div className="edit_search_bar">
+                    <div className="edit_filter_bar">
                         <Typography>Find User</Typography>
                         <TextField
-                            id="searchUserName"
-                            label="Search Username"
-                            className={classes.search_textfield}
-                            onChange={handleSearchUserName}
+                            id="filterUserName"
+                            label="Filter UserName"
+                            className={classes.filter_textfield}
+                            onChange={handleFilterUserName}
                         />
                     </div>
                     <br />
                     <div className="edit_container">
-                        {searchUserNameResult.length > 0 ?
+                        {filterUserNameResult.length > 0 ?
                             <Table className={classes.user_table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
@@ -200,7 +200,7 @@ function EditGroup(props) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {searchUserNameResult.map((thisUser) => <TableRow key={thisUser[0]}>
+                                    {filterUserNameResult.map((thisUser) => <TableRow key={thisUser[0]}>
                                         <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                         <TableCell align="right">{thisUser[1]}</TableCell>
                                         <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>

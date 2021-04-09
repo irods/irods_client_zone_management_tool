@@ -86,7 +86,7 @@
     overflow-y: scroll;
 }
 
-.edit_search_bar{
+.edit_filter_bar{
     display: flex;
     align-items: baseline;
     justify-content: center;
