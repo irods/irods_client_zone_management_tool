@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
     pagination_item: {
         transitionDuration: '1.5s'
     },
-    search: {
+    filter: {
         marginLeft: 30,
         width: 200
     },
@@ -99,7 +99,7 @@ function Group() {
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [currGroup, setCurrGroup] = useState([]);
-    const [searchGroupName, setSearchName] = useState('');
+    const [filterGroupName, setFilterName] = useState('');
     let group_id = 0;
 
     const [currPage, setCurrPage] = useState(1);
@@ -110,11 +110,12 @@ function Group() {
 
 
     // load group from context provider,
-    // pass in perPage, currentPage, searchname('' by default), order, orderBy
+    // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
     useEffect(() => {
-        loadGroup(perPage * (currPage - 1), perPage, searchGroupName, order, "USER_NAME");
-    }, [currPage, perPage, searchGroupName, order, orderBy])
+        console.log(filterGroupName)
+        loadGroup(perPage * (currPage - 1), perPage, filterGroupName, order, "USER_NAME");
+    }, [currPage, perPage, filterGroupName, order, orderBy])
 
     async function addGroup() {
         try {
@@ -225,11 +226,11 @@ function Group() {
                             </Select>
                         </FormControl>
                         <TextField
-                            className={classes.search}
-                            id="search-term"
-                            label="Search"
-                            placeholder="Search by GroupName"
-                            onChange={(event) => setSearchName(event.target.value)}
+                            className={classes.filter}
+                            id="filter-term"
+                            label="Filter"
+                            placeholder="Filter by GroupName"
+                            onChange={(event) => setFilterName(event.target.value)}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New Group
