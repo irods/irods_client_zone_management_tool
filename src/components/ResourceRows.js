@@ -101,8 +101,8 @@ function ResourceRows(props) {
         <TableCell className={classes.cell} align="left">{row[0]}</TableCell>
         <TableCell className={classes.cell} align="left">{row[1]}</TableCell>
         <TableCell className={classes.cell} align="left">{row[4]}</TableCell>
-        <TableCell className={classes.cell} align="left">{decodeURIComponent(row[3])}</TableCell>
-        <TableCell className={classes.cell} align="left">{row[2]}<IconButton>
+        <TableCell className={classes.cell} align="left">{row[3]}</TableCell>
+        <TableCell className={classes.cell} align="right"><IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton></TableCell>
       </TableRow>
