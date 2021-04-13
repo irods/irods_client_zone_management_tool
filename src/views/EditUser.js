@@ -166,7 +166,7 @@ function EditUser(props) {
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
-                    <Link to="/user" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
+                    <Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
                     {currentUser[0]}
                     <div className="edit_filter_bar">
                         <Typography>Find Group</Typography>
