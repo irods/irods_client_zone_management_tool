@@ -51,6 +51,9 @@ function Sidebar(props) {
                     <MenuItem button selected={selected === 3} component={Link} to="/resources" key='resource'>
                         <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
                     </MenuItem>
+                    <MenuItem button selected={selected === 4} component={Link} to="/servers" key='server'>
+                        <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
+                    </MenuItem>
                 </List>
                 <Divider />
                 <List>
