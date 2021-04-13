@@ -175,7 +175,7 @@ function EditGroup(props) {
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
-                    <Link to="/group" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
+                    <Link to="/groups" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
                     {currentGroup[0]}
                     <br />
                     <div className="edit_filter_bar">

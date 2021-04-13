@@ -8,6 +8,7 @@ import Resource from './views/Resource';
 import Logout from './views/Logout';
 import Home from './views/Home';
 import Landing from './views/Landing';
+import Server from './views/Server';
 import './App.css';
 import Footer from './components/Footer';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
@@ -22,11 +23,12 @@ class App extends Component {
             <div className="app_wrap">
               <Router>
                 <Home path="/home" />
-                <EditUser path='/user/edit' />
-                <User path="/user" />
-                <EditGroup path='group/edit' />
-                <Group path='/group' />
-                <Resource path='/resource' />
+                <EditUser path='/users/edit' />
+                <User path="/users" />
+                <EditGroup path='groups/edit' />
+                <Group path='/groups' />
+                <Resource path='/resources' />
+                <Server path='/servers' />
                 <Landing path="/" />
                 <Logout default />
               </Router>
