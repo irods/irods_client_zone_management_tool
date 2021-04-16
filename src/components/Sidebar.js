@@ -29,39 +29,39 @@ function Sidebar(props) {
     const { userContext, groupContext, rescContext, zoneContext } = useServer();
 
     return (
-            <Drawer
-                className={classes.drawer}
-                variant="permanent"
-                classes={{
-                    paper: classes.drawerPaper,
-                }}
-                anchor="left"
-            >
-                <Divider />
-                <List>
-                    <MenuItem button selected={selected === 0} component={Link} to="/home" key='home'>
-                        <ListItemText primary='Home' />
-                    </MenuItem>
-                    <MenuItem button selected={selected === 1} component={Link} to="/users" key='user'>
-                        <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
-                    </MenuItem>
-                    <MenuItem button selected={selected === 2} component={Link} to="/groups" key='group'>
-                        <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
-                    </MenuItem>
-                    <MenuItem button selected={selected === 3} component={Link} to="/resources" key='resource'>
-                        <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
-                    </MenuItem>
-                    <MenuItem button selected={selected === 4} component={Link} to="/servers" key='server'>
-                        <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
-                    </MenuItem>
-                </List>
-                <Divider />
-                <List>
-                    <MenuItem button component={Link} to="/logout" key='logout'>
-                        <ListItemText primary='Logout' />
-                    </MenuItem>
-                </List>
-            </Drawer>
+        <Drawer
+            className={classes.drawer}
+            variant="permanent"
+            classes={{
+                paper: classes.drawerPaper,
+            }}
+            anchor="left"
+        >
+            <Divider />
+            <List>
+                <MenuItem button selected={selected === 0} component={Link} to="/home" key='home'>
+                    <ListItemText primary='Home' />
+                </MenuItem>
+                <MenuItem button selected={selected === 1} component={Link} to="/users" key='user'>
+                    <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
+                </MenuItem>
+                <MenuItem button selected={selected === 2} component={Link} to="/groups" key='group'>
+                    <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
+                </MenuItem>
+                <MenuItem button selected={selected === 3} component={Link} to="/resources" key='resource'>
+                    <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
+                </MenuItem>
+                <MenuItem button selected={selected === 4} component={Link} to="/servers" key='server'>
+                    <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext['servers'].length + 1})</ListItemText>
+                </MenuItem>
+            </List>
+            <Divider />
+            <List>
+                <MenuItem button component={Link} to="/logout" key='logout'>
+                    <ListItemText primary='Logout' />
+                </MenuItem>
+            </List>
+        </Drawer>
     );
 }
 
