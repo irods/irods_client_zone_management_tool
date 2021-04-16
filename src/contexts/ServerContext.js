@@ -127,7 +127,7 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             }
         }).then((res) => {
-            setZoneContext(res.data.zones);
+            setZoneContext(res.data.zones[0]);
         }).catch((e) => {
         });
 
