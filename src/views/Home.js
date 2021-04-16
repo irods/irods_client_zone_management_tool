@@ -113,7 +113,6 @@ function Home() {
     }
 
     const viewDetails = (event) => {
-        setCurrZone(zoneContext[document.getElementsByClassName(classes.server_card)[0].id]['icat_server']);
         setDetails(true);
     }
 
@@ -191,7 +190,7 @@ function Home() {
                         </Grid>
                     </Container>
                     <br />
-                    <Pagination count={1} /><br />{zoneContext !== undefined ? zoneContext.map((zone_report) =>
+                    <Pagination count={1} /><br />{zoneContext !== undefined ? 
                         <Card key={zone_id} className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={
@@ -208,9 +207,9 @@ function Home() {
                             />
                             <Collapse in={expanded} timeout="auto" unmountOnExit>
                                 <CardContent>
-                                    <Typography paragraph>Hostname: {zone_report['icat_server']['host_system_information']['hostname']}</Typography>
-                                    <Typography paragraph>OS Distribution Name: {zone_report['icat_server']['host_system_information']['os_distribution_name']}</Typography>
-                                    <Typography paragraph>OS Distribution Version: {zone_report['icat_server']['host_system_information']['os_distribution_version']}</Typography>
+                                    <Typography paragraph>Hostname: {zoneContext['icat_server']['host_system_information']['hostname']}</Typography>
+                                    <Typography paragraph>OS Distribution Name: {zoneContext['icat_server']['host_system_information']['os_distribution_name']}</Typography>
+                                    <Typography paragraph>OS Distribution Version: {zoneContext['icat_server']['host_system_information']['os_distribution_version']}</Typography>
                                     <Button onClick={viewDetails} color="primary">Details</Button>
                                 </CardContent>
                                 {details === true ? <Dialog open={details} className={classes.dialog} onClose={closeDetails}>
@@ -222,33 +221,21 @@ function Home() {
                                             <Tab className={classes.tab} label="Plugin" {...a11yProps(2)} />
                                         </Tabs>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={0}>
-                                            <Typography component={'span'} className={classes.info}>Schema Name: {curr_zone['host_access_control_config']['schema_name']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Schema Version: {curr_zone['host_access_control_config']['schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Catalog Schema Version: {curr_zone['version']['catalog_schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Configuration Schema Version: {curr_zone['version']['configuration_schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Version: {curr_zone['version']['irods_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Installation Time: {curr_zone['version']['installation_time']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Schema Name: {zoneContext['icat_server']['host_access_control_config']['schema_name']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Schema Version: {zoneContext['icat_server']['host_access_control_config']['schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Catalog Schema Version: {zoneContext['icat_server']['version']['catalog_schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Configuration Schema Version: {zoneContext['icat_server']['version']['configuration_schema_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>iRODS Version: {zoneContext['icat_server']['version']['irods_version']}</Typography>
+                                            <Typography component={'span'} className={classes.info}>Installation Time: {zoneContext['icat_server']['version']['installation_time']}</Typography>
                                         </TabPanel>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={1}>
-                                            <Typography component={'span'} className={classes.info}>iRODS Client Server Negotiation: {curr_zone['service_account_environment']['irods_client_server_negotiation']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Client Server Policy: {curr_zone['service_account_environment']['irods_client_server_policy']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Connection Refresh Time: {curr_zone['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS CWD: {curr_zone['service_account_environment']['irods_cwd']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Default Hash Scheme: {curr_zone['service_account_environment']['irods_default_hash_scheme']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Default Resource: {curr_zone['service_account_environment']['irods_default_resource']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Algorithm: {curr_zone['service_account_environment']['irods_encryption_algorithm']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Key Size: {curr_zone['service_account_environment']['irods_encryption_key_size']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Hash Rounds: {curr_zone['service_account_environment']['irods_encryption_num_hash_rounds']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Encryption Salt Size: {curr_zone['service_account_environment']['irods_encryption_salt_size']}</Typography>
                                         </TabPanel>
                                         <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
-                                            <Typography component={'span'} className={classes.info}>Total number of Plugins: {curr_zone['plugins'].length}</Typography>
                                         </TabPanel>
                                     </DialogContent>
                                 </Dialog> : <span />}
                             </Collapse>
-                        </Card>
-                    ) : <div><CircularProgress /> Loading...</div>}</div></main>
+                        </Card> : <div><CircularProgress /> Loading...</div>}</div></main>
             </div>
         </div >
     );
