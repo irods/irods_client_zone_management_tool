@@ -161,7 +161,7 @@ function Home() {
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Servers</Typography>
-                                <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext.length}</Typography>
+                                <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext['servers'].length + 1}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
@@ -190,7 +190,7 @@ function Home() {
                         </Grid>
                     </Container>
                     <br />
-                    <Pagination count={1} /><br />{zoneContext !== undefined ? 
+                    <Pagination count={1} /><br />{zoneContext !== undefined ?
                         <Card key={zone_id} className={classes.server_card} id={zone_id}>
                             <CardHeader
                                 avatar={
