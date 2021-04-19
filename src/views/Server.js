@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         fontSize: 14
     },
+    plugin_info: {
+        fontSize: 14
+    },
     server: {
         width: theme.spacing(8)
     },
@@ -143,7 +146,7 @@ function Server() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Type</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Role</b></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Hostname</b></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>OS Distribution</b></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align="right"></TableCell>
@@ -151,16 +154,17 @@ function Server() {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>iCAT Server</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>Catalog Service Provider</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{zoneContext['icat_server']['host_system_information']['hostname']}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{zoneContext['icat_server']['host_system_information']['os_distribution_name'] + " " + zoneContext['icat_server']['host_system_information']['os_distribution_version']}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(zoneContext['icat_server']); setOpenDetails(true); }}>Stats</Button></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(zoneContext['icat_server']); setOpenDetails(true); }}>Details</Button></TableCell>
                                     </TableRow>
                                     {zoneContext.servers.map((server) =>
                                         <TableRow>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>Catalog Service Consumer</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['icat_server']['host_system_information']['hostname']}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'>{server['icat_server']['host_system_information']['os_distribution_name'] + " " + server['icat_server']['host_system_information']['os_distribution_version']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Stats</Button></TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Details</Button></TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -223,7 +227,7 @@ function Server() {
                                     <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
                                         <div>
                                             <tr><td><b>Name</b></td><td><b>Type</b></td></tr>
-                                            {currServer['plugins'].map(plugin => <tr><td><div className={classes.info}>{plugin.name}</div></td><td><div className={classes.info}>{plugin.type}</div></td></tr>)}
+                                            {currServer['plugins'].map(plugin => <tr><td><div className={classes.plugin_info}>{plugin.name}</div></td><td><div className={classes.info}>{plugin.type}</div></td></tr>)}
                                         </div>
                                     </TabPanel>
                                 </DialogContent>
