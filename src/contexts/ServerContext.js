@@ -22,6 +22,7 @@ export const ServerProvider = ({ children }) => {
     const [userContext, setUserContext] = useState(initialState);
     const [groupContext, setGroupContext] = useState(initialState);
     const [rescContext, setRescContext] = useState(initialState);
+    const [filteredServers, setFilteredServers] = useState([]);
 
     const loadUser = (offset, limit, name, order, orderBy) => {
         let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`;
@@ -118,20 +119,8 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-    const loadZone = async () => {
-        axios({
-            method: 'POST',
-            url: `${restApiLocation}/zone_report`,
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': localStorage.getItem('zmt-token')
-            }
-        }).then((res) => {
-            setZoneContext(res.data.zones[0]);
-        }).catch((e) => {
-        });
-
-        axios({
+    const loadZoneName = () => {
+        return axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -148,8 +137,32 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
+    const loadZoneReport = () => {
+        return axios({
+            method: 'POST',
+            url: `${restApiLocation}/zone_report`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': localStorage.getItem('zmt-token')
+            }
+        }).then((res) => {
+            let catalog_service_provider = [res.data.zones[0]['icat_server']];
+            let fullServersArray = catalog_service_provider.concat(res.data.zones[0]['servers']);
+            setZoneContext(fullServersArray);
+            setFilteredServers(fullServersArray.slice(0, 10));
+        }).catch((e) => {
+        });
+    }
+
+    const loadCurrServer = (offset, perPage) => {
+        if (zoneContext !== undefined) {
+            setFilteredServers(zoneContext.slice(offset, offset + perPage));
+        }
+    }
+
     const loadData = () => {
-        loadZone();
+        loadZoneName();
+        loadZoneReport();
         loadUser(0, 10, '', 'asc', 'USER_NAME');
         loadGroup(0, 10, '', 'asc', 'USER_NAME');
         loadResource(0, 10, '', 'asc', 'RESC_NAME');
@@ -165,7 +178,7 @@ export const ServerProvider = ({ children }) => {
 
     return (
         <ServerContext.Provider value={{
-            zoneContext, zoneName, loadZone,
+            zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
             userContext, loadUser,
             groupContext, loadGroup,
             rescContext, loadResource,
