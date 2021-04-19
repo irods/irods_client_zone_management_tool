@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Logout from './Logout';
 import Appbar from '../components/Appbar';
@@ -77,12 +77,16 @@ function Server() {
         return <Logout />
     }
     const classes = useStyles();
-    const { zoneContext } = useServer();
-    const [currPage, setCurrPage] = useState();
+    const { zoneContext, filteredServers, loadCurrServer } = useServer();
+    const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [tabValue, setTabValue] = useState(0);
     const [openDetails, setOpenDetails] = useState(false);
     const [currServer, setCurrServer] = useState();
+
+    useEffect(() => {
+        loadCurrServer(perPage * (currPage - 1), perPage * currPage);
+    }, [perPage, currPage])
 
     function TabPanel(props) {
         const { children, value, index, ...other } = props;
@@ -153,17 +157,11 @@ function Server() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>Catalog Service Provider</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{zoneContext['icat_server']['host_system_information']['hostname']}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{zoneContext['icat_server']['host_system_information']['os_distribution_name'] + " " + zoneContext['icat_server']['host_system_information']['os_distribution_version']}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(zoneContext['icat_server']); setOpenDetails(true); }}>Details</Button></TableCell>
-                                    </TableRow>
-                                    {zoneContext.servers.map((server) =>
+                                    {filteredServers.map((server) =>
                                         <TableRow>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>Catalog Service Consumer</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['icat_server']['host_system_information']['hostname']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'>{server['icat_server']['host_system_information']['os_distribution_name'] + " " + server['icat_server']['host_system_information']['os_distribution_version']}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['host_system_information']['hostname']}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Details</Button></TableCell>
                                         </TableRow>
                                     )}
