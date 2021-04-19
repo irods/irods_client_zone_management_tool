@@ -161,7 +161,7 @@ function Home() {
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Servers</Typography>
-                                <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext['servers'].length + 1}</Typography>
+                                <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext.length}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
@@ -189,53 +189,7 @@ function Home() {
                             </Paper>
                         </Grid>
                     </Container>
-                    <br />
-                    <Pagination count={1} /><br />{zoneContext !== undefined ?
-                        <Card key={zone_id} className={classes.server_card} id={zone_id}>
-                            <CardHeader
-                                avatar={
-                                    <img alt="Zone Icon" className={classes.server} id={zone_id} src={ServerIcon}></img>
-                                }
-                                title="Server"
-                                subheader="iCAT Server"
-                                action={
-                                    <IconButton
-                                        onClick={handleExpandClick}>
-                                        <ExpandMoreIcon />
-                                    </IconButton>
-                                }
-                            />
-                            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                                <CardContent>
-                                    <Typography paragraph>Hostname: {zoneContext['icat_server']['host_system_information']['hostname']}</Typography>
-                                    <Typography paragraph>OS Distribution Name: {zoneContext['icat_server']['host_system_information']['os_distribution_name']}</Typography>
-                                    <Typography paragraph>OS Distribution Version: {zoneContext['icat_server']['host_system_information']['os_distribution_version']}</Typography>
-                                    <Button onClick={viewDetails} color="primary">Details</Button>
-                                </CardContent>
-                                {details === true ? <Dialog open={details} className={classes.dialog} onClose={closeDetails}>
-                                    <DialogTitle>Server Details</DialogTitle>
-                                    <DialogContent className={classes.server_details}>
-                                        <Tabs orientation="vertical" variant="scrollable" value={tabValue} className={classes.tabs} onChange={handleTabChange} aria-label="vertical tabs example">
-                                            <Tab className={classes.tab} label="Host" {...a11yProps(0)} />
-                                            <Tab className={classes.tab} label="Service" {...a11yProps(1)} />
-                                            <Tab className={classes.tab} label="Plugin" {...a11yProps(2)} />
-                                        </Tabs>
-                                        <TabPanel className={classes.tab_panel} value={tabValue} index={0}>
-                                            <Typography component={'span'} className={classes.info}>Schema Name: {zoneContext['icat_server']['host_access_control_config']['schema_name']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Schema Version: {zoneContext['icat_server']['host_access_control_config']['schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Catalog Schema Version: {zoneContext['icat_server']['version']['catalog_schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Configuration Schema Version: {zoneContext['icat_server']['version']['configuration_schema_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>iRODS Version: {zoneContext['icat_server']['version']['irods_version']}</Typography>
-                                            <Typography component={'span'} className={classes.info}>Installation Time: {zoneContext['icat_server']['version']['installation_time']}</Typography>
-                                        </TabPanel>
-                                        <TabPanel className={classes.tab_panel} value={tabValue} index={1}>
-                                        </TabPanel>
-                                        <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
-                                        </TabPanel>
-                                    </DialogContent>
-                                </Dialog> : <span />}
-                            </Collapse>
-                        </Card> : <div><CircularProgress /> Loading...</div>}</div></main>
+                    </div></main>
             </div>
         </div >
     );
