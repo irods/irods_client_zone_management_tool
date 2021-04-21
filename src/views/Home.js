@@ -155,7 +155,7 @@ function Home() {
 
     return (
         <div>
-            <div className={classes.root}><Appbar /><Sidebar menu_id="0" /><main className={classes.content}><div className={classes.toolbar} />
+            <div className={classes.root}><Appbar /><Sidebar menu_id="1" /><main className={classes.content}><div className={classes.toolbar} />
                 <div className={classes.main}>
                     <Container className={classes.status_box}>
                         <Grid item xs={12} md={8} lg={9}>

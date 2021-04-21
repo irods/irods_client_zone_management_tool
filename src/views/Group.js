@@ -205,7 +205,7 @@ function Group() {
     return (
         <div className={classes.root}>
             <Appbar />
-            <Sidebar menu_id="2" />
+            <Sidebar menu_id="5" />
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
