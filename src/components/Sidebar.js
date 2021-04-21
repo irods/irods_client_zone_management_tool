@@ -39,20 +39,21 @@ function Sidebar(props) {
         >
             <Divider />
             <List>
-                <MenuItem button selected={selected === 0} component={Link} to="/home" key='home'>
+                <MenuItem button selected={selected === '1'} component={Link} to="/home" key='home'>
                     <ListItemText primary='Home' />
                 </MenuItem>
-                <MenuItem button selected={selected === 1} component={Link} to="/users" key='user'>
-                    <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
+                <MenuItem button selected={selected === '2'} component={Link} to="/servers" key='server'>
+                    <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
                 </MenuItem>
-                <MenuItem button selected={selected === 2} component={Link} to="/groups" key='group'>
-                    <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
-                </MenuItem>
-                <MenuItem button selected={selected === 3} component={Link} to="/resources" key='resource'>
+                <MenuItem button selected={selected === '3'} component={Link} to="/resources" key='resource'>
                     <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
                 </MenuItem>
-                <MenuItem button selected={selected === 4} component={Link} to="/servers" key='server'>
-                    <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
+
+                <MenuItem button selected={selected === '4'} component={Link} to="/users" key='user'>
+                    <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
+                </MenuItem>
+                <MenuItem button selected={selected === '5'} component={Link} to="/groups" key='group'>
+                    <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
                 </MenuItem>
             </List>
             <Divider />
