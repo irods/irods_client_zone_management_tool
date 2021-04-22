@@ -113,7 +113,6 @@ function Group() {
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
     useEffect(() => {
-        console.log(filterGroupName)
         loadGroup(perPage * (currPage - 1), perPage, filterGroupName, order, "USER_NAME");
     }, [currPage, perPage, filterGroupName, order, orderBy])
 

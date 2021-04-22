@@ -83,10 +83,18 @@ function Server() {
     const [tabValue, setTabValue] = useState(0);
     const [openDetails, setOpenDetails] = useState(false);
     const [currServer, setCurrServer] = useState();
+    const [order, setOrder] = useState("asc");
+    const [orderBy, setOrderBy] = useState("role");
 
     useEffect(() => {
-        loadCurrServer(perPage * (currPage - 1), perPage * currPage);
-    }, [perPage, currPage])
+        loadCurrServer(perPage * (currPage - 1), perPage * currPage, order, orderBy);
+    }, [perPage, currPage, order, orderBy])
+
+    const handleSort = props => {
+        const isAsc = orderBy === props && order === 'desc';
+        setOrder(isAsc ? 'asc' : 'desc');
+        setOrderBy(props);
+    }
 
     function TabPanel(props) {
         const { children, value, index, ...other } = props;
@@ -150,9 +158,9 @@ function Server() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Role</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Hostname</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>OS Distribution</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Role</b><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Hostname</b><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>OS Distribution</b><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }} /></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align="right"></TableCell>
                                     </TableRow>
                                 </TableHead>
