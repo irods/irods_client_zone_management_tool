@@ -154,9 +154,25 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-    const loadCurrServer = (offset, perPage) => {
+    const loadCurrServer = (offset, perPage, order, orderBy) => {
         if (zoneContext !== undefined) {
-            setFilteredServers(zoneContext.slice(offset, offset + perPage));
+            let tem_servers = zoneContext;
+            let orderSyntax = order === 'asc' ? 1 : -1;
+
+            const server_sort_comparator = (a, b) => {
+                switch (orderBy) {
+                    case 'hostname':
+                        const a_fullIP = a['host_system_information']['hostname'].slice(3, a.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
+                        const b_fullIP = b['host_system_information']['hostname'].slice(3, b.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
+                        return orderSyntax * (a_fullIP - b_fullIP);
+                    case 'role':
+                        return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']))
+                    case 'os':
+                        return orderSyntax * ((a['host_system_information']['os_distribution_name'] + a['host_system_information']['os_distribution_version']).localeCompare((b['host_system_information']['os_distribution_name'] + b['host_system_information']['os_distribution_version'])))
+                }
+            }
+            tem_servers.sort(server_sort_comparator);
+            setFilteredServers(tem_servers.slice(offset, offset + perPage));
         }
     }
 
