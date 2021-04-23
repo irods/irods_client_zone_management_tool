@@ -145,22 +145,51 @@ export const ServerProvider = ({ children }) => {
                 'Accept': 'application/json',
                 'Authorization': localStorage.getItem('zmt-token')
             }
-        }).then((res) => {
-            let catalog_service_provider = [res.data.zones[0]['icat_server']];
-            let fullServersArray = catalog_service_provider.concat(res.data.zones[0]['servers']);
-            setZoneContext(fullServersArray);
-            setFilteredServers(fullServersArray.slice(0, 10));
-        }).catch((e) => {
-        });
+        })
     }
 
-    const loadCurrServer = (offset, perPage, order, orderBy) => {
+    // to query all resources that live on a specific hostname
+    const fetchServerResources = (server_hostname) => {
+        return axios({
+            method: 'GET',
+            url: `${restApiLocation}/query`,
+            headers: {
+                'Authorization': localStorage.getItem('zmt-token')
+            },
+            params: {
+                query_string: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        })
+    }
+
+    // load all servers at each render, and iterate through server list to fetch resources which have the same hostname
+    const loadServers = async () => {
+        let zone_report = await loadZoneReport();
+        let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
+        let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
+        for (let curr_server of fullServersArray) {
+            let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname']);
+            curr_server["resources"] = resource_counts.data.total;
+        }
+        setZoneContext(fullServersArray)
+        setFilteredServers(fullServersArray.slice(0, 10));
+    }
+
+    // handle servers page pagination and sorting
+    const loadCurrServer = async (offset, perPage, order, orderBy) => {
         if (zoneContext !== undefined) {
             let tem_servers = zoneContext;
             let orderSyntax = order === 'asc' ? 1 : -1;
 
             const server_sort_comparator = (a, b) => {
                 switch (orderBy) {
+                    // NOTE: this comparator will ignore 'ip' and all '-' in ip address and concate the number together,
+                    // and edges cases are also handled here.
+                    // e.g. 'ip-172-31-13-194' will be converted to '172031013194'
+                    // 'ip-2-21-13-194' will interpreted as '0020210130194'
                     case 'hostname':
                         const a_fullIP = a['host_system_information']['hostname'].slice(3, a.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
                         const b_fullIP = b['host_system_information']['hostname'].slice(3, b.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
@@ -169,23 +198,27 @@ export const ServerProvider = ({ children }) => {
                         return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']))
                     case 'os':
                         return orderSyntax * ((a['host_system_information']['os_distribution_name'] + a['host_system_information']['os_distribution_version']).localeCompare((b['host_system_information']['os_distribution_name'] + b['host_system_information']['os_distribution_version'])))
+                    case 'resources':
+                        return orderSyntax * (a['resources'] - b['resources'])
+                    default:
+                        return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']));
                 }
             }
             tem_servers.sort(server_sort_comparator);
-            setFilteredServers(tem_servers.slice(offset, offset + perPage));
+            tem_servers = tem_servers.slice(offset, offset + perPage);
+            setFilteredServers(tem_servers);
         }
     }
 
     const loadData = () => {
         loadZoneName();
-        loadZoneReport();
+        loadServers();
         loadUser(0, 10, '', 'asc', 'USER_NAME');
         loadGroup(0, 10, '', 'asc', 'USER_NAME');
         loadResource(0, 10, '', 'asc', 'RESC_NAME');
     }
 
-    // reload zone, user, group, resource on page refresh
-
+     // load all zone data at each render if user is logged in
     useEffect(() => {
         if (localStorage.getItem('zmt-token') !== null) {
             loadData()
