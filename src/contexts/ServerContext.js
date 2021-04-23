@@ -186,14 +186,8 @@ export const ServerProvider = ({ children }) => {
 
             const server_sort_comparator = (a, b) => {
                 switch (orderBy) {
-                    // NOTE: this comparator will ignore 'ip' and all '-' in ip address and concate the number together,
-                    // and edges cases are also handled here.
-                    // e.g. 'ip-172-31-13-194' will be converted to '172031013194'
-                    // 'ip-2-21-13-194' will interpreted as '0020210130194'
                     case 'hostname':
-                        const a_fullIP = a['host_system_information']['hostname'].slice(3, a.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
-                        const b_fullIP = b['host_system_information']['hostname'].slice(3, b.length).split('-').map((num) => (`000${num}`).slice(-3)).join("");
-                        return orderSyntax * (a_fullIP - b_fullIP);
+                        return orderSyntax * (a['host_system_information']['hostname']).localeCompare(b['host_system_information']['hostname']);
                     case 'role':
                         return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']))
                     case 'os':
