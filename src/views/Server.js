@@ -7,7 +7,7 @@ import { useServer } from '../contexts/ServerContext';
 import { makeStyles, Typography } from '@material-ui/core';
 import { Button, FormControl, InputLabel, Select } from '@material-ui/core';
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-import { Box, Grid, Paper, Tab, Tabs, TabContent } from '@material-ui/core';
+import { Box, Paper, Tab, Tabs } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 
@@ -158,18 +158,20 @@ function Server() {
                             <Table className={classes.table} aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Role</b><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Hostname</b><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>OS Distribution</b><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><b>Role</b><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '25%' }} ><b>Hostname</b><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Resources</b><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>OS Distribution</b><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }} /></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align="right"></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {filteredServers.map((server) =>
-                                        <TableRow>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['host_system_information']['hostname']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
+                                        <TableRow key={server['host_system_information']['hostname']}>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }}>{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }}>{server['host_system_information']['hostname']}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{server['resources']}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '10%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Details</Button></TableCell>
                                         </TableRow>
                                     )}
