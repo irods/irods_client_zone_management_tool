@@ -91,3 +91,20 @@
     align-items: baseline;
     justify-content: center;
 }
+
+.server_provider{
+    border-left: 10px solid #04d1c2;
+    height: 6vh;
+    margin-right: 10px;
+}
+
+.server_consumer{
+    border-left: 10px solid #808080;
+    height: 6vh;
+    margin-right: 10px;
+}
+
+.server_role_container{
+    display: flex;
+    align-items: center;
+}
