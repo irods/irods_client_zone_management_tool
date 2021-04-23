@@ -168,7 +168,7 @@ function Server() {
                                 <TableBody>
                                     {filteredServers.map((server) =>
                                         <TableRow key={server['host_system_information']['hostname']}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }}>{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</TableCell>
+                                            <TableCell style={{ padding: 0, fontSize: '1.1rem', width: '25%' }}><div className="server_role_container"><div className={`server_${server['server_config']['catalog_service_role']}`} />{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</div></TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '25%' }}>{server['host_system_information']['hostname']}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{server['resources']}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
