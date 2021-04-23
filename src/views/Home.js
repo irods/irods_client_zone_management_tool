@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import Sidebar from '../components/Sidebar';
 import Appbar from '../components/Appbar';
 import { makeStyles } from '@material-ui/core/styles';
-import ServerIcon from '../img/servers-logo.png';
-import IconButton from '@material-ui/core/IconButton';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import Pagination from '@material-ui/lab/Pagination';
-import { Typography, CircularProgress, Container } from '@material-ui/core';
-import { Button, Card, CardHeader, CardContent, Collapse } from '@material-ui/core';
-import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-import { Box, Grid, Paper, Tab, Tabs } from '@material-ui/core';
+import { Typography, Container } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import { useServer } from '../contexts/ServerContext';
 import Logout from './Logout';
 
@@ -90,12 +83,7 @@ function Home() {
         return <Logout />
     }
     const { userContext, groupContext, rescContext, zoneContext, loadData } = useServer();
-    const [curr_zone, setCurrZone] = useState();
-    const [details, setDetails] = useState(false);
-    const [expanded, setExpanded] = useState(false);
-    const [tabValue, setTab] = useState(0);
     const classes = useStyles();
-    let zone_id = 0;
 
     const [status, setStatus] = useState()
 
@@ -103,55 +91,6 @@ function Home() {
         loadData();
         setStatus("OK");
     }, [])
-
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    }
-
-    const handleTabChange = (event, newValue) => {
-        setTab(newValue);
-    }
-
-    const viewDetails = (event) => {
-        setDetails(true);
-    }
-
-    const closeDetails = (event) => {
-        setDetails(false);
-    }
-
-    function TabPanel(props) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`vertical-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box p={3}>
-                        <Typography>{children}</Typography>
-                    </Box>
-                )}
-            </div>
-        );
-    }
-
-    TabPanel.propTypes = {
-        children: PropTypes.node,
-        index: PropTypes.any.isRequired,
-        value: PropTypes.any.isRequired,
-    };
-
-    function a11yProps(index) {
-        return {
-            id: `simple-tab-${index}`,
-            'aria-controls': `simple-tabpanel-${index}`,
-        };
-    }
 
     return (
         <div>
