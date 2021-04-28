@@ -99,14 +99,20 @@ function Home() {
                     <Container className={classes.status_box}>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
+                                <Typography className={classes.paper_title}>Zone Status</Typography>
+                                <Typography className={classes.paper_content}>{status}</Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12} md={8} lg={9}>
+                            <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Servers</Typography>
                                 <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext.length}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={classes.paper}>
-                                <Typography className={classes.paper_title}>Zone Status</Typography>
-                                <Typography className={classes.paper_content}>{status}</Typography>
+                                <Typography className={classes.paper_title}>Resources</Typography>
+                                <Typography className={classes.paper_content}>{rescContext === undefined ? 0 : rescContext.total}</Typography>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
@@ -119,12 +125,6 @@ function Home() {
                             <Paper className={classes.paper}>
                                 <Typography className={classes.paper_title}>Groups</Typography>
                                 <Typography className={classes.paper_content}>{groupContext === undefined ? 0 : groupContext.total}</Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper className={classes.paper}>
-                                <Typography className={classes.paper_title}>Resources</Typography>
-                                <Typography className={classes.paper_content}>{rescContext === undefined ? 0 : rescContext.total}</Typography>
                             </Paper>
                         </Grid>
                     </Container>
