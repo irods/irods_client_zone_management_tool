@@ -64,6 +64,18 @@
     margin-right: 5px;
 }
 
+.green {
+    color: #04d1c2
+}
+
+.red {
+    color: #ff0000
+}
+
+.grey_out {
+    opacity: 0.4;
+}
+
 .hidden {
     display: none;
 }
@@ -94,17 +106,57 @@
 
 .server_provider{
     border-left: 10px solid #04d1c2;
-    height: 6vh;
+    height: 68px;
     margin-right: 10px;
 }
 
 .server_consumer{
     border-left: 10px solid #808080;
-    height: 6vh;
+    height: 68px;
     margin-right: 10px;
 }
 
 .server_role_container{
     display: flex;
     align-items: center;
+}
+
+.resource_tree_header {
+    display: flex;
+}
+
+.resource_tree_header_right{
+    position: absolute;
+    right: 50px;
+}
+
+.resource_tree_parent_info {
+    display: flex;
+    padding-left: 10px;
+    justify-content: space-between;
+}
+
+.resource_tree_status {
+    padding-left: 15px;
+}
+
+.resource_tree_container {
+    display: flex;
+    height: max-content;
+}
+
+.resource_tree {
+    flex: 1 0 80%;
+    margin: 10px;
+    min-height: 100%;
+    overflow: scroll;
+}
+
+.resource_tree_notifcations {
+    width: 400px;
+    font-size: 14px;
+}
+
+.resource_tree_status {
+    text-align: center;
 }
