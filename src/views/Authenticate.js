@@ -42,6 +42,7 @@ function Authenticate() {
     const classes = useStyles();
     const navigate = useNavigate();
     const { restApiLocation, loginLogo, brandingName } = useEnvironment();
+    const renderLogo = require(`../img/${loginLogo}`).default;
 
 
     const handleUsername = (event) => {
@@ -83,7 +84,7 @@ function Authenticate() {
     return (
         <Container component="main" maxWidth="xs">
             <div className={classes.mainForm}>
-                <img alt="iRODS Logo" className={classes.logo} src={require(`../img/${loginLogo}`)}></img>
+                <img alt="iRODS Logo" className={classes.logo} src={renderLogo}></img>
                 <br />
                 <Typography component="h4" variant="h5">{brandingName}</Typography>
                 <TextField

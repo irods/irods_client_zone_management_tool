@@ -12,6 +12,7 @@ const drawerWidth = 240;
 function Appbar() {
     const environment = useEnvironment();
     const { zoneName } = useServer();
+    const AppBarLogo = require(`../img/${environment.appbarLogo}`).default;
     const useStyles = makeStyles((theme) => ({
         appBar: {
             width: `calc(100% - ${drawerWidth}px)`,
@@ -41,7 +42,7 @@ function Appbar() {
         <AppBar position="fixed" className={classes.appBar} >
             <Toolbar >
                 <a className={classes.branding}>
-                    <img alt="Branding Icon" className={classes.logo} src={require(`../img/${environment.appbarLogo}`)}></img> <Typography variant="h6"> {environment.brandingName} </Typography> </a>
+                    <img alt="Branding Icon" className={classes.logo} src={AppBarLogo}></img> <Typography variant="h6"> {environment.brandingName} </Typography> </a>
                 <Typography className={classes.rightToolbar} variant="h6" noWrap > {zoneName} </Typography>
             </Toolbar>
         </AppBar>

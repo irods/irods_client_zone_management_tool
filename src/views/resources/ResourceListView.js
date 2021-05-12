@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Appbar from '../components/Appbar';
-import Sidebar from '../components/Sidebar';
-import Logout from '../views/Logout';
+import Appbar from '../../components/Appbar';
+import Sidebar from '../../components/Sidebar';
+import Logout from '../../views/Logout';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, Input, InputLabel } from '@material-ui/core';
@@ -16,11 +16,14 @@ import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import Pagination from '@material-ui/lab/Pagination';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
-import { useServer } from '../contexts/ServerContext';
-
-import '../App.css';
-import ResourceRows from '../components/ResourceRows';
-import { useEnvironment } from '../contexts/EnvironmentContext';
+import { useServer } from '../../contexts/ServerContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
+import '../../App.css';
+import ResourceRows from '../../components/ResourceRows';
+import ListIcon from '@material-ui/icons/List';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
+import ResourceTreeView from './ResourceTreeView';
+import { navigate } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -95,13 +98,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Resource() {
-    const { restApiLocation } = useEnvironment();
+function ResourceListView() {
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
     }
     const classes = useStyles();
+    const [tab, setTab] = useState('list');
     const [isLoading, setLoading] = useState(false);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
@@ -116,7 +119,7 @@ function Resource() {
 
     const [filterRescName, setFilterName] = useState('');
 
-
+    const { restApiLocation } = useEnvironment();
     const { zoneName, rescContext, loadResource } = useServer();
 
     useEffect(() => {
@@ -200,6 +203,10 @@ function Resource() {
             <main className={classes.content}>
                 <div className={classes.toolbar} />
                 <div className={classes.main}>
+                    <ToggleButtonGroup className={classes.tabGroup} size="small" value={tab}>
+                        <ToggleButton value="list" aria-label="list" onClick={() => navigate('/resources')}><ListIcon /></ToggleButton>
+                        <ToggleButton value="tree" aria-label="tree" onClick={() => navigate('/resources/tree')}><AccountTreeIcon /></ToggleButton>
+                    </ToggleButtonGroup>
                     <div className={classes.pagination}>
                         <Pagination className={classes.pagination_item} count={Math.ceil(rescContext.total / perPage)} onChange={handlePageChange} />
                         <FormControl className={classes.itemsControl}>
@@ -286,9 +293,9 @@ function Resource() {
                         <DialogContent>
                             <DialogContentText>
                                 Resource Name: {rescName}<br />
-                                    Type: {rescType}<br />
-                                    Vault Path: {rescLocation}<br />
-                                    Zone: {zoneName}
+                                Type: {rescType}<br />
+                                Vault Path: {rescLocation}<br />
+                                Zone: {zoneName}
                             </DialogContentText>
                             {isLoading === true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                         </DialogContent>
@@ -301,4 +308,4 @@ function Resource() {
     );
 }
 
-export default Resource;
+export default ResourceListView;
