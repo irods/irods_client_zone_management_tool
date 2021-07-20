@@ -114,7 +114,7 @@ function ResourceListView() {
     const [rescVaultPath, setRescVaultPath] = useState();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("RESC_NAME");
-    const [currPage, setCurrPage] = useState(0);
+    const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
 
     const [filterRescName, setFilterName] = useState('');
@@ -123,7 +123,7 @@ function ResourceListView() {
     const { zoneName, rescContext, loadResource } = useServer();
 
     useEffect(() => {
-        loadResource(currPage, perPage, filterRescName, order, orderBy);
+        loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
     }, [currPage, perPage, filterRescName, order, orderBy])
 
     async function addResource() {
