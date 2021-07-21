@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from '@reach/router'
 import Appbar from '../components/Appbar';
@@ -10,7 +10,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
-import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
@@ -100,6 +100,12 @@ function Group() {
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [currGroup, setCurrGroup] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [groupContextWithUserCount, setGroupContextWithUserCount] = useState({
+        _embedded: [],
+        count: 0,
+        total: 0
+    });
     let group_id = 0;
 
     const [currPage, setCurrPage] = useState(1);
@@ -115,6 +121,36 @@ function Group() {
     useEffect(() => {
         loadGroup(perPage * (currPage - 1), perPage, filterGroupName, order, "USER_NAME");
     }, [currPage, perPage, filterGroupName, order, orderBy])
+
+    useEffect(() => {
+        const loadGroupUserCounts = async () => {
+            setIsLoading(true);
+            let inputArray = groupContext;
+            for (let i = 0; i < inputArray._embedded.length; i++) {
+                let thisGroupName = inputArray._embedded[i][0];
+                await axios({
+                    method: 'GET',
+                    url: `${restApiLocation}/query`,
+                    headers: {
+                        'Authorization': localStorage.getItem('zmt-token')
+                    },
+                    params: {
+                        query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
+                        query_limit: 100,
+                        row_offset: 0,
+                        query_type: 'general'
+                    }
+                }).then((res) => {
+                    inputArray._embedded[i].push(res.data._embedded.length);
+                    if (i === inputArray._embedded.length - 1) {
+                        setGroupContextWithUserCount(inputArray);
+                    }
+                })
+            }
+            setIsLoading(false)
+        }
+        loadGroupUserCounts();
+    }, [groupContext])
 
     async function addGroup() {
         try {
@@ -240,7 +276,7 @@ function Group() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} ><b>Users</b></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
                                     <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -250,10 +286,10 @@ function Group() {
                                     <TableCell></TableCell>
                                     <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {groupContext._embedded.map((group) =>
+                                {groupContext._embedded.map((group) => 
                                     <TableRow key={group_id}>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[1]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : group[1]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                     </TableRow>
                                 )}
@@ -265,7 +301,7 @@ function Group() {
                         <DialogContent>
                             <DialogContentText>
                                 Error Message:
-                                </DialogContentText>
+                            </DialogContentText>
                             <p className={classes.errorMsg}>{addErrorMsg}</p>
                         </DialogContent>
                         <DialogActions>

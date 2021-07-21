@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 function Sidebar(props) {
     const classes = useStyles();
     const selected = props.menu_id;
-    const { userContext, groupContext, rescContext, zoneContext } = useServer();
+    const { userTotal, groupTotal, rescTotal, zoneContext } = useServer();
 
     return (
         <Drawer
@@ -46,14 +46,14 @@ function Sidebar(props) {
                     <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
                 </MenuItem>
                 <MenuItem button selected={selected === '3'} component={Link} to="/resources" key='resource'>
-                    <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
+                    <ListItemText>Resources ({rescTotal})</ListItemText>
                 </MenuItem>
 
                 <MenuItem button selected={selected === '4'} component={Link} to="/users" key='user'>
-                    <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
+                    <ListItemText>Users ({userTotal})</ListItemText>
                 </MenuItem>
                 <MenuItem button selected={selected === '5'} component={Link} to="/groups" key='group'>
-                    <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
+                    <ListItemText>Groups ({groupTotal})</ListItemText>
                 </MenuItem>
             </List>
             <Divider />
