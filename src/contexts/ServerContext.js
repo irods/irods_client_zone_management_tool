@@ -20,8 +20,11 @@ export const ServerProvider = ({ children }) => {
     const [zoneContext, setZoneContext] = useState();
     const [zoneName, setZoneName] = useState();
     const [userContext, setUserContext] = useState(initialState);
+    const [userTotal, setUserTotal] = useState(0);
     const [groupContext, setGroupContext] = useState(initialState);
+    const [groupTotal, setGroupTotal] = useState(0);
     const [rescContext, setRescContext] = useState(initialState);
+    const [rescTotal, setRescTotal] = useState(0);
     const [filteredServers, setFilteredServers] = useState([]);
 
     const loadUser = (offset, limit, name, order, orderBy) => {
@@ -44,6 +47,7 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setUserContext(res.data);
+            if(name === '') setUserTotal(res.data.total)
         }).catch((e) => {
         });
     }
@@ -68,30 +72,8 @@ export const ServerProvider = ({ children }) => {
             }
         }).catch((e) => {
         });
-
-        // iterate through group result to retrieve user counts
-        let inputArray = groupResult.data;
-        for (let i = 0; i < inputArray._embedded.length; i++) {
-            let thisGroupName = inputArray._embedded[i][0];
-            await axios({
-                method: 'GET',
-                url: `${restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
-                    query_limit: 100,
-                    row_offset: 0,
-                    query_type: 'general'
-                }
-            }).then((res) => {
-                inputArray._embedded[i].push(res.data._embedded.length);
-                if (i === inputArray._embedded.length - 1) {
-                    setGroupContext(inputArray);
-                }
-            })
-        }
+        setGroupContext(groupResult.data)
+        if(name === '') setGroupTotal(groupResult.data.total)
     }
 
 
@@ -115,6 +97,7 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setRescContext(res.data);
+            if(name === '') setRescTotal(res.data.total)
         }).catch((e) => {
         });
     }
@@ -222,9 +205,9 @@ export const ServerProvider = ({ children }) => {
     return (
         <ServerContext.Provider value={{
             zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
-            userContext, loadUser,
-            groupContext, loadGroup,
-            rescContext, loadResource,
+            userTotal, userContext, loadUser,
+            groupTotal, groupContext, loadGroup,
+            rescTotal, rescContext, loadResource,
             loadData
         }}>
             { children}
