@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from '@reach/router'
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
-import Logout from '../views/Logout';
+import { Logout } from './';
 import { makeStyles } from '@material-ui/core';
 import { Button, FormControl, TextField, Input, InputLabel, Select, Typography } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Group() {
+export const Group = () => {
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
@@ -288,5 +288,3 @@ function Group() {
         </div>
     );
 }
-
-export default Group;

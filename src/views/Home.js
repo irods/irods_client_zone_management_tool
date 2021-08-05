@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Container } from '@material-ui/core';
 import { Grid, Paper } from '@material-ui/core';
 import { useServer } from '../contexts/ServerContext';
-import Logout from './Logout';
+import { Logout } from './';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Home() {
+export const Home = () => {
     const auth = localStorage.getItem('zmt-token')
     if (auth === null) {
         return <Logout />
@@ -132,6 +132,4 @@ function Home() {
             </div>
         </div >
     );
-}
-
-export default Home;
+};

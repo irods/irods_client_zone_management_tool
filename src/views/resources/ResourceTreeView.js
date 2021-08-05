@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Logout from '../../views/Logout';
+import { Logout } from '../../views/Logout';
 import Appbar from '../../components/Appbar';
 import Sidebar from '../../components/Sidebar';
 import { makeStyles } from '@material-ui/core';
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-function ResourceTreeView() {
+export const ResourceTreeView = () => {
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
@@ -77,6 +77,4 @@ function ResourceTreeView() {
             </main>
         </div>
     )
-}
-
-export default ResourceTreeView;
+};

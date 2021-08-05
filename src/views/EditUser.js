@@ -4,7 +4,7 @@ import { Link } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
-import Logout from '../views/Logout';
+import { Logout } from './';
 import { Button, LinearProgress, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function EditUser(props) {
+export const EditUser = (props) => {
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
@@ -203,5 +203,3 @@ function EditUser(props) {
         </div>
     );
 }
-
-export default EditUser;

@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-function Logout() {
+export const Logout = () => {
     const classes = useStyles();
     localStorage.removeItem('zmt-token');
 
@@ -22,6 +22,4 @@ function Logout() {
             <BlockIcon /><br /><div>Please <Link to="/" replace>login</Link> to use the administration dashboard.</div>
         </div>
     )
-}
-
-export default Logout;
+};
