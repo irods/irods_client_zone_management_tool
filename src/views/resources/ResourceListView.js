@@ -3,7 +3,7 @@ import axios from 'axios';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Appbar from '../../components/Appbar';
 import Sidebar from '../../components/Sidebar';
-import Logout from '../../views/Logout';
+import { Logout } from '../../views/Logout';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { FormControl, Input, InputLabel } from '@material-ui/core';
@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function ResourceListView() {
+export const ResourceListView = () => {
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
@@ -307,5 +307,3 @@ function ResourceListView() {
         </div>
     );
 }
-
-export default ResourceListView;

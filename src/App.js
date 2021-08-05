@@ -1,19 +1,10 @@
 import React, { Component } from 'react';
 import { LocationProvider, Router } from '@reach/router';
-import User from './views/User';
-import EditUser from './views/EditUser';
-import Group from './views/Group';
-import EditGroup from './views/EditGroup';
-import ResourceListView from './views/resources/ResourceListView';
-import ResourceTreeView from './views/resources/ResourceTreeView';
-import Logout from './views/Logout';
-import Home from './views/Home';
-import Landing from './views/Landing';
-import Server from './views/Server';
-import './App.css';
 import Footer from './components/Footer';
+import { EditGroup, EditUser, Group, Home, NotFound, Landing, Logout, ResourceListView, ResourceTreeView, Server, User } from './views';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { ConnectionProvider } from './contexts/ConnectionContext';
+import './App.css';
 
 class App extends Component {
   render() {
@@ -32,8 +23,9 @@ class App extends Component {
                   <ResourceListView path='/resources' />
                   <ResourceTreeView path='/resources/tree' />
                   <Server path='/servers' />
+                  <Logout path="/logout" />
                   <Landing path="/" />
-                  <Logout default />
+                  <NotFound default />
                 </Router>
               </LocationProvider>
             </div>

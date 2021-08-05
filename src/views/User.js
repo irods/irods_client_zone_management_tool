@@ -21,7 +21,7 @@ import '../App.css';
 import { useServer } from '../contexts/ServerContext';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 
-import Logout from '../views/Logout';
+import { Logout } from './';
 
 
 
@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function User() {
+export const User = () => {
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
@@ -269,7 +269,7 @@ function User() {
                         <DialogContent>
                             <DialogContentText>
                                 Error Message:
-                                </DialogContentText>
+                            </DialogContentText>
                             <p className={classes.errorMsg}>{addErrorMsg}</p>
                         </DialogContent>
                         <DialogActions>
@@ -292,5 +292,3 @@ function User() {
         </div>
     );
 }
-
-export default User;

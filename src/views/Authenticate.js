@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-function Authenticate() {
+export const Authenticate = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [incorrect, setIncorrect] = useState(false);
@@ -121,5 +121,3 @@ function Authenticate() {
         </Container>
     );
 }
-
-export default Authenticate;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Logout from './Logout';
+import { Logout } from './';
 import Appbar from '../components/Appbar';
 import Sidebar from '../components/Sidebar';
 import { useServer } from '../contexts/ServerContext';
@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-function Server() {
+export const Server = () =>{
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
@@ -247,5 +247,3 @@ function Server() {
         </div>
     )
 }
-
-export default Server;
