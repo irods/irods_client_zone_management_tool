@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Box from '@material-ui/core/Box'
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
+import { Box, Button, Container, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-
-import '../App.css';
-
 import { useNavigate } from '@reach/router';
-import { useEnvironment } from '../contexts/EnvironmentContext';
+import { useEnvironment } from '../contexts';
+import { useLayout, hideLayout } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
@@ -73,6 +67,7 @@ export const Authenticate = () => {
                 if (res.status === 200) {
                     localStorage.setItem('zmt-token', res.data);
                     navigate('/home', { replace: true });
+                    useLayout();
                 }
             })
         } catch (err) {
@@ -80,6 +75,10 @@ export const Authenticate = () => {
             else setIncorrect(true);
         }
     }
+
+    useEffect(() => {
+        hideLayout();
+    },[])
 
     return (
         <Container component="main" maxWidth="xs">

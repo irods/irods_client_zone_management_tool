@@ -203,6 +203,7 @@ export const Tree = (props) => {
 
         return (
             <StyledTreeItem
+                key={nodeId}
                 nodeId={nodeId}
                 label={node[0]}
                 draggable={node[11] === '' ? false : true}
@@ -225,11 +226,11 @@ export const Tree = (props) => {
         <div>
             <div className="resource_tree_header">
                 <div className="resource_tree_header_left">
-                    <Button disabled={tasks.length === 0} startIcon={<UndoIcon />} onClick={undoTask}>Undo</Button>
-                    <Button disabled={redo.length === 0} startIcon={<RedoIcon />} onClick={redoTask}>Redo</Button>
+                    <Button key={`undo-${tasks.length === 0}`} disabled={tasks.length === 0} startIcon={<UndoIcon />} onClick={undoTask}>Undo</Button>
+                    <Button key={`redo-${tasks.length === 0}`} disabled={redo.length === 0} startIcon={<RedoIcon />} onClick={redoTask}>Redo</Button>
                 </div><div className="resource_tree_header_right">
                     <Button color="secondary" startIcon={<ReplayIcon />} onClick={resetTree}>Reset</Button>
-                    <Button color="primary" disabled={tasks.length === 0} startIcon={<SaveIcon />} onClick={() => setConfirmDialog(true)}>Save</Button>
+                    <Button key={`save-${tasks.length === 0}`} color="primary" disabled={tasks.length === 0} startIcon={<SaveIcon />} onClick={() => setConfirmDialog(true)}>Save</Button>
                 </div>
             </div>
             <hr />
@@ -246,46 +247,46 @@ export const Tree = (props) => {
                     }
                 >Your move is invalid.</Alert>
             </Collapse>
-            {currNode && targetNode ? <div>Dragging {currNode[0]} over {targetNode[0]}</div> : <div>Resource Hierachy</div>}
-            <div className="resource_tree_container">
-                <div className="resource_tree">
-                    <TreeView
-                        defaultExpanded={expanded}
-                        defaultCollapseIcon={<MinusSquare />}
-                        defaultExpandIcon={<PlusSquare />}
-                        defaultEndIcon={<MinusSquare className="grey_out" />}
-                    >{renderTreeNode(stagedDataMap.get(""))}
-                    </TreeView>
-                </div>
-                <div className="resource_tree_notifcations">
-                    <h3>Staged Changes <Badge badgeContent={tasks.length} color="primary"><LowPriorityIcon /></Badge></h3>
-                    <div>
-                        {tasks.map(task => <div>
-                            {task[0][0]} parent: {task[1][0]} -> {task[2][0]}
-                        </div>)}
-                    </div>
-                    <Dialog open={confirmDialog}>
-                        <DialogTitle>Are these changes correct?</DialogTitle>
-                        <DialogContent>
-                            {tasks.map((task, index) => <div style={{ padding: '5px 0px' }}><b>{task[0][0]}</b>
-                                <div className="resource_tree_parent_info">
-                                    <span> Remove previous parent: {task[1][0]}</span>
-                                    {task[3] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[3] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
-                                </div>
-                                <div className="resource_tree_parent_info">
-                                    <span> Add new parent: {task[2][0]}</span>
-                                    {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
-                                </div>
-                            </div>
-                            )}
-                        </DialogContent>
-                        <br />
-                        {!hasError && isComplete ? <span className="resource_tree_status">Operation success. </span> : ""}
-                        {hasError && isComplete ? <span className="resource_tree_status">Operation failed. Please see the error message above.</span> : ""}
-                        {isComplete ? <DialogActions><Button color="primary" onClick={() => { setConfirmDialog(false); window.location.reload(); }}>Close</Button></DialogActions> : <DialogActions style={{ justifyContent: 'space-around'}}><Button color="secondary" onClick={() => setConfirmDialog(false)}>No</Button><Button color="primary" onClick={runTask}>Yes</Button></DialogActions>}
-                    </Dialog>
-                </div>
+            { currNode && targetNode ? <div>Dragging {currNode[0]} over {targetNode[0]}</div> : <div>Resource Hierachy</div> }
+    <div className="resource_tree_container">
+        <div className="resource_tree">
+            <TreeView
+                defaultExpanded={expanded}
+                defaultCollapseIcon={<MinusSquare />}
+                defaultExpandIcon={<PlusSquare />}
+                defaultEndIcon={<MinusSquare className="grey_out" />}
+            >{renderTreeNode(stagedDataMap.get(""))}
+            </TreeView>
+        </div>
+        <div className="resource_tree_notifcations">
+            <h3>Staged Changes <Badge badgeContent={tasks.length} color="primary"><LowPriorityIcon /></Badge></h3>
+            <div>
+                {tasks.map(task => <div>
+                    {task[0][0]} parent: {task[1][0]} -> {task[2][0]}
+                </div>)}
             </div>
+            <Dialog open={confirmDialog}>
+                <DialogTitle>Are these changes correct?</DialogTitle>
+                <DialogContent>
+                    {tasks.map((task, index) => <div style={{ padding: '5px 0px' }}><b>{task[0][0]}</b>
+                        <div className="resource_tree_parent_info">
+                            <span> Remove previous parent: {task[1][0]}</span>
+                            {task[3] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[3] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
+                        </div>
+                        <div className="resource_tree_parent_info">
+                            <span> Add new parent: {task[2][0]}</span>
+                            {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
+                        </div>
+                    </div>
+                    )}
+                </DialogContent>
+                <br />
+                {!hasError && isComplete ? <span className="resource_tree_status">Operation success. </span> : ""}
+                {hasError && isComplete ? <span className="resource_tree_status">Operation failed. Please see the error message above.</span> : ""}
+                {isComplete ? <DialogActions><Button color="primary" onClick={() => { setConfirmDialog(false); window.location.reload(); }}>Close</Button></DialogActions> : <DialogActions style={{ justifyContent: 'space-around' }}><Button color="secondary" onClick={() => setConfirmDialog(false)}>No</Button><Button color="primary" onClick={runTask}>Yes</Button></DialogActions>}
+            </Dialog>
+        </div>
+    </div>
         </div >
     )
 }

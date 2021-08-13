@@ -1,38 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import Appbar from '../components/Appbar';
-import Sidebar from '../components/Sidebar';
 import { Logout } from './';
-import { Button, LinearProgress, TextField, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
-import { useEnvironment } from '../contexts/EnvironmentContext';
-import { useServer } from '../contexts/ServerContext';
+import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
+import { useEnvironment, useServer } from '../contexts';
 
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        display: "flex",
-    },
-    toolbar: theme.mixins.toolbar,
-    content: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        padding: theme.spacing(3),
-    },
-    main: {
-        whiteSpace: "pre-wrap",
-        fontSize: 20
-    },
-    logout: {
-        marginTop: theme.spacing(20),
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        fontSize: theme.spacing(3)
-    },
     link_button: {
         textDecoration: "none"
     },
@@ -160,46 +135,39 @@ export const EditUser = (props) => {
     }
 
     return (
-        <div className={classes.root}>
-            <Appbar />
-            <Sidebar menu_id="4" />
-            <main className={classes.content}>
-                <div className={classes.toolbar} />
-                <div className={classes.main}>
-                    <Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
-                    {currentUser[0]}
-                    <div className="edit_filter_bar">
-                        <Typography>Find Group</Typography>
-                        <TextField
-                            id="filterGroupName"
-                            label="Filter GroupName"
-                            className={classes.filter_textfield}
-                            onChange={(e) => setFilterName(e.target.value)}
-                        />
-                    </div>
-                    <br />
-                    <div className="edit_container">
-                        {filterGroupNameResult.length > 0 ?
-                            <Table className={classes.user_table} aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell><b>Group Name</b></TableCell>
-                                        <TableCell align="right"><b>Status</b></TableCell>
-                                        <TableCell align="right"><b>Action</b></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
-                                        <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
-                                        <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
-                                        <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
-                                    </TableRow>)}
-                                </TableBody>
-                            </Table> : <br />}
-                    </div>
-                    {isLoading === true ? <div><LinearProgress /></div> : <div />}
-                </div>
-            </main>
-        </div>
+        <Fragment>
+            <Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
+            {currentUser[0]}
+            <div className="edit_filter_bar">
+                <Typography>Find Group</Typography>
+                <TextField
+                    id="filterGroupName"
+                    label="Filter GroupName"
+                    className={classes.filter_textfield}
+                    onChange={(e) => setFilterName(e.target.value)}
+                />
+            </div>
+            <br />
+            <div className="edit_container">
+                {filterGroupNameResult.length > 0 ?
+                    <Table className={classes.user_table} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><b>Group Name</b></TableCell>
+                                <TableCell align="right"><b>Status</b></TableCell>
+                                <TableCell align="right"><b>Action</b></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
+                                <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
+                                <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
+                                <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
+                            </TableRow>)}
+                        </TableBody>
+                    </Table> : <br />}
+            </div>
+            {isLoading === true ? <div><LinearProgress /></div> : <div />}
+        </Fragment>
     );
 }

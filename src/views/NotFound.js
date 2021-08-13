@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from '@reach/router';
 import { Container, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocation } from '@reach/router';
 import { useEnvironment } from '../contexts/EnvironmentContext';
+import { useLayout, hideLayout } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     notFoundContainer: {
@@ -34,9 +35,13 @@ export const NotFound = () => {
     const { loginLogo } = useEnvironment();
     const iRODSLogo = require(`../img/${loginLogo}`).default;
 
+    useEffect(() => {
+        hideLayout();
+    },[])
+
     return (
         <Container className={classes.notFoundContainer}>
-            <Link to='/'><img className={classes.irodsLogo} src={iRODSLogo}></img></Link>
+            <Link to='/' onClick={() => useLayout()}><img className={classes.irodsLogo} src={iRODSLogo}></img></Link>
             <div>
                 <br />
                 <Typography className={classes.text}>ERROR 404</Typography>

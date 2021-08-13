@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BlockIcon from '@material-ui/icons/Block';
 import { Link } from '@reach/router';
 import { makeStyles } from '@material-ui/core/styles';
+import { hideLayout } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     logout: {
@@ -16,6 +17,10 @@ const useStyles = makeStyles((theme) => ({
 export const Logout = () => {
     const classes = useStyles();
     localStorage.removeItem('zmt-token');
+
+    useEffect(() => {
+        hideLayout();
+    },[])
 
     return (
         <div className={classes.logout}>

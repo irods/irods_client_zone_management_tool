@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { LocationProvider, Router } from '@reach/router';
-import Footer from './components/Footer';
+import { Layout, Footer } from './components';
 import { EditGroup, EditUser, Group, Home, NotFound, Landing, Logout, ResourceListView, ResourceTreeView, Server, User } from './views';
-import { EnvironmentProvider } from './contexts/EnvironmentContext';
-import { ConnectionProvider } from './contexts/ConnectionContext';
+import { ConnectionProvider, EnvironmentProvider } from './contexts';
 import './App.css';
 
 class App extends Component {
@@ -11,27 +10,29 @@ class App extends Component {
     return (
       <EnvironmentProvider>
         <ConnectionProvider>
-          <div className="app_body">
-            <div className="app_wrap">
-              <LocationProvider>
-                <Router>
-                  <Home path="/home" />
-                  <EditUser path='/users/edit' />
-                  <User path="/users" />
-                  <EditGroup path='groups/edit' />
-                  <Group path='/groups' />
-                  <ResourceListView path='/resources' />
-                  <ResourceTreeView path='/resources/tree' />
-                  <Server path='/servers' />
-                  <Logout path="/logout" />
-                  <Landing path="/" />
-                  <NotFound default />
-                </Router>
-              </LocationProvider>
+          <LocationProvider>
+            <div className="app_body">
+              <div className="app_wrap">
+                <Layout>
+                  <Router primary={false}>
+                    <Home path="/home" />
+                    <EditUser path='/users/edit' />
+                    <User path="/users" />
+                    <EditGroup path='groups/edit' />
+                    <Group path='/groups' />
+                    <ResourceListView path='/resources' />
+                    <ResourceTreeView path='/resources/tree' />
+                    <Server path='/servers' />
+                    <Logout path="/logout" />
+                    <Landing path="/" />
+                    <NotFound default />
+                  </Router>
+                </Layout>
+              </div>
+              <hr />
+              <Footer />
             </div>
-            <hr />
-            <Footer />
-          </div>
+          </LocationProvider>
         </ConnectionProvider>
       </EnvironmentProvider>
     );
