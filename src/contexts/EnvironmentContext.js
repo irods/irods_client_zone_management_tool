@@ -1,11 +1,26 @@
-import React, { createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext, useContext } from 'react';
 
 export const EnvironmentContext = createContext();
 
 export const EnvironmentProvider = ({ children }) => {
+    const [deviceType, setDeviceType] = useState("");
+
+    // detect if mobile device
+    useEffect(() => {
+        if (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(
+                navigator.userAgent
+            )
+        ) {
+            setDeviceType("Mobile");
+        } else {
+            setDeviceType("Desktop");
+        }
+    }, []);
 
     return (
         <EnvironmentContext.Provider value={{
+            deviceType: deviceType,
             restApiLocation: process.env.REACT_APP_REST_API_URL + '/irods-rest/1.0.0',
             restApiTimeout: process.env.REACT_APP_REST_API_CONNECTION_TIMEOUT_SECOND,
             primaryColor: process.env.REACT_APP_PRIMARY_COLOR,

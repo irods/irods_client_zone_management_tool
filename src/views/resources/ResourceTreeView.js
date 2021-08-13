@@ -1,39 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Logout } from '../../views/Logout';
-import Appbar from '../../components/Appbar';
-import Sidebar from '../../components/Sidebar';
-import { makeStyles } from '@material-ui/core';
-import { useServer } from '../../contexts/ServerContext';
+import { useEnvironment, useServer } from '../../contexts';
 import { Tree } from '../../components/draggable-tree/tree';
 import { navigate } from '@reach/router';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import ListIcon from '@material-ui/icons/List';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-    },
-    toolbar: theme.mixins.toolbar,
-    content: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        padding: theme.spacing(3),
-    },
-    main: {
-        whiteSpace: "pre-wrap",
-        fontSize: 20
-    }
-}))
-
 export const ResourceTreeView = () => {
     const auth = localStorage.getItem('zmt-token');
     if (auth === null) {
         return <Logout />
     }
-    const classes = useStyles();
     const [tab, setTab] = useState('tree');
-    const { zoneName, rescContext, loadResource } = useServer();
+    const { rescContext } = useServer();
+    const { deviceType } = useEnvironment();
     const [childrenMap, setChildrenMap] = useState();
     const [dataMap, setDataMap] = useState();
 
@@ -62,19 +43,18 @@ export const ResourceTreeView = () => {
     }, [rescContext])
 
     return (
-        <div className={classes.root}>
-            <Appbar />
-            <Sidebar menu_id="3" />
-            <main className={classes.content}>
-                <div className={classes.toolbar} />
-                <div className={classes.main}>
-                    <ToggleButtonGroup className={classes.tabGroup} size="small" value={tab}>
-                        <ToggleButton value="list" aria-label="list" onClick={() => navigate('/resources')}><ListIcon /></ToggleButton>
-                        <ToggleButton value="tree" aria-label="tree" onClick={() => navigate('/resources/tree')}><AccountTreeIcon /></ToggleButton>
-                    </ToggleButtonGroup>
-                    {dataMap !== undefined && <Tree data={dataMap} children={childrenMap} />}
-                </div>
-            </main>
-        </div>
+        <Fragment>
+            <ToggleButtonGroup size="small" value={tab}>
+                <ToggleButton value="list" aria-label="list" onClick={() => navigate('/resources')}><ListIcon /></ToggleButton>
+                <ToggleButton value="tree" aria-label="tree" onClick={() => navigate('/resources/tree')}><AccountTreeIcon /></ToggleButton>
+            </ToggleButtonGroup>
+            {deviceType === "Desktop" ?
+                <Fragment>
+                    {dataMap !== undefined && <Tree data={dataMap} children={childrenMap} />} </Fragment> :
+                <p>
+                    Resource Treeview is not currently available on mobile device. Please use your desktop device to visit treeview.
+                </p>
+            }
+        </Fragment>
     )
 };

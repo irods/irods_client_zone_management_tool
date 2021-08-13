@@ -1,14 +1,17 @@
-.MuiTableSortLabel-icon { opacity: 0.2; }
+.MuiTableSortLabel-icon {
+    opacity: 0.2;
+}
 
 .app_body {
-    min-height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 .app_footer {
+    position: relative;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
-    height: 5vh;
+    height: 50px;
     color: #224;
     background-color: white;
     display: flex;
@@ -16,18 +19,23 @@
     align-items: center;
     justify-content: space-around;
     padding-bottom: 0.5vh;
+    font-size: 0.8rem;
 }
 
-.app_footer_logo{
+.app_footer_logo {
     width: 3vw;
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
-.app_footer_text{
+.app_footer_item {
+    padding: 10px;
+}
+
+.app_footer_text {
     text-decoration: none;
 }
 
-.app_footer_text:visited{
+.app_footer_text:visited {
     color: black;
 }
 
@@ -42,7 +50,7 @@
     font-size: 1rem;
 }
 
-.connection_text_status{
+.connection_text_status {
     display: flex;
     justify-content: space-between;
 }
@@ -93,30 +101,33 @@
     cursor: pointer;
 }
 
+.main_wrapper {
+    padding: 15px;
+}
 
 .edit_container {
     overflow-y: scroll;
 }
 
-.edit_filter_bar{
+.edit_filter_bar {
     display: flex;
     align-items: baseline;
     justify-content: center;
 }
 
-.server_provider{
+.server_provider {
     border-left: 10px solid #04d1c2;
     height: 68px;
     margin-right: 10px;
 }
 
-.server_consumer{
+.server_consumer {
     border-left: 10px solid #808080;
     height: 68px;
     margin-right: 10px;
 }
 
-.server_role_container{
+.server_role_container {
     display: flex;
     align-items: center;
 }
@@ -125,7 +136,7 @@
     display: flex;
 }
 
-.resource_tree_header_right{
+.resource_tree_header_right {
     position: absolute;
     right: 50px;
 }
