@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useEnvironment } from './EnvironmentContext';
 
@@ -48,7 +49,7 @@ export const ServerProvider = ({ children }) => {
         }).then((res) => {
             setUserContext(res.data);
             if(name === '') setUserTotal(res.data.total)
-        }).catch((e) => {
+        }).catch(() => {
         });
     }
 
@@ -70,14 +71,13 @@ export const ServerProvider = ({ children }) => {
                 row_offset: offset,
                 query_type: 'general'
             }
-        }).catch((e) => {
         });
         setGroupContext(groupResult.data)
         if(name === '') setGroupTotal(groupResult.data.total)
     }
 
 
-    const loadResource = (offset, limit, name, order, orderBy) => {
+    const loadResource = useCallback((offset, limit, name, order, orderBy) => {
         let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc'`
         if (name !== '') {
             _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc' AND RESC_NAME LIKE '%${name}%'`
@@ -98,9 +98,9 @@ export const ServerProvider = ({ children }) => {
         }).then((res) => {
             setRescContext(res.data);
             if(name === '') setRescTotal(res.data.total)
-        }).catch((e) => {
+        }).catch(() => {
         });
-    }
+    }, [restApiLocation])
 
     const loadZoneName = () => {
         return axios({
@@ -195,12 +195,12 @@ export const ServerProvider = ({ children }) => {
         loadResource(0, 10, '', 'asc', 'RESC_NAME');
     }
 
-     // load all zone data at each render if user is logged in
+    // load all zone data at each render if user is logged in
     useEffect(() => {
-        if (localStorage.getItem('zmt-token') !== null) {
+        if (zoneName === undefined && localStorage.getItem('zmt-token') !== null) {
             loadData()
         }
-    }, [])
+    })
 
     return (
         <ServerContext.Provider value={{
@@ -210,9 +210,13 @@ export const ServerProvider = ({ children }) => {
             rescTotal, rescContext, loadResource,
             loadData
         }}>
-            { children}
+            {children}
         </ServerContext.Provider>
     )
+}
+
+ServerProvider.propTypes = {
+    children: PropTypes.node.isRequired
 }
 
 export const useServer = () => useContext(ServerContext);

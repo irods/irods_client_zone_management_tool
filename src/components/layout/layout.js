@@ -1,76 +1,75 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from '@reach/router';
 import { AppBar, CssBaseline, Drawer, Divider, Hidden, IconButton, List, ListItemText, MenuItem, Toolbar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { useEnvironment, useServer } from '../../contexts';
 
 const drawerWidth = '200px';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        width: '100vw',
-        maxHeight: '100vh'
-    },
-    appBar: {
-        width: '100%',
-        height: '64px',
-        background: useEnvironment().primaryColor,
-    },
-    rightToolbar: {
-        marginLeft: "auto",
-        marginRight: -12,
-        fontSize: 18
-    },
-    sidebarContainer: {
-        [theme.breakpoints.up('sm')]: {
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-    },
-    logo: {
-        width: 70,
-        height: '64px',
-        marginRight: 20
-    },
-    branding: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textDecoration: 'none',
-        height: '64px'
-    },
-    drawer: {
-        width: 'auto',
-        flexShrink: 0,
-    },
-    drawerPaper: {
-        width: drawerWidth,
-        marginTop: '64px',
-        height: `calc(100vh - 50px - 64px)`,
-        borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
-    },
-    component: {
-        flexGrow: 1,
-        overflow: 'auto',
-        width: '100%',
-    },
-    toolbar: theme.mixins.toolbar,
-    mobileMenu: {
-        position: 'absolute',
-        right: '2px'
-    }
-}))
-
 export const Layout = ({ children }) => {
     const environment = useEnvironment();
-    const theme = useTheme();
+    const useStyles = makeStyles((theme) => ({
+        root: {
+            display: 'flex',
+            width: '100vw',
+            maxHeight: '100vh'
+        },
+        appBar: {
+            width: '100%',
+            height: '64px',
+            background: environment.primaryColor,
+        },
+        rightToolbar: {
+            marginLeft: "auto",
+            marginRight: -12,
+            fontSize: 18
+        },
+        sidebarContainer: {
+            [theme.breakpoints.up('sm')]: {
+                width: drawerWidth,
+                flexShrink: 0,
+            },
+        },
+        logo: {
+            width: 70,
+            height: '64px',
+            marginRight: 20
+        },
+        branding: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textDecoration: 'none',
+            height: '64px'
+        },
+        drawer: {
+            width: 'auto',
+            flexShrink: 0,
+        },
+        drawerPaper: {
+            width: drawerWidth,
+            marginTop: '64px',
+            height: `calc(100vh - 50px - 64px)`,
+            borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
+        },
+        component: {
+            flexGrow: 1,
+            overflow: 'auto',
+            width: '100%',
+        },
+        toolbar: theme.mixins.toolbar,
+        mobileMenu: {
+            position: 'absolute',
+            right: '2px'
+        }
+    }))
+    const classes = useStyles();
     const { zoneName } = useServer();
     const AppBarLogo = require(`../../img/${environment.appbarLogo}`).default;
     const [mobileOpen, setMobileOpen] = useState(false);
     const { userContext, groupContext, rescContext, zoneContext } = useServer();
-    const classes = useStyles();
 
     const drawer = (
         <div>
@@ -165,4 +164,8 @@ export const Layout = ({ children }) => {
             </div>
         </div>
     )
+}
+
+Layout.propTypes = {
+    children: PropTypes.node.isRequired
 }

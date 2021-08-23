@@ -14,4 +14,4 @@ export const StyledTreeItem = withStyles((theme) => ({
         paddingLeft: 18,
         borderLeft: `1px dashed ${fade(theme.palette.text.primary, 0.4)}`,
     },
-}))((props) => <TreeItem draggable={props.draggable} {...props} TransitionComponent={TransitionComponent} />);
+}))((props) => <TreeItem draggable={props.draggable} {...props} TransitionComponent={TransitionComponent}>{props.children}</TreeItem>);

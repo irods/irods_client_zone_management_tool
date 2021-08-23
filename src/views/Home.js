@@ -29,18 +29,17 @@ const useStyles = makeStyles((theme) => ({
 
 export const Home = () => {
     const auth = localStorage.getItem('zmt-token')
-    if (auth === null) {
-        return <Logout />
-    }
-    const { userContext, groupContext, rescContext, zoneContext, loadData } = useServer();
+    const { userContext, groupContext, rescContext, zoneContext } = useServer();
     const classes = useStyles();
-
     const [status, setStatus] = useState()
 
     useEffect(() => {
-        loadData();
         setStatus("OK");
     }, [])
+
+    if (auth === null) {
+        return <Logout />
+    }
 
     return (
         <Fragment>

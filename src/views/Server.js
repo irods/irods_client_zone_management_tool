@@ -1,8 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { TabPanel } from '../components'
 import { Logout } from './';
 import { useServer } from '../contexts';
-import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Typography, Box, Paper, Tab, Tabs } from '@material-ui/core';
+import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -42,9 +42,6 @@ const useStyles = makeStyles((theme) => ({
 
 export const Server = () => {
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
     const classes = useStyles();
     const { zoneContext, filteredServers, loadCurrServer } = useServer();
     const [currPage, setCurrPage] = useState(1);
@@ -65,37 +62,15 @@ export const Server = () => {
         setOrderBy(props);
     }
 
-    function TabPanel(props) {
-        const { children, value, index, ...other } = props;
-
-        return (
-            <div
-                role="tabpanel"
-                hidden={value !== index}
-                id={`simple-tabpanel-${index}`}
-                aria-labelledby={`vertical-tab-${index}`}
-                {...other}
-            >
-                {value === index && (
-                    <Box p={1}>
-                        <Typography>{children}</Typography>
-                    </Box>
-                )}
-            </div>
-        );
-    }
-
-    TabPanel.propTypes = {
-        children: PropTypes.node,
-        index: PropTypes.any.isRequired,
-        value: PropTypes.any.isRequired,
-    };
-
     function a11yProps(index) {
         return {
             id: `simple-tab-${index}`,
             'aria-controls': `simple-tabpanel-${index}`,
         };
+    }
+
+    if (auth === null) {
+        return <Logout />
     }
 
     return (
@@ -182,7 +157,7 @@ export const Server = () => {
                         <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
                             <div>
                                 <tr><td><b>Name</b></td><td><b>Type</b></td></tr>
-                                {currServer['plugins'].map(plugin => <tr><td><div className={classes.plugin_info}>{plugin.name}</div></td><td><div className={classes.info}>{plugin.type}</div></td></tr>)}
+                                {currServer['plugins'].map(plugin => <tr key={plugin.name}><td><div className={classes.plugin_info}>{plugin.name}</div></td><td><div className={classes.info}>{plugin.type}</div></td></tr>)}
                             </div>
                         </TabPanel>
                     </DialogContent>

@@ -45,11 +45,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const ResourceListView = () => {
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
     const classes = useStyles();
-    const [tab, setTab] = useState('list');
+    const tab = 'list';
     const [isLoading, setLoading] = useState(false);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
@@ -69,7 +66,7 @@ export const ResourceListView = () => {
 
     useEffect(() => {
         loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
-    }, [currPage, perPage, filterRescName, order, orderBy])
+    }, [loadResource, currPage, perPage, filterRescName, order, orderBy])
 
     async function addResource() {
         setAddFormOpen(true);
@@ -89,7 +86,7 @@ export const ResourceListView = () => {
                 arg5: "",
                 arg6: zoneName
             }
-        }).then((res) => {
+        }).then(() => {
             window.location.reload();
             setAddResult("Resource created.")
             setLoading(false);
@@ -111,8 +108,8 @@ export const ResourceListView = () => {
         document.getElementById("add_newrow").style["display"] = "none";
     }
 
-    const handleRemoveFormOpen = (props) => {
-        setRescName(props[0]);
+    const handleRemoveFormOpen = (resc) => {
+        setRescName(resc[0]);
     }
 
     const handleRescNameChange = (event) => {
@@ -140,6 +137,9 @@ export const ResourceListView = () => {
         setCurrPage(value + 1);
     }
 
+    if (auth === null) {
+        return <Logout />
+    }
 
     return (
         <Fragment>

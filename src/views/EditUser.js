@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Link } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -7,7 +8,7 @@ import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableH
 import { useEnvironment, useServer } from '../contexts';
 
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     link_button: {
         textDecoration: "none"
     },
@@ -21,9 +22,6 @@ const useStyles = makeStyles((theme) => ({
 
 export const EditUser = (props) => {
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
     const currentUser = props.location.state.userInfo;
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
@@ -53,7 +51,7 @@ export const EditUser = (props) => {
             setGroupOfUser(res.data._embedded);
             setLoading(false);
         })
-    }, [refresh])
+    }, [auth, currentUser, restApiLocation, refresh])
 
     useEffect(() => {
         axios({
@@ -71,9 +69,9 @@ export const EditUser = (props) => {
         }).then((res) => {
             setFilterNameResult(res.data._embedded);
         })
-    }, [filterGroupName])
+    }, [auth, restApiLocation, filterGroupName])
 
-    async function removeGroupFromUser(props) {
+    async function removeGroupFromUser(group) {
         try {
             await axios({
                 method: 'POST',
@@ -81,7 +79,7 @@ export const EditUser = (props) => {
                 params: {
                     action: 'modify',
                     target: 'group',
-                    arg2: props[0],
+                    arg2: group[0],
                     arg3: 'remove',
                     arg4: currentUser[0],
                     arg5: zoneName
@@ -90,7 +88,7 @@ export const EditUser = (props) => {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then((res) => {
+            }).then(() => {
                 setRefresh(!refresh);
             })
         } catch (e) {
@@ -99,7 +97,7 @@ export const EditUser = (props) => {
 
     }
 
-    async function addGroupToUser(props) {
+    async function addGroupToUser(group) {
         try {
             await axios({
                 method: 'POST',
@@ -107,7 +105,7 @@ export const EditUser = (props) => {
                 params: {
                     action: 'modify',
                     target: 'group',
-                    arg2: props[0],
+                    arg2: group[0],
                     arg3: 'add',
                     arg4: currentUser[0],
                     arg5: zoneName
@@ -116,7 +114,7 @@ export const EditUser = (props) => {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then((res) => {
+            }).then(() => {
                 setRefresh(!refresh);
             })
         }
@@ -132,6 +130,10 @@ export const EditUser = (props) => {
             }
         }
         return false;
+    }
+
+    if (auth === null) {
+        return <Logout />
     }
 
     return (
@@ -170,4 +172,8 @@ export const EditUser = (props) => {
             {isLoading === true ? <div><LinearProgress /></div> : <div />}
         </Fragment>
     );
+}
+
+EditUser.propTypes = {
+    location: PropTypes.any
 }

@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Link } from '@reach/router';
 import axios from 'axios';
 import { useEnvironment, useServer } from '../contexts';
-import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
+import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
@@ -51,9 +51,6 @@ const useStyles = makeStyles((theme) => ({
 export const User = () => {
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
     const classes = useStyles();
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
@@ -85,7 +82,7 @@ export const User = () => {
                     arg4: zoneName,
                     arg5: '',
                 }
-            }).then((res) => {
+            }).then(() => {
                 window.location.reload();
             })
         } catch (e) {
@@ -108,7 +105,7 @@ export const User = () => {
                     arg2: currUser[0],
                     arg3: zoneName
                 }
-            }).then((res) => {
+            }).then(() => {
                 window.location.reload();
             })
         } catch (e) {
@@ -152,10 +149,11 @@ export const User = () => {
 
     useEffect(() => {
         loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
-
     }, [currPage, perPage, filterUsername, order, orderBy])
 
-
+    if (auth === null) {
+        return <Logout />
+    }
 
     return (
         <Fragment>

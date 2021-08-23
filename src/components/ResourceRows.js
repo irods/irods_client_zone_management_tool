@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Collapse from '@material-ui/core/Collapse';
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -54,7 +55,6 @@ function ResourceRows(props) {
   const { row } = props;
   const classes = useStyles();
   const { restApiLocation } = useEnvironment();
-
   const [editFormOpen, setEditForm] = useState(false);
   const [editResult, setEditResult] = useState();
   const [isEditingFreespace, setEditingFreespace] = useState(false);
@@ -145,3 +145,7 @@ function ResourceRows(props) {
 }
 
 export default ResourceRows;
+
+ResourceRows.propTypes = {
+  row: PropTypes.array
+}

@@ -15,7 +15,11 @@
     "react-scripts": "4.0.3",
     "react-spring": "^9.1.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0"
+  },
   "scripts": {
     "start": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && react-scripts start",
     "build": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && react-scripts build",
