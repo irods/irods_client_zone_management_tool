@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useEnvironment } from './EnvironmentContext';
 
@@ -98,8 +99,8 @@ export const ConnectionProvider = ({ children }) => {
 
     // run connection test on initial load
     useEffect(() => {
-        testConnection();
-    }, [])
+        if(timeStamp === undefined) testConnection();
+    })
 
     return (
         <ConnectionContext.Provider value={{
@@ -108,6 +109,10 @@ export const ConnectionProvider = ({ children }) => {
             { children}
         </ConnectionContext.Provider>
     )
+}
+
+ConnectionProvider.propTypes = {
+    children: PropTypes.node.isRequired
 }
 
 export const useConnection = () => useContext(ConnectionContext);

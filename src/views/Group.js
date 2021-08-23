@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from '@reach/router'
 import { useEnvironment, useServer } from '../contexts';
 import { Logout } from './';
-import { makeStyles, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, TextField, Input, InputLabel, Select, Typography } from '@material-ui/core';
+import { makeStyles, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Input, Typography } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
@@ -42,9 +42,6 @@ const useStyles = makeStyles((theme) => ({
 export const Group = () => {
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
     const classes = useStyles();
     const { zoneName, groupContext, loadGroup } = useServer();
 
@@ -55,11 +52,7 @@ export const Group = () => {
     const [currGroup, setCurrGroup] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [groupContextWithUserCount, setGroupContextWithUserCount] = useState({
-        _embedded: [],
-        count: 0,
-        total: 0
-    });
+    const [groupContextWithUserCount, setGroupContextWithUserCount] = useState(new Map());
     let group_id = 0;
 
     const [currPage, setCurrPage] = useState(1);
@@ -80,6 +73,7 @@ export const Group = () => {
         const loadGroupUserCounts = async () => {
             setIsLoading(true);
             let inputArray = groupContext;
+            let userCountMap = new Map();
             for (let i = 0; i < inputArray._embedded.length; i++) {
                 let thisGroupName = inputArray._embedded[i][0];
                 await axios({
@@ -96,8 +90,9 @@ export const Group = () => {
                     }
                 }).then((res) => {
                     inputArray._embedded[i].push(res.data._embedded.length);
+                    userCountMap.set(thisGroupName, res.data._embedded.length);
                     if (i === inputArray._embedded.length - 1) {
-                        setGroupContextWithUserCount(inputArray);
+                        setGroupContextWithUserCount(userCountMap);
                     }
                 })
             }
@@ -123,7 +118,7 @@ export const Group = () => {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then(() => {
                 window.location.reload();
             })
         }
@@ -148,7 +143,7 @@ export const Group = () => {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then(res => {
+            }).then(() => {
                 window.location.reload();
             })
         } catch (e) {
@@ -191,6 +186,10 @@ export const Group = () => {
         setRemoveErrorMsg();
     }
 
+    if (auth === null) {
+        return <Logout />
+    }
+
     return (
         <Fragment>
             <div className={classes.filterGroup}>
@@ -211,7 +210,7 @@ export const Group = () => {
                     <TableHead>
                         <TableRow>
                             <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
-                            <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} ><b>Users</b></TableCell>
+                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
                             <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                         </TableRow>
                     </TableHead>
@@ -223,8 +222,8 @@ export const Group = () => {
                         </TableRow>
                         {groupContext._embedded.map((group) =>
                             <TableRow key={group_id}>
-                                <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '30%', textAlign: 'center' }} component="th" scope="row">{group[1]}</TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
                                 <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                             </TableRow>
                         )}

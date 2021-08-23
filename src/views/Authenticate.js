@@ -4,7 +4,7 @@ import { Box, Button, Container, TextField, Typography } from '@material-ui/core
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from '@reach/router';
 import { useEnvironment } from '../contexts';
-import { useLayout, hideLayout } from '../utils';
+import { renderLayout, hideLayout } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     mainForm: {
@@ -67,7 +67,7 @@ export const Authenticate = () => {
                 if (res.status === 200) {
                     localStorage.setItem('zmt-token', res.data);
                     navigate('/home', { replace: true });
-                    useLayout();
+                    renderLayout();
                 }
             })
         } catch (err) {

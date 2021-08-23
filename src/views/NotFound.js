@@ -4,9 +4,9 @@ import { Container, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocation } from '@reach/router';
 import { useEnvironment } from '../contexts/EnvironmentContext';
-import { useLayout, hideLayout } from '../utils';
+import { renderLayout, hideLayout } from '../utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     notFoundContainer: {
         display: 'flex',
         flexDirection: 'column',
@@ -41,7 +41,7 @@ export const NotFound = () => {
 
     return (
         <Container className={classes.notFoundContainer}>
-            <Link to='/' onClick={() => useLayout()}><img className={classes.irodsLogo} src={iRODSLogo}></img></Link>
+            <Link to='/' onClick={() => renderLayout()}><img className={classes.irodsLogo} src={iRODSLogo}></img></Link>
             <div>
                 <br />
                 <Typography className={classes.text}>ERROR 404</Typography>

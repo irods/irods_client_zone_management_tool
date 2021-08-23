@@ -1,4 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Link } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -6,7 +7,7 @@ import { Logout } from './';
 import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
 import { useEnvironment, useServer } from '../contexts';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     link_button: {
         textDecoration: 'none'
     },
@@ -20,22 +21,17 @@ const useStyles = makeStyles((theme) => ({
 
 export const EditGroup = (props) => {
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
-
     const { zoneName } = useServer();
     const currentGroup = props.location.state.groupInfo;
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const { restApiLocation } = useEnvironment();
-
     const [usersInGroup, setUsersInGroup] = useState([]);
     const [filterUserName, setFilterName] = useState('');
     const [filterUserNameResult, setFilterNameResult] = useState([]);
 
-    useEffect(() => {
+    const loadCurrentGroupInfo = useCallback(() => {
         setLoading(true);
         axios({
             method: 'GET',
@@ -54,9 +50,9 @@ export const EditGroup = (props) => {
             setUsersInGroup(res.data._embedded);
             setLoading(false);
         })
-    }, [refresh])
+    }, [auth, currentGroup, restApiLocation])
 
-    useEffect(() => {
+    const loadFilteredUsers = useCallback(() => {
         setLoading(true);
         axios({
             method: 'GET',
@@ -74,11 +70,19 @@ export const EditGroup = (props) => {
             setFilterNameResult(res.data._embedded);
             setLoading(false);
         })
-    }, [filterUserName])
+    }, [auth, restApiLocation, filterUserName])
+
+    useEffect(() => {
+        loadCurrentGroupInfo()
+    }, [refresh, loadCurrentGroupInfo])
+
+    useEffect(() => {
+        loadFilteredUsers()
+    }, [loadFilteredUsers])
 
 
 
-    async function removeUserFromGroup(props) {
+    async function removeUserFromGroup(user) {
         try {
             await axios({
                 method: 'POST',
@@ -88,14 +92,14 @@ export const EditGroup = (props) => {
                     target: 'group',
                     arg2: currentGroup[0],
                     arg3: 'remove',
-                    arg4: props[0],
+                    arg4: user[0],
                     arg5: zoneName
                 },
                 headers: {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then((res) => {
+            }).then(() => {
                 setRefresh(!refresh);
             })
         } catch (e) {
@@ -103,7 +107,7 @@ export const EditGroup = (props) => {
         }
     }
 
-    async function addUserToGroup(props) {
+    async function addUserToGroup(user) {
         try {
             await axios({
                 method: 'POST',
@@ -113,14 +117,14 @@ export const EditGroup = (props) => {
                     target: 'group',
                     arg2: currentGroup[0],
                     arg3: 'add',
-                    arg4: props[0],
+                    arg4: user[0],
                     arg5: zoneName
                 },
                 headers: {
                     'Authorization': auth,
                     'Accept': 'application/json'
                 }
-            }).then((res) => {
+            }).then(() => {
                 setRefresh(!refresh);
             })
         }
@@ -140,6 +144,10 @@ export const EditGroup = (props) => {
 
     const handleFilterUserName = (event) => {
         setFilterName(event.target.value);
+    }
+
+    if (auth === null) {
+        return <Logout />
     }
 
     return (
@@ -181,4 +189,8 @@ export const EditGroup = (props) => {
             {isLoading === true ? <div><LinearProgress /></div> : <div />}
         </Fragment>
     );
+}
+
+EditGroup.propTypes = {
+    location: PropTypes.any
 }

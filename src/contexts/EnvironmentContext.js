@@ -1,4 +1,5 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
+import PropTypes from 'prop-types';
 
 export const EnvironmentContext = createContext();
 
@@ -31,6 +32,10 @@ export const EnvironmentProvider = ({ children }) => {
             {children}
         </EnvironmentContext.Provider>
     )
+}
+
+EnvironmentProvider.propTypes = {
+    children: PropTypes.node.isRequired
 }
 
 export const useEnvironment = () => useContext(EnvironmentContext);

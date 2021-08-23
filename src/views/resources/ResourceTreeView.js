@@ -9,10 +9,7 @@ import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
 export const ResourceTreeView = () => {
     const auth = localStorage.getItem('zmt-token');
-    if (auth === null) {
-        return <Logout />
-    }
-    const [tab, setTab] = useState('tree');
+    const tab = 'tree';
     const { rescContext } = useServer();
     const { deviceType } = useEnvironment();
     const [childrenMap, setChildrenMap] = useState();
@@ -42,6 +39,10 @@ export const ResourceTreeView = () => {
         }
     }, [rescContext])
 
+    if (auth === null) {
+        return <Logout />
+    }
+
     return (
         <Fragment>
             <ToggleButtonGroup size="small" value={tab}>
@@ -50,7 +51,7 @@ export const ResourceTreeView = () => {
             </ToggleButtonGroup>
             {deviceType === "Desktop" ?
                 <Fragment>
-                    {dataMap !== undefined && <Tree data={dataMap} children={childrenMap} />} </Fragment> :
+                    {dataMap !== undefined && <Tree dataMap={dataMap} childrenMap={childrenMap} />} </Fragment> :
                 <p>
                     Resource Treeview is not currently available on mobile device. Please use your desktop device to visit treeview.
                 </p>

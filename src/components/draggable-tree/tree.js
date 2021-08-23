@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, AlertTitle, TreeView } from '@material-ui/lab';
+import PropTypes from 'prop-types';
+import { Alert, TreeView } from '@material-ui/lab';
 import { StyledTreeItem } from './tree-item';
 import { Badge, Button, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -16,7 +17,6 @@ import { replacer, reviver } from '../../utils';
 const checkIfDescendent = (node, target, map) => {
     const nodeId = node[11];
     let isDescendent = false;
-    console.log("checking " + node[0])
     if (!map.has(nodeId)) return isDescendent;
     else {
         const descendents = map.get(nodeId);
@@ -34,8 +34,8 @@ const checkIfDescendent = (node, target, map) => {
 }
 
 export const Tree = (props) => {
-    let childrenMap = props.children;
-    let dataMap = props.data;
+    let childrenMap = props.childrenMap;
+    let dataMap = props.dataMap;
     let originalChildrenMap = JSON.stringify(childrenMap, replacer);
     let originalDataMap = JSON.stringify(dataMap, replacer);
     const { restApiLocation } = useEnvironment();
@@ -50,6 +50,7 @@ export const Tree = (props) => {
     const [isComplete, setIsComplete] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
+    const [currExpanded, setExpanded] = useState([])
     let expanded = [];
 
     const dragndropController = async (curr, prev) => {
@@ -76,8 +77,7 @@ export const Tree = (props) => {
             for (let task of tasks_copy) {
                 try {
                     if (task[1][0] !== 'tempZone') {
-                        const remove_child_result = await RemoveChildRescourceController(task[1][0], task[0][0], restApiLocation);
-                        console.log(remove_child_result);
+                        await RemoveChildRescourceController(task[1][0], task[0][0], restApiLocation);
                         task[3] = 'success'
                     }
                     else {
@@ -92,8 +92,7 @@ export const Tree = (props) => {
                 setTasks(tasks_copy)
                 try {
                     if (task[2][0] !== 'tempZone') {
-                        const add_child_result = await AddChildRescourceController(task[2][0], task[0][0], restApiLocation);
-                        console.log(add_child_result);
+                        await AddChildRescourceController(task[2][0], task[0][0], restApiLocation);
                         task[4] = 'success'
                     }
                     else {
@@ -162,6 +161,10 @@ export const Tree = (props) => {
         setTasks([]);
     }
 
+    const handleToggle = (event, nodeIds) => {
+        setExpanded(nodeIds)
+    }
+
     const renderTreeNode = (node) => {
         const nodeId = node[0] === 'tempZone' ? "" : node[11];
         expanded.push(nodeId)
@@ -203,7 +206,7 @@ export const Tree = (props) => {
 
         return (
             <StyledTreeItem
-                key={nodeId}
+                key={`tree-item-${nodeId}`}
                 nodeId={nodeId}
                 label={node[0]}
                 draggable={node[11] === '' ? false : true}
@@ -247,46 +250,53 @@ export const Tree = (props) => {
                     }
                 >Your move is invalid.</Alert>
             </Collapse>
-            { currNode && targetNode ? <div>Dragging {currNode[0]} over {targetNode[0]}</div> : <div>Resource Hierachy</div> }
-    <div className="resource_tree_container">
-        <div className="resource_tree">
-            <TreeView
-                defaultExpanded={expanded}
-                defaultCollapseIcon={<MinusSquare />}
-                defaultExpandIcon={<PlusSquare />}
-                defaultEndIcon={<MinusSquare className="grey_out" />}
-            >{renderTreeNode(stagedDataMap.get(""))}
-            </TreeView>
-        </div>
-        <div className="resource_tree_notifcations">
-            <h3>Staged Changes <Badge badgeContent={tasks.length} color="primary"><LowPriorityIcon /></Badge></h3>
-            <div>
-                {tasks.map(task => <div>
-                    {task[0][0]} parent: {task[1][0]} -> {task[2][0]}
-                </div>)}
-            </div>
-            <Dialog open={confirmDialog}>
-                <DialogTitle>Are these changes correct?</DialogTitle>
-                <DialogContent>
-                    {tasks.map((task, index) => <div style={{ padding: '5px 0px' }}><b>{task[0][0]}</b>
-                        <div className="resource_tree_parent_info">
-                            <span> Remove previous parent: {task[1][0]}</span>
-                            {task[3] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[3] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
-                        </div>
-                        <div className="resource_tree_parent_info">
-                            <span> Add new parent: {task[2][0]}</span>
-                            {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
-                        </div>
+            {currNode && targetNode ? <div>Dragging {currNode[0]} over {targetNode[0]}</div> : <div>Resource Hierachy</div>}
+            <div className="resource_tree_container">
+                <div className="resource_tree">
+                    <TreeView
+                        defaultExpanded={expanded}
+                        expanded={currExpanded.length === 0 ? expanded : currExpanded}
+                        defaultCollapseIcon={<MinusSquare />}
+                        defaultExpandIcon={<PlusSquare />}
+                        defaultEndIcon={<MinusSquare className="grey_out" />}
+                        onNodeToggle={handleToggle}
+                    >{renderTreeNode(stagedDataMap.get(""))}
+                    </TreeView>
+                </div>
+                <div className="resource_tree_notifcations">
+                    <h3>Staged Changes <Badge badgeContent={tasks.length} color="primary"><LowPriorityIcon /></Badge></h3>
+                    <div>
+                        {tasks.map(task => <div key={`task-${task[0][0]}-${task[1][0]}`}>
+                            {task[0][0]} parent: {task[1][0]} &gt; {task[2][0]}
+                        </div>)}
                     </div>
-                    )}
-                </DialogContent>
-                <br />
-                {!hasError && isComplete ? <span className="resource_tree_status">Operation success. </span> : ""}
-                {hasError && isComplete ? <span className="resource_tree_status">Operation failed. Please see the error message above.</span> : ""}
-                {isComplete ? <DialogActions><Button color="primary" onClick={() => { setConfirmDialog(false); window.location.reload(); }}>Close</Button></DialogActions> : <DialogActions style={{ justifyContent: 'space-around' }}><Button color="secondary" onClick={() => setConfirmDialog(false)}>No</Button><Button color="primary" onClick={runTask}>Yes</Button></DialogActions>}
-            </Dialog>
-        </div>
-    </div>
+                    <Dialog open={confirmDialog}>
+                        <DialogTitle>Are these changes correct?</DialogTitle>
+                        <DialogContent>
+                            {tasks.map((task) => <div key={`display-task-${task[0][0]}-${task[1][0]}`} style={{ padding: '5px 0px' }}><b>{task[0][0]}</b>
+                                <div className="resource_tree_parent_info">
+                                    <span> Remove previous parent: {task[1][0]}</span>
+                                    {task[3] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[3] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
+                                </div>
+                                <div className="resource_tree_parent_info">
+                                    <span> Add new parent: {task[2][0]}</span>
+                                    {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
+                                </div>
+                            </div>
+                            )}
+                        </DialogContent>
+                        <br />
+                        {!hasError && isComplete ? <span className="resource_tree_status">Operation success. </span> : ""}
+                        {hasError && isComplete ? <span className="resource_tree_status">Operation failed. Please see the error message above.</span> : ""}
+                        {isComplete ? <DialogActions><Button color="primary" onClick={() => { setConfirmDialog(false); window.location.reload(); }}>Close</Button></DialogActions> : <DialogActions style={{ justifyContent: 'space-around' }}><Button color="secondary" onClick={() => setConfirmDialog(false)}>No</Button><Button color="primary" onClick={runTask}>Yes</Button></DialogActions>}
+                    </Dialog>
+                </div>
+            </div>
         </div >
     )
+}
+
+Tree.propTypes = {
+    childrenMap: PropTypes.node,
+    dataMap: PropTypes.node
 }
