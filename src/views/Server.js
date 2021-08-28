@@ -134,7 +134,7 @@ export const Server = () => {
                             <div className={classes.info}>Server Control Plane Encryption Algorithm: {currServer['server_config']['server_control_plane_encryption_algorithm']}</div>
                             <div className={classes.info}>Server Control Plane Encryption Num Hash Rounds: {currServer['server_config']['server_control_plane_encryption_num_hash_rounds']}</div>
                             <div className={classes.info}>Server Control Plane Port: {currServer['server_config']['server_control_plane_port']}</div>
-                            <div className={classes.info}>Server Port Range: {currServer['server_config']['server_port_range_start']} ~ {currServer['server_config']['server_port_range_end']}</div>
+                            <div className={classes.info}>Server Port Range: {currServer['server_config']['server_port_range_start']} - {currServer['server_config']['server_port_range_end']}</div>
                             <div className={classes.info}>XMSG Port: {currServer['server_config']['xmsg_port']}</div>
                             <div className={classes.info}>Zone Auth Scheme: {currServer['server_config']['zone_auth_scheme']}</div>
                             <div className={classes.info}>Zone Port: {currServer['server_config']['zone_port']}</div>
