@@ -20,15 +20,20 @@ export const ServerProvider = ({ children }) => {
     const { restApiLocation } = useEnvironment();
     const [zoneContext, setZoneContext] = useState();
     const [zoneName, setZoneName] = useState();
+    const [isLoadingZoneContext, setIsLoadingZoneContext] = useState(false);
     const [userContext, setUserContext] = useState(initialState);
     const [userTotal, setUserTotal] = useState(0);
+    const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
     const [groupContext, setGroupContext] = useState(initialState);
     const [groupTotal, setGroupTotal] = useState(0);
+    const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
     const [rescContext, setRescContext] = useState(initialState);
     const [rescTotal, setRescTotal] = useState(0);
+    const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
     const [filteredServers, setFilteredServers] = useState([]);
 
     const loadUser = (offset, limit, name, order, orderBy) => {
+        setIsLoadingUserContext(true);
         let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`;
         if (name !== '') {
             _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${name}%'`
@@ -48,18 +53,21 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setUserContext(res.data);
-            if(name === '') setUserTotal(res.data.total)
+            if (name === '') setUserTotal(res.data.total)
+            setIsLoadingUserContext(false);
         }).catch(() => {
+            setIsLoadingUserContext(false);
         });
     }
 
-    const loadGroup = async (offset, limit, name, order, orderBy) => {
+    const loadGroup = (offset, limit, name, order, orderBy) => {
+        setIsLoadingGroupContext(true);
         let _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'`;
         if (name !== '') {
             _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
-        const groupResult = await axios({
+        return axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -71,13 +79,18 @@ export const ServerProvider = ({ children }) => {
                 row_offset: offset,
                 query_type: 'general'
             }
+        }).then((res) => {
+            setGroupContext(res.data);
+            if (name === '') setGroupTotal(res.data.total)
+            setIsLoadingGroupContext(false);
+        }).catch(() => {
+            setIsLoadingGroupContext(false);
         });
-        setGroupContext(groupResult.data)
-        if(name === '') setGroupTotal(groupResult.data.total)
     }
 
 
     const loadResource = useCallback((offset, limit, name, order, orderBy) => {
+        setIsLoadingRescContext(true);
         let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc'`
         if (name !== '') {
             _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc' AND RESC_NAME LIKE '%${name}%'`
@@ -97,8 +110,10 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setRescContext(res.data);
-            if(name === '') setRescTotal(res.data.total)
+            if (name === '') setRescTotal(res.data.total)
+            setIsLoadingRescContext(false);
         }).catch(() => {
+            setIsLoadingRescContext(false);
         });
     }, [restApiLocation])
 
@@ -127,7 +142,9 @@ export const ServerProvider = ({ children }) => {
             headers: {
                 'Accept': 'application/json',
                 'Authorization': localStorage.getItem('zmt-token')
-            }
+            },
+        }).catch(() => {
+            setIsLoadingZoneContext(false)
         })
     }
 
@@ -150,15 +167,20 @@ export const ServerProvider = ({ children }) => {
 
     // load all servers at each render, and iterate through server list to fetch resources which have the same hostname
     const loadServers = async () => {
+        setIsLoadingZoneContext(true);
         let zone_report = await loadZoneReport();
-        let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
-        let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
-        for (let curr_server of fullServersArray) {
-            let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname']);
-            curr_server["resources"] = resource_counts.data.total;
+        if (zone_report !== undefined) {
+            let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
+            let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
+            for (let curr_server of fullServersArray) {
+                let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
+                if(resource_counts === undefined) curr_server["resources"] = 0;
+                else curr_server["resources"] = resource_counts.data.total;
+            }
+            setZoneContext(fullServersArray)
+            setFilteredServers(fullServersArray.slice(0, 10));
+            setIsLoadingZoneContext(false);
         }
-        setZoneContext(fullServersArray)
-        setFilteredServers(fullServersArray.slice(0, 10));
     }
 
     // handle servers page pagination and sorting
@@ -208,6 +230,7 @@ export const ServerProvider = ({ children }) => {
             userTotal, userContext, loadUser,
             groupTotal, groupContext, loadGroup,
             rescTotal, rescContext, loadResource,
+            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
             loadData
         }}>
             {children}
