@@ -174,13 +174,25 @@ export const ServerProvider = ({ children }) => {
             let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
             for (let curr_server of fullServersArray) {
                 let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
-                if(resource_counts === undefined) curr_server["resources"] = 0;
+                if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
             }
             setZoneContext(fullServersArray)
             setFilteredServers(fullServersArray.slice(0, 10));
             setIsLoadingZoneContext(false);
         }
+    }
+
+    // designed to compare different irods version (e.g. 4.2.10 > 4.2.8)
+    const irodsVersionComparator = (a, b) => {
+        let aa = a.split('.').map(Number);
+        let bb = b.split('.').map(Number);
+        let r = 0;
+        let l = Math.max(aa.length, bb.length)
+        for (let i = 0; !r && i < l; i++) {
+            r = (aa[i] || 0) - (bb[i] || 0)
+        }
+        return r;
     }
 
     // handle servers page pagination and sorting
@@ -199,6 +211,8 @@ export const ServerProvider = ({ children }) => {
                         return orderSyntax * ((a['host_system_information']['os_distribution_name'] + a['host_system_information']['os_distribution_version']).localeCompare((b['host_system_information']['os_distribution_name'] + b['host_system_information']['os_distribution_version'])))
                     case 'resources':
                         return orderSyntax * (a['resources'] - b['resources'])
+                    case 'irods-version':
+                        return orderSyntax * irodsVersionComparator(a['version']['irods_version'], b['version']['irods_version'])
                     default:
                         return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']));
                 }
