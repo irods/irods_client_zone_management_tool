@@ -113,18 +113,19 @@ export const ResourceListView = () => {
     }
 
     const handleRescNameChange = (event) => {
-        setRescName(event.target.value);
+        // trim all whitespace in the resource name
+        setRescName(event.target.value.trim());
     }
 
     const handleRescTypeChange = (event) => {
-        setRescType(event.target.value);
+        setRescType(event.target.value.trim());
     }
 
     const handleRescLocationChange = (event) => {
-        setRescLocation(encodeURI(event.target.value));
+        setRescLocation(encodeURI(event.target.value.trim()));
     }
     const handleRescVaultPathChange = (event) => {
-        setRescVaultPath(event.target.value);
+        setRescVaultPath(event.target.value.trim());
     }
 
     const handleSort = (props) => {
@@ -220,8 +221,8 @@ export const ResourceListView = () => {
                             <DialogContentText>
                                 Resource Name: {rescName}<br />
                                 Type: {rescType}<br />
-                                Vault Path: {rescLocation}<br />
-                                Zone: {zoneName}
+                                Hostname: {rescLocation}<br />
+                                Vault Path: {rescVaultPath}
                             </DialogContentText>
                             {isLoading === true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                         </DialogContent>
