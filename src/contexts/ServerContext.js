@@ -31,6 +31,7 @@ export const ServerProvider = ({ children }) => {
     const [rescTypes, setRescTypes] = useState([]);
     const [rescTotal, setRescTotal] = useState(0);
     const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
+    const [editingRescID, setEditingRescID] = useState();
     const [filteredServers, setFilteredServers] = useState();
 
     const loadUser = (offset, limit, name, order, orderBy) => {
@@ -122,6 +123,10 @@ export const ServerProvider = ({ children }) => {
             setIsLoadingRescContext(false);
         });
     }, [restApiLocation])
+
+    const editingResource = (id) => {
+        setEditingRescID(id);
+    }
 
     const loadZoneName = () => {
         return axios({
@@ -260,7 +265,7 @@ export const ServerProvider = ({ children }) => {
             zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
             userTotal, userContext, loadUser,
             groupTotal, groupContext, loadGroup,
-            rescTotal, rescContext, rescTypes, loadResource,
+            rescTotal, rescContext, rescTypes, editingRescID, editingResource, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
             loadData
         }}>
