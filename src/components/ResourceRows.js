@@ -1,21 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@material-ui/core/Button';
 import Collapse from '@material-ui/core/Collapse';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save';
+import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { useEnvironment } from '../contexts/EnvironmentContext';
-
+import { useEnvironment, useServer } from '../contexts';
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
-
-import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
+import MuiAlert from '@material-ui/lab/Alert';
+import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -29,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
   },
   table_cell: {
     width: '50%',
-    fontSize: 15
+    fontSize: 15,
+    height: 40
   },
   remove_button: {
     float: 'right'
@@ -48,37 +46,92 @@ const useStyles = makeStyles((theme) => ({
   },
   cell: {
     fontSize: '1rem'
+  },
+  resource_container: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '10px 0'
+  },
+  resource_textfield: {
+    width: '50%'
   }
 }));
 
-function ResourceRows(props) {
-  const { row } = props;
+function ResourceRows({ row }) {
   const classes = useStyles();
   const { restApiLocation } = useEnvironment();
-  const [editFormOpen, setEditForm] = useState(false);
-  const [editResult, setEditResult] = useState();
-  const [isEditingFreespace, setEditingFreespace] = useState(false);
-  const [isEditingComment, setEditingComment] = useState(false);
-  const [isEditingContext, setEditingContext] = useState(false);
+  const { rescTypes, editingRescID, editingResource } = useServer();
+  const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
-  const [freespace, setFreespace] = useState(row[6]);
-  const [comment, setComment] = useState(row[7]);
-  const [context, setContext] = useState(row[9]);
-
+  const [successNotification, setSuccessNotification] = useState(false);
+  const [failNotification, setFailNotification] = useState(false);
+  const [resc, setResc] = useState(row);
+  const [currentResc, setCurrentResc] = useState(row);
   const [removeFormOpen, setRemoveForm] = useState(false);
   const [removeErrorMsg, setRemoveErrorMsg] = useState();
 
-  const editResource = async (name, arg, value) => {
-    setEditForm(true);
-    try {
-      await ModifyResourceController(name, arg, value, restApiLocation);
-      setEditResult("Success");
-      setTimeout(() => {
-        window.location.reload();
-      }, 500)
-    } catch (e) {
-      setEditResult("Failed");
+  useEffect(() => {
+    if (editingRescID === resc[11]) setIsEditing(true);
+    else {
+      setCurrentResc(resc);
+      setIsEditing(false);
     }
+  }, [editingRescID])
+
+  const handleKeyDown = event => {
+    if (event.keyCode === 13) {
+      saveResource();
+    }
+  }
+
+  const saveResource = async () => {
+    let updatedResc = [...resc];
+    try {
+      if (currentResc[0] !== resc[0]) {
+        await ModifyResourceController(resc[0], 'name', currentResc[0], restApiLocation)
+        updatedResc[0] = currentResc[0];
+      }
+      if (currentResc[1] !== resc[1]) {
+        await ModifyResourceController(currentResc[0], 'type', currentResc[1], restApiLocation)
+        updatedResc[1] = currentResc[1];
+      }
+      if (currentResc[3] !== resc[3]) {
+        await ModifyResourceController(currentResc[0], 'path', currentResc[3], restApiLocation)
+        updatedResc[3] = currentResc[3];
+      }
+      if (currentResc[4] !== resc[4]) {
+        await ModifyResourceController(currentResc[0], 'host', currentResc[4], restApiLocation)
+        updatedResc[4] = currentResc[4];
+      }
+      if (currentResc[5] !== resc[5]) {
+        await ModifyResourceController(currentResc[0], 'info', currentResc[5], restApiLocation)
+        updatedResc[5] = currentResc[5];
+      }
+      if (currentResc[6] !== resc[6]) {
+        await ModifyResourceController(currentResc[0], 'free_space', currentResc[6], restApiLocation)
+        updatedResc[6] = currentResc[6];
+      }
+      if (currentResc[7] !== resc[7]) {
+        await ModifyResourceController(currentResc[0], 'comment', currentResc[7], restApiLocation)
+        updatedResc[7] = currentResc[7];
+      }
+      if (currentResc[9] !== resc[9]) {
+        await ModifyResourceController(currentResc[0], 'context', currentResc[9], restApiLocation);
+        updatedResc[9] = currentResc[9];
+      }
+      setResc(updatedResc);
+      setSuccessNotification(true);
+      closeEditFormHandler();
+    }
+    catch {
+      setResc(updatedResc);
+      setCurrentResc(updatedResc);
+      setFailNotification(true);
+    }
+  }
+
+  const checkIfChanged = () => {
+    return currentResc[0] === resc[0] && currentResc[1] === resc[1] && currentResc[3] === resc[3] && currentResc[4] === resc[4] && currentResc[5] === resc[5] && currentResc[6] === resc[6] && currentResc[7] === resc[7] && currentResc[9] === resc[9];
   }
 
   const removeResource = async (name) => {
@@ -95,13 +148,23 @@ function ResourceRows(props) {
     setRemoveErrorMsg();
   }
 
+  const updateCurrentRescHandler = (index, value) => {
+    let newCurrResc = [...currentResc];
+    newCurrResc[index] = value;
+    setCurrentResc(newCurrResc);
+  }
+
+  const closeEditFormHandler = () => {
+    editingResource("-1");
+  }
+
   return (
     <React.Fragment >
       <TableRow hover={true} onClick={() => setOpen(!open)}>
-        <TableCell className={classes.cell} align="left">{row[0]}</TableCell>
-        <TableCell className={classes.cell} align="left">{row[1]}</TableCell>
-        <TableCell className={classes.cell} align="left">{row[4]}</TableCell>
-        <TableCell className={classes.cell} align="left">{row[3]}</TableCell>
+        <TableCell className={classes.cell} align="left">{resc[0]}</TableCell>
+        <TableCell className={classes.cell} align="left">{resc[1]}</TableCell>
+        <TableCell className={classes.cell} align="left">{resc[4]}</TableCell>
+        <TableCell className={classes.cell} align="left">{resc[3]}</TableCell>
         <TableCell className={classes.cell} align="right"><IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
         </IconButton></TableCell>
@@ -109,25 +172,32 @@ function ResourceRows(props) {
       <TableRow hover={true}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Typography className={classes.row} variant="h6" gutterBottom component="div">
-              Resource Details<span className={classes.remove_button}><Button variant="outlined" color="secondary" onClick={() => setRemoveForm(true)}>Remove</Button></span>
-            </Typography>
-            <Table size="small" aria-label="purchases">
-              <TableBody>
-                <TableRow>
-                  <TableCell className={classes.table_cell}>Resource Name: {row[0]}</TableCell>
-                  <TableCell className={classes.table_cell}>Status: {row[8]}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table_cell}><span>Information: {row[5]}</span></TableCell>
-                  <TableCell className={classes.table_cell}>{isEditingFreespace ? <span>Freespace: <input style={{ fontSize: 15 }} defaultValue={row[6]} onChange={(event) => { setFreespace(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'freespace', freespace) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingFreespace(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Freespace: {row[6]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingFreespace(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className={classes.table_cell}>{isEditingComment ? <span>Comment: <input style={{ fontSize: 15 }} defaultValue={row[7]} onChange={(event) => { setComment(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'comment', comment) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingComment(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Comment: {row[7]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingComment(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
-                  <TableCell className={classes.table_cell}>{isEditingContext ? <span>Context: <input style={{ fontSize: 15 }} defaultValue={row[9]} onChange={(event) => { setContext(event.target.value) }}></input><ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="save" onClick={() => { editResource(row[0], 'context', context) }}><SaveIcon style={{ fontSize: 15 }} /></ToggleButton><ToggleButton value="close" onClick={() => { setEditingContext(false) }}><CancelIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span> : <span>Context: {row[9]}<ToggleButtonGroup size="small" className={classes.toggle_group}><ToggleButton value="edit" onClick={() => { setEditingContext(true) }}><EditIcon style={{ fontSize: 15 }} /></ToggleButton></ToggleButtonGroup></span>}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <div className={classes.resource_container}>
+              <Typography className={classes.row} variant="h6" gutterBottom component="div">
+                Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={checkIfChanged()} onClick={saveResource}><SaveIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip>}
+                  {isEditing ? <Tooltip title="Cancel"><IconButton onClick={closeEditFormHandler}><CancelIcon style={{ fontSize: 20 }} /></IconButton></Tooltip> : <Tooltip color="primary" title="Edit"><IconButton onClick={() => editingResource(resc[11])}><EditIcon style={{ fontSize: 20 }} /></IconButton></Tooltip>}<Tooltip color="secondary" title="Delete"><span><IconButton disabled={isEditing} onClick={() => setRemoveForm(true)}><DeleteIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip></span>
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableBody>
+                  <TableRow>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Name" defaultValue={currentResc[0]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(0, event.target.value) }} /> : <span>Name: {resc[0]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} select label="Type" defaultValue={currentResc[1]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(1, event.target.value) }} SelectProps={{ native: true }}>{rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}</TextField> : <span>Type: {resc[1]}</span>}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Hostname" defaultValue={currentResc[4]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(4, event.target.value) }} /> : <span>Hostname: {resc[4]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Vault Path" defaultValue={currentResc[3]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(3, event.target.value) }} /> : <span>Vault Path: {resc[3]}</span>}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Information" defaultValue={currentResc[5]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(5, event.target.value) }} /> : <span>Information: {resc[5]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Freespace" defaultValue={currentResc[6]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(6, event.target.value) }} /> : <span>Freespace: {resc[6]}</span>}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Comment" defaultValue={currentResc[7]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(7, event.target.value) }} /> : <span>Comment: {resc[7]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Context" defaultValue={currentResc[9]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(9, event.target.value) }} /> : <span>Context: {resc[9]}</span>}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
           </Collapse>
         </TableCell>
       </TableRow>
@@ -136,10 +206,8 @@ function ResourceRows(props) {
         <DialogContentText className={classes.remove_result}>{removeErrorMsg}</DialogContentText>
         <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
       </Dialog>
-      <Dialog open={editFormOpen} onClose={() => { setEditForm(false) }} aria-labelledby="form-dialog-title">
-        <DialogContent className={classes.dialog_content}>Modify Resource</DialogContent>
-        <DialogContent className={classes.dialog_contenttext}>{editResult}</DialogContent>
-      </Dialog>
+      <Snackbar open={successNotification} autoHideDuration={5000} onClose={() => setSuccessNotification(false)}><MuiAlert elevation={6} variant="filled" severity="success">Success! Resource {row[0]} updated.</MuiAlert></Snackbar>
+      <Snackbar open={failNotification} autoHideDuration={5000} onClose={() => setFailNotification(false)}><MuiAlert elevation={6} variant="filled" severity="error">Failed to edit resource {row[0]}.</MuiAlert></Snackbar>
     </React.Fragment >
   );
 }
