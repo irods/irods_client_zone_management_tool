@@ -58,6 +58,7 @@ export const Layout = ({ children }) => {
             flexGrow: 1,
             overflow: 'auto',
             width: '100%',
+            height: 'calc(100vh - 50px)'
         },
         toolbar: theme.mixins.toolbar,
         mobileMenu: {
