@@ -110,7 +110,9 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setRescContext(res.data);
-            if (name === '') setRescTotal(res.data.total)
+            if (name === ''){
+                setRescTotal(res.data.total)
+            }
             setIsLoadingRescContext(false);
         }).catch(() => {
             setIsLoadingRescContext(false);

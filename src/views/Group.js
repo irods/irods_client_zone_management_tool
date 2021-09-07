@@ -191,71 +191,72 @@ export const Group = () => {
 
     return (
         <Fragment>
-            {isLoadingGroupContext ? <LinearProgress /> :
-                (groupContext === undefined ? <div>Cannot load group data. Please check your iRODS Client REST API endpoint connection.</div> :
-                    <Fragment>
-                        <div className={classes.filterGroup}>
-                            <TextField
-                                className={classes.filter}
-                                id="filter-term"
-                                label="Filter"
-                                placeholder="Filter by GroupName"
-                                onChange={(event) => setFilterName(event.target.value)}
-                            />
-                            <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
-                                Add New Group
-                            </Button>
-                        </div>
-                        <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
-                        <TableContainer className={classes.tableContainer} component={Paper}>
-                            <Table aria-label="simple table">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
+            {isLoadingGroupContext ? <LinearProgress /> : <div style={{ height: '4px' }} />}
+            <br />
+            {groupContext === undefined ? <div>Cannot load group data. Please check your iRODS Client REST API endpoint connection.</div> :
+                <Fragment>
+                    <div className={classes.filterGroup}>
+                        <TextField
+                            className={classes.filter}
+                            id="filter-term"
+                            label="Filter"
+                            placeholder="Filter by GroupName"
+                            onChange={(event) => setFilterName(event.target.value)}
+                        />
+                        <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
+                            Add New Group
+                        </Button>
+                    </div>
+                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow id="add-group-row" style={{ display: 'none' }}>
+                                    <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
+                                    <TableCell></TableCell>
+                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                </TableRow>
+                                {groupContext._embedded.map((group) =>
+                                    <TableRow key={group_id}>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                     </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    <TableRow id="add-group-row" style={{ display: 'none' }}>
-                                        <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
-                                    </TableRow>
-                                    {groupContext._embedded.map((group) =>
-                                        <TableRow key={group_id}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <Dialog open={addFormOpen} className={classes.formContainer} onClick={handleAddFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Adding New Group</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Error Message:
-                                </DialogContentText>
-                                <p className={classes.errorMsg}>{addErrorMsg}</p>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleAddFormClose} color="primary">Close</Button>
-                            </DialogActions>
-                        </Dialog>
-                        <Dialog open={removeFormOpen} className={classes.formContainer} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle>Warning</DialogTitle>
-                            <DialogContent>
-                                <Typography>Are you sure to remove <b>{currGroup[0]}</b>?</Typography>
-                                <p className={classes.errorMsg}>{removeErrorMsg}</p>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={removeGroup} color="secondary">Remove</Button>
-                                <Button onClick={handleRemoveFormClose} color="primary">Cancel</Button>
-                            </DialogActions>
-                        </Dialog>
-                    </Fragment>)
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Dialog open={addFormOpen} className={classes.formContainer} onClick={handleAddFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Adding New Group</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Error Message:
+                            </DialogContentText>
+                            <p className={classes.errorMsg}>{addErrorMsg}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleAddFormClose} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog open={removeFormOpen} className={classes.formContainer} onClose={handleRemoveFormClose} aria-labelledby="form-dialog-title">
+                        <DialogTitle>Warning</DialogTitle>
+                        <DialogContent>
+                            <Typography>Are you sure to remove <b>{currGroup[0]}</b>?</Typography>
+                            <p className={classes.errorMsg}>{removeErrorMsg}</p>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={removeGroup} color="secondary">Remove</Button>
+                            <Button onClick={handleRemoveFormClose} color="primary">Cancel</Button>
+                        </DialogActions>
+                    </Dialog>
+                </Fragment>
             }
         </Fragment>
     );
