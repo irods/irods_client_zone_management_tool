@@ -29,7 +29,6 @@ class App extends Component {
                   </Router>
                 </Layout>
               </div>
-              <hr />
               <Footer />
             </div>
           </LocationProvider>
