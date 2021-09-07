@@ -69,7 +69,7 @@ export const Layout = ({ children }) => {
     const { zoneName } = useServer();
     const AppBarLogo = require(`../../img/${environment.appbarLogo}`).default;
     const [mobileOpen, setMobileOpen] = useState(false);
-    const { userContext, groupContext, rescContext, zoneContext } = useServer();
+    const { userTotal, groupTotal, rescTotal, zoneContext } = useServer();
 
     const drawer = (
         <div>
@@ -82,14 +82,14 @@ export const Layout = ({ children }) => {
                     <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
                 </MenuItem>
                 <MenuItem button component={Link} to="/resources" key='resource'>
-                    <ListItemText>Resources ({rescContext === undefined ? 0 : rescContext.total})</ListItemText>
+                    <ListItemText>Resources ({rescTotal})</ListItemText>
                 </MenuItem>
 
                 <MenuItem button component={Link} to="/users" key='user'>
-                    <ListItemText>Users ({userContext === undefined ? 0 : userContext.total})</ListItemText>
+                    <ListItemText>Users ({userTotal})</ListItemText>
                 </MenuItem>
                 <MenuItem button component={Link} to="/groups" key='group'>
-                    <ListItemText>Groups ({groupContext === undefined ? 0 : groupContext.total})</ListItemText>
+                    <ListItemText>Groups ({groupTotal})</ListItemText>
                 </MenuItem>
             </List>
             <Divider />
