@@ -178,8 +178,8 @@ export const User = () => {
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>Username</b><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }} /></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Type</b><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }} /></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>Username</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </StylesProvider>
@@ -198,7 +198,7 @@ export const User = () => {
                                 {userContext !== undefined ? userContext._embedded.map((this_user) =>
                                     <TableRow key={this_user[0]}>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right">{this_user[1]}</TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{this_user[1]}</TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                             <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                     </TableRow>
