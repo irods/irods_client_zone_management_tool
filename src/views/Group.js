@@ -212,7 +212,7 @@ export const Group = () => {
                         <Table aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><b>Group Name</b><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }} /></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
                                     <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
                                     <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                 </TableRow>

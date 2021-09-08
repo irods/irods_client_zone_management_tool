@@ -18,7 +18,7 @@ const queryGenerator = (_query, order, orderBy) => {
 
 export const ServerProvider = ({ children }) => {
     const { restApiLocation } = useEnvironment();
-    const [zoneContext, setZoneContext] = useState();
+    const [zoneContext, setZoneContext] = useState([]);
     const [zoneName, setZoneName] = useState();
     const [isLoadingZoneContext, setIsLoadingZoneContext] = useState(false);
     const [userContext, setUserContext] = useState(initialState);
@@ -56,6 +56,7 @@ export const ServerProvider = ({ children }) => {
             if (name === '') setUserTotal(res.data.total)
             setIsLoadingUserContext(false);
         }).catch(() => {
+            setUserContext(undefined);
             setIsLoadingUserContext(false);
         });
     }
@@ -84,6 +85,7 @@ export const ServerProvider = ({ children }) => {
             if (name === '') setGroupTotal(res.data.total)
             setIsLoadingGroupContext(false);
         }).catch(() => {
+            setGroupContext(undefined)
             setIsLoadingGroupContext(false);
         });
     }
@@ -115,6 +117,7 @@ export const ServerProvider = ({ children }) => {
             }
             setIsLoadingRescContext(false);
         }).catch(() => {
+            setRescContext(undefined)
             setIsLoadingRescContext(false);
         });
     }, [restApiLocation])
@@ -146,6 +149,7 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
         }).catch(() => {
+            setZoneContext(undefined)
             setIsLoadingZoneContext(false)
         })
     }
@@ -199,7 +203,7 @@ export const ServerProvider = ({ children }) => {
 
     // handle servers page pagination and sorting
     const loadCurrServer = async (offset, perPage, order, orderBy) => {
-        if (zoneContext !== undefined) {
+        if (zoneContext !== undefined && zoneContext.length !== 0) {
             let tem_servers = zoneContext;
             let orderSyntax = order === 'asc' ? 1 : -1;
 

@@ -83,11 +83,11 @@ export const Server = () => {
                     <Table className={classes.table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
-                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><b>Role</b><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }} /></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '15%' }}><b>iRODS Version</b><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version") }} /></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }} ><b>Hostname</b><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }} /></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '10%' }}><b>Resources</b><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }} /></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><b>OS Distribution</b><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }} /></TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }}><b>Role</b></TableSortLabel></TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '15%' }}><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version") }}><b>iRODS Version</b></TableSortLabel></TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }}><b>Hostname</b></TableSortLabel></TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '10%' }}><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }}><b>Resources</b></TableSortLabel></TableCell>
+                                <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }}><b>OS Distribution</b></TableSortLabel></TableCell>
                                 <TableCell style={{ fontSize: '1.1rem', width: '5%' }} align="right"></TableCell>
                             </TableRow>
                         </TableHead>
