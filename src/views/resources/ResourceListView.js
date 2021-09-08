@@ -62,7 +62,7 @@ export const ResourceListView = () => {
     const [filterRescName, setFilterName] = useState('');
 
     const { restApiLocation } = useEnvironment();
-    const { isLoadingRescContext, zoneName, rescContext, loadResource } = useServer();
+    const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource } = useServer();
 
     useEffect(() => {
         loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
@@ -188,23 +188,7 @@ export const ResourceListView = () => {
                                     onChange={handleRescTypeChange}
                                 >
                                     <option aria-label="None" value="" />
-                                    <option value="compound">Compound</option>
-                                    <option value="load_balance">Load Balance</option>
-                                    <option value="passthru">Passthru</option>
-                                    <option value="random">Random</option>
-                                    <option value="replication">Replication</option>
-                                    <option value="round_robin">Round Robin</option>
-                                    <option value="deferred">Deferred</option>
-                                    <option value="emc_ecs">EMC ECS</option>
-                                    <option value="emc_isilon">EMC Isilon</option>
-                                    <option value="mockarchive">Mockarchive</option>
-                                    <option value="mso">MSO</option>
-                                    <option value="mssofile">MSSOFile</option>
-                                    <option value="non_blocking">Non-blocking</option>
-                                    <option value="struct_file">Struct file</option>
-                                    <option value="universal_mass_storage">Universal Mass Storage</option>
-                                    <option value="unixfilesystem">Unix File System</option>
-                                    <option value="wos">WOS</option>
+                                    {rescTypes.length && rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}
                                 </Select></TableCell>
                                 <TableCell><Input id="location"
                                     onChange={handleRescLocationChange}></Input></TableCell>

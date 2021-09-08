@@ -28,9 +28,10 @@ export const ServerProvider = ({ children }) => {
     const [groupTotal, setGroupTotal] = useState(0);
     const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
     const [rescContext, setRescContext] = useState(initialState);
+    const [rescTypes, setRescTypes] = useState([]);
     const [rescTotal, setRescTotal] = useState(0);
     const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
-    const [filteredServers, setFilteredServers] = useState([]);
+    const [filteredServers, setFilteredServers] = useState();
 
     const loadUser = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
@@ -112,7 +113,7 @@ export const ServerProvider = ({ children }) => {
             }
         }).then((res) => {
             setRescContext(res.data);
-            if (name === ''){
+            if (name === '') {
                 setRescTotal(res.data.total)
             }
             setIsLoadingRescContext(false);
@@ -176,13 +177,23 @@ export const ServerProvider = ({ children }) => {
         setIsLoadingZoneContext(true);
         let zone_report = await loadZoneReport();
         if (zone_report !== undefined) {
+            let resc_types = new Set();
             let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
             let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
             for (let curr_server of fullServersArray) {
+                // check and load resource plugins from zone report
+                if (curr_server.plugins) {
+                    for (let i = 0; i < curr_server.plugins.length; i++) {
+                        if (curr_server.plugins[i].type === 'resource' && !resc_types.has(curr_server.plugins[i].name)) {
+                            resc_types.add(curr_server.plugins[i].name)
+                        }
+                    }
+                } 
                 let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
                 if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
             }
+            setRescTypes([...resc_types].sort())
             setZoneContext(fullServersArray)
             setFilteredServers(fullServersArray.slice(0, 10));
             setIsLoadingZoneContext(false);
@@ -249,7 +260,7 @@ export const ServerProvider = ({ children }) => {
             zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
             userTotal, userContext, loadUser,
             groupTotal, groupContext, loadGroup,
-            rescTotal, rescContext, loadResource,
+            rescTotal, rescContext, rescTypes, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
             loadData
         }}>
