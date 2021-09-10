@@ -58,9 +58,7 @@ export const ResourceListView = () => {
     const [orderBy, setOrderBy] = useState("RESC_NAME");
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-
     const [filterRescName, setFilterName] = useState('');
-
     const { restApiLocation } = useEnvironment();
     const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource } = useServer();
 
