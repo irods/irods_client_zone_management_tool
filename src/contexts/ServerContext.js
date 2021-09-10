@@ -92,36 +92,106 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-
-    const loadResource = useCallback((offset, limit, name, order, orderBy) => {
-        setIsLoadingRescContext(true);
-        let _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc'`
-        if (name !== '') {
-            _query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc' AND RESC_NAME LIKE '%${name}%'`
+    // sort and remove duplicate resources
+    const resourceSortRemoveDuplicatesHelper = (rescArray, offset, limit, order, orderBy) => {
+        let filteredRescContext = {
+            _embedded: rescArray,
+            total: 0
+        };
+        let uniqueResc = new Set();
+        let filteredResc = [];
+        for (let i = 0; i < rescArray.length; i++) {
+            if (!uniqueResc.has(rescArray[i][11])) {
+                uniqueResc.add(rescArray[i][11]);
+                filteredResc.push(rescArray[i]);
+            }
         }
-        _query = queryGenerator(_query, order, orderBy);
-        return axios({
-            method: 'GET',
-            url: `${restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query_string: _query,
-                query_limit: limit,
-                row_offset: offset,
-                query_type: 'general'
+        let orderSyntax = order === 'asc' ? 1 : -1;
+        const resourceComparator = (a, b) => {
+            switch (orderBy) {
+                case 'RESC_TYPE_NAME':
+                    return orderSyntax * (a[1].localeCompare(b[1]))
+                case 'RESC_LOC':
+                    return orderSyntax * (a[4].localeCompare(b[4]))
+                case 'RESC_VAULT_PATH':
+                    return orderSyntax * (a[3].localeCompare(b[3]))
+                default:
+                    return orderSyntax * (a[0].localeCompare(b[0]))
             }
-        }).then((res) => {
-            setRescContext(res.data);
-            if (name === '') {
+        }
+        filteredResc.sort(resourceComparator);
+        // slice the array to get pagination working
+        filteredRescContext._embedded = filteredResc.slice(offset, offset + limit);
+        filteredRescContext.total = filteredResc.length;
+        setRescContext(filteredRescContext);
+    }
+
+    const loadResource = useCallback(async (offset, limit, name, order, orderBy) => {
+        setIsLoadingRescContext(true);
+        let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc'`
+        if (name === '') {
+            let _query = queryGenerator(base_query, "asc", "RESC_NAME");
+            return axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query_string: _query,
+                    query_limit: limit,
+                    row_offset: offset,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                setRescContext(res.data);
                 setRescTotal(res.data.total)
-            }
-            setIsLoadingRescContext(false);
-        }).catch(() => {
-            setRescContext(undefined)
-            setIsLoadingRescContext(false);
-        });
+                setIsLoadingRescContext(false);
+            }).catch(() => {
+                setRescContext(undefined)
+                setIsLoadingRescContext(false);
+            });
+        }
+        else {
+            let filteredResults = {};
+            await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query_string: base_query+` AND RESC_NAME LIKE '%${name}%'`,
+                    query_limit: 500,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                filteredResults = res.data;
+            }).catch(() => {
+                setRescContext(undefined)
+                setIsLoadingRescContext(false);
+            });
+            await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query_string: base_query+` AND RESC_LOC LIKE '%${name}%'`,
+                    query_limit: 500,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                resourceSortRemoveDuplicatesHelper([...filteredResults._embedded, ...res.data._embedded], offset, limit, order, orderBy);
+                setIsLoadingRescContext(false);
+            }).catch(() => {
+                setRescContext(undefined)
+                setIsLoadingRescContext(false);
+            });
+        }
     }, [restApiLocation])
 
     const editingResource = (id) => {
