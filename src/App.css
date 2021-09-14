@@ -167,3 +167,11 @@
 .resource_tree_status {
     text-align: center;
 }
+
+.table_view_spinner_holder {
+    height: 4px;
+}
+
+.table_view_no_results_container {
+    text-align: center;
+}

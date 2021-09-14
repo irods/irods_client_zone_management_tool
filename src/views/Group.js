@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme) => ({
     },
     filter: {
         marginLeft: 30,
+        width: 300
+    },
+    add_group_name: {
         width: 200
     },
     add_button: {
@@ -191,7 +194,7 @@ export const Group = () => {
 
     return (
         <Fragment>
-            {isLoadingGroupContext ? <LinearProgress /> : <div style={{ height: '4px' }} />}
+            {isLoadingGroupContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
             <br />
             {groupContext === undefined ? <div>Cannot load group data. Please check your iRODS Client REST API endpoint connection.</div> :
                 <Fragment>
@@ -200,39 +203,40 @@ export const Group = () => {
                             className={classes.filter}
                             id="filter-term"
                             label="Filter"
-                            placeholder="Filter by GroupName"
+                            placeholder="Filter by Group Name"
                             onChange={(event) => setFilterName(event.target.value)}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New Group
                         </Button>
                     </div>
-                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
-                    <TableContainer className={classes.tableContainer} component={Paper}>
-                        <Table aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow id="add-group-row" style={{ display: 'none' }}>
-                                    <TableCell><Input placeholder="Enter new groupname" id="add-group-name" /></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
-                                </TableRow>
-                                {groupContext._embedded.map((group) =>
-                                    <TableRow key={group_id}>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
+                    <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                        <TableContainer className={classes.tableContainer} component={Paper}>
+                            <Table aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                </TableHead>
+                                <TableBody>
+                                    <TableRow id="add-group-row" style={{ display: 'none' }}>
+                                        <TableCell><Input className={classes.add_group_name} placeholder="Enter new Group Name" id="add-group-name" /></TableCell>
+                                        <TableCell></TableCell>
+                                        <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    </TableRow>
+                                    {!isLoadingGroupContext && (groupContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : groupContext._embedded.map((group) =>
+                                        <TableRow key={group_id}>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Fragment>
                     <Dialog open={addFormOpen} className={classes.formContainer} onClick={handleAddFormClose} aria-labelledby="form-dialog-title">
                         <DialogTitle>Adding New Group</DialogTitle>
                         <DialogContent>
