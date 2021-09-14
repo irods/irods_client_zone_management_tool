@@ -30,7 +30,7 @@ export const EditUser = (props) => {
     const { zoneName } = useServer();
     const [groupsOfUser, setGroupOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
-    const [filterGroupNameResult, setFilterNameResult] = useState([]);
+    const [filterGroupNameResult, setFilterNameResult] = useState();
 
     useEffect(() => {
         setLoading(true);
@@ -138,20 +138,22 @@ export const EditUser = (props) => {
 
     return (
         <Fragment>
+            {isLoading === true ? <div><LinearProgress /></div> : <div className="table_view_spinner_holder" />}
             <Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
             {currentUser[0]}
             <div className="edit_filter_bar">
                 <Typography>Find Group</Typography>
                 <TextField
                     id="filterGroupName"
-                    label="Filter GroupName"
+                    label="Filter"
+                    placeholder="Filter by Group Name"
                     className={classes.filter_textfield}
                     onChange={(e) => setFilterName(e.target.value)}
                 />
             </div>
             <br />
             <div className="edit_container">
-                {filterGroupNameResult.length > 0 ?
+                {filterGroupNameResult &&
                     <Table className={classes.user_table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
@@ -161,15 +163,14 @@ export const EditUser = (props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
+                            {filterGroupNameResult.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
                                 <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                 <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
                                 <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
                             </TableRow>)}
                         </TableBody>
-                    </Table> : <br />}
+                    </Table>}
             </div>
-            {isLoading === true ? <div><LinearProgress /></div> : <div />}
         </Fragment>
     );
 }

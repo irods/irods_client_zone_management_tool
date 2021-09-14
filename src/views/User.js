@@ -41,7 +41,11 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center'
     },
     filter: {
-        marginLeft: 30
+        marginLeft: 30,
+        width: 300
+    },
+    add_user_name: {
+        width: 200
     },
     add_button: {
         marginLeft: 30
@@ -156,7 +160,7 @@ export const User = () => {
 
     return (
         <Fragment>
-            {isLoadingUserContext ? <LinearProgress /> : <div style={{ height: '4px' }} />}
+            {isLoadingUserContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
             <br />
             {userContext === undefined ? <div>Cannot load user data. Please check your iRODS Client REST API endpoint connection.</div> :
                 <Fragment>
@@ -165,7 +169,7 @@ export const User = () => {
                             className={classes.filter}
                             id="filter-term"
                             label="Filter"
-                            placeholder="Filter by UserName"
+                            placeholder="Filter by User Name"
                             onChange={(event) => setFilterName(event.target.value)}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
@@ -178,7 +182,7 @@ export const User = () => {
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>Username</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>User Name</b></TableSortLabel></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
@@ -186,8 +190,8 @@ export const User = () => {
                             </TableHead>
                             <TableBody>
                                 <TableRow id="add-user-row" style={{ display: 'none' }}>
-                                    <TableCell><Input id="add-user-name" placeholder="Enter new username" /></TableCell>
-                                    <TableCell align="right"><Select
+                                    <TableCell><Input className={classes.add_user_name} id="add-user-name" placeholder="Enter new User Name" /></TableCell>
+                                    <TableCell><Select
                                         native
                                         id="add-user-type"
                                     >
@@ -195,14 +199,15 @@ export const User = () => {
                                     </Select></TableCell>
                                     <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {userContext !== undefined ? userContext._embedded.map((this_user) =>
-                                    <TableRow key={this_user[0]}>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{this_user[1]}</TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
-                                            <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
-                                    </TableRow>
-                                ) : <span />}
+                                {!isLoadingUserContext && (userContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterUsername}].</div></TableCell></TableRow> :
+                                    userContext._embedded.map((this_user) =>
+                                        <TableRow key={this_user[0]}>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{this_user[1]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                                <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
+                                        </TableRow>
+                                    ))}
                             </TableBody>
                         </Table>
                     </TableContainer>

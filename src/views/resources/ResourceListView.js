@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     },
     filter: {
         marginLeft: 30,
-        width: 200
+        width: 300
     },
     add_button: {
         marginLeft: 30
@@ -142,7 +142,7 @@ export const ResourceListView = () => {
 
     return (
         <Fragment>
-            {isLoadingRescContext ? <LinearProgress /> : <div style={{ height: '4px'}}/>}
+            {isLoadingRescContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
             <br />
             {rescContext === undefined ? <div>Cannot load resource data. Please check iRODS Client Rest API.</div> : <Fragment>
                 <ToggleButtonGroup className={classes.tabGroup} size="small" value={tab}>
@@ -154,50 +154,52 @@ export const ResourceListView = () => {
                         className={classes.filter}
                         id="filter-term"
                         label="Filter"
-                        placeholder="Filter by ResourceName"
+                        placeholder="Filter by Name or Hostname"
                         onChange={(e) => setFilterName(e.target.value)}
                     />
                     <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                         Add New Resource
                     </Button>
                 </div>
-                <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(rescContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
-                <TableContainer className={classes.tableContainer} component={Paper}>
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="8" align="left"><TableSortLabel active={orderBy === 'RESC_LOC'} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }}><b>Hostname</b></TableSortLabel></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
-                                <TableCell style={{ fontSize: '1.1rem', width: '1%' }} align="right"></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            <TableRow id="add_newrow" className={classes.add_hidden}>
-                                <TableCell><Input id="name"
-                                    onChange={handleRescNameChange}></Input></TableCell>
-                                <TableCell><Select
-                                    native
-                                    id="zone-type-select"
-                                    placeholder="Resource Type"
-                                    onChange={handleRescTypeChange}
-                                >
-                                    <option aria-label="None" value="" />
-                                    {rescTypes.length && rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}
-                                </Select></TableCell>
-                                <TableCell><Input id="location"
-                                    onChange={handleRescLocationChange}></Input></TableCell>
-                                <TableCell><Input id="vault_path"
-                                    onChange={handleRescVaultPathChange}></Input></TableCell>
-                                <TableCell><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
-                            </TableRow>
-                            {rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />)}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(rescContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                    <TableContainer className={classes.tableContainer} component={Paper}>
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="8" align="left"><TableSortLabel active={orderBy === 'RESC_LOC'} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }}><b>Hostname</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '1%' }} align="right"></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow id="add_newrow" className={classes.add_hidden}>
+                                    <TableCell><Input id="name"
+                                        onChange={handleRescNameChange}></Input></TableCell>
+                                    <TableCell><Select
+                                        native
+                                        id="zone-type-select"
+                                        placeholder="Resource Type"
+                                        onChange={handleRescTypeChange}
+                                    >
+                                        <option aria-label="None" value="" />
+                                        {rescTypes.length && rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}
+                                    </Select></TableCell>
+                                    <TableCell><Input id="location"
+                                        onChange={handleRescLocationChange}></Input></TableCell>
+                                    <TableCell><Input id="vault_path"
+                                        onChange={handleRescVaultPathChange}></Input></TableCell>
+                                    <TableCell><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                </TableRow>
+                                {!isLoadingRescContext && (rescContext._embedded.length === 0 ? <TableRow><TableCell colSpan={4}><div className="table_view_no_results_container">No results found for [{filterRescName}].</div></TableCell></TableRow> :
+                                rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Fragment>
                 <Dialog open={addFormOpen} onClose={handleAddFormClose} aria-labelledby="form-dialog-title">
                     <DialogTitle>Add New Resource</DialogTitle>
                     <DialogContent>

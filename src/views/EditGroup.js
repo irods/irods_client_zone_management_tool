@@ -29,7 +29,7 @@ export const EditGroup = (props) => {
     const { restApiLocation } = useEnvironment();
     const [usersInGroup, setUsersInGroup] = useState([]);
     const [filterUserName, setFilterName] = useState('');
-    const [filterUserNameResult, setFilterNameResult] = useState([]);
+    const [filterUserNameResult, setFilterNameResult] = useState();
 
     const loadCurrentGroupInfo = useCallback(() => {
         setLoading(true);
@@ -152,6 +152,7 @@ export const EditGroup = (props) => {
 
     return (
         <Fragment>
+            {isLoading === true ? <div><LinearProgress /></div> : <div className="table_view_spinner_holder" />}
             <Link to="/groups" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
             {currentGroup[0]}
             <br />
@@ -159,14 +160,15 @@ export const EditGroup = (props) => {
                 <Typography>Find User</Typography>
                 <TextField
                     id="filterUserName"
-                    label="Filter UserName"
+                    label="Filter"
+                    placeholder="Filter by User Name"
                     className={classes.filter_textfield}
                     onChange={handleFilterUserName}
                 />
             </div>
             <br />
             <div className="edit_container">
-                {filterUserNameResult.length > 0 ?
+                {filterUserNameResult &&
                     <Table className={classes.user_table} aria-label="simple table">
                         <TableHead>
                             <TableRow>
@@ -177,16 +179,15 @@ export const EditGroup = (props) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filterUserNameResult.map((thisUser) => <TableRow key={thisUser[0]}>
+                            {filterUserNameResult.length === 0 ? <TableRow><TableCell colSpan={4}><div className="table_view_no_results_container">No results found for [{filterUserName}].</div></TableCell></TableRow> : filterUserNameResult.map((thisUser) => <TableRow key={thisUser[0]}>
                                 <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                 <TableCell align="right">{thisUser[1]}</TableCell>
                                 <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>
                                 <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser) }}>Add</Button>}</TableCell>
                             </TableRow>)}
                         </TableBody>
-                    </Table> : <br />}
+                    </Table>}
             </div>
-            {isLoading === true ? <div><LinearProgress /></div> : <div />}
         </Fragment>
     );
 }
