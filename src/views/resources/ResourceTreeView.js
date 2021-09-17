@@ -10,13 +10,18 @@ import AccountTreeIcon from '@material-ui/icons/AccountTree';
 export const ResourceTreeView = () => {
     const auth = localStorage.getItem('zmt-token');
     const tab = 'tree';
-    const { rescContext } = useServer();
+    const { loadResource, rescContext } = useServer();
     const { deviceType } = useEnvironment();
     const [childrenMap, setChildrenMap] = useState();
     const [dataMap, setDataMap] = useState();
 
+    // load all resources to render the hierachy  
     useEffect(() => {
-        if (rescContext.total !== 0) {
+        loadResource(0, 0, '', 'asc', 'RESC_NAME');
+    }, [loadResource])
+
+    useEffect(() => {
+        if (rescContext && rescContext.total !== 0 && rescContext.total === rescContext.count) {
             let childrenMap = new Map();
             let dataMap = new Map();
             let tempZoneData = ['tempZone'];
