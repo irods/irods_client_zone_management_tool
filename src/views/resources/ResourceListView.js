@@ -63,8 +63,8 @@ export const ResourceListView = () => {
     const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource } = useServer();
 
     useEffect(() => {
-        loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
-    }, [loadResource, currPage, perPage, filterRescName, order, orderBy])
+        if(zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
+    }, [currPage, perPage, filterRescName, order, orderBy])
 
     async function addResource() {
         setAddFormOpen(true);

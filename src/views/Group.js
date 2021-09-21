@@ -7,7 +7,7 @@ import { makeStyles, Button, Dialog, DialogActions, DialogContent, DialogContent
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
     link_button: {
@@ -53,8 +53,6 @@ export const Group = () => {
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [currGroup, setCurrGroup] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [groupContextWithUserCount, setGroupContextWithUserCount] = useState(new Map());
     let group_id = 0;
 
     const [currPage, setCurrPage] = useState(1);
@@ -68,40 +66,8 @@ export const Group = () => {
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
     useEffect(() => {
-        loadGroup(perPage * (currPage - 1), perPage, filterGroupName, order, "USER_NAME");
+        if(zoneName) loadGroup((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
     }, [currPage, perPage, filterGroupName, order, orderBy])
-
-    useEffect(() => {
-        const loadGroupUserCounts = async () => {
-            setIsLoading(true);
-            let inputArray = groupContext;
-            let userCountMap = new Map();
-            for (let i = 0; i < inputArray._embedded.length; i++) {
-                let thisGroupName = inputArray._embedded[i][0];
-                await axios({
-                    method: 'GET',
-                    url: `${restApiLocation}/query`,
-                    headers: {
-                        'Authorization': localStorage.getItem('zmt-token')
-                    },
-                    params: {
-                        query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
-                        query_limit: 100,
-                        row_offset: 0,
-                        query_type: 'general'
-                    }
-                }).then((res) => {
-                    inputArray._embedded[i].push(res.data._embedded.length);
-                    userCountMap.set(thisGroupName, res.data._embedded.length);
-                    if (i === inputArray._embedded.length - 1) {
-                        setGroupContextWithUserCount(userCountMap);
-                    }
-                })
-            }
-            setIsLoading(false)
-        }
-        loadGroupUserCounts();
-    }, [groupContext])
 
     async function addGroup() {
         try {
@@ -216,7 +182,7 @@ export const Group = () => {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} ><b>Users</b></TableCell>
+                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_COUNT"} direction={orderBy === "USER_COUNT" ? order : 'asc'} onClick={() => { handleSort("USER_COUNT") }}><b>Users</b></TableSortLabel></TableCell>
                                         <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -228,8 +194,8 @@ export const Group = () => {
                                     </TableRow>
                                     {!isLoadingGroupContext && (groupContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : groupContext._embedded.map((group) =>
                                         <TableRow key={group_id}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton width="80%" /> : group[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{isLoading ? <Skeleton variant="text" width="50%" /> : groupContextWithUserCount.get(group[0])}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
+                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[1]}</TableCell>
                                             <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     ))}

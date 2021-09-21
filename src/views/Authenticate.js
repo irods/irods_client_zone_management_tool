@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Box, Button, Container, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from '@reach/router';
-import { useEnvironment } from '../contexts';
+import { useEnvironment, useServer } from '../contexts';
 import { renderLayout, hideLayout } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -36,6 +36,7 @@ export const Authenticate = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const { restApiLocation, loginLogo, brandingName } = useEnvironment();
+    const { loadData } = useServer();
     const renderLogo = require(`../img/${loginLogo}`).default;
 
 
@@ -68,6 +69,7 @@ export const Authenticate = () => {
                     localStorage.setItem('zmt-token', res.data);
                     navigate('/home', { replace: true });
                     renderLayout();
+                    loadData();
                 }
             })
         } catch (err) {
