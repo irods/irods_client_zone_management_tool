@@ -93,7 +93,7 @@ export const Server = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {!isLoadingZoneContext && (filteredServers.length === 0 ? <TableRow><TableCell colSpan={6}><div className="table_view_no_results_container">No results found.</div></TableCell></TableRow> :
+                                {!isLoadingZoneContext && filteredServers && (filteredServers.length === 0 ? <TableRow><TableCell colSpan={6}><div className="table_view_no_results_container">No results found.</div></TableCell></TableRow> :
                                     filteredServers.map((server) =>
                                         <TableRow key={server['host_system_information']['hostname']}>
                                             <TableCell style={{ padding: 0, fontSize: '1.1rem', width: '25%' }}><div className="server_role_container"><div className={`server_${server['server_config']['catalog_service_role']}`} />{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</div></TableCell>

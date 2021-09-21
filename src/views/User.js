@@ -151,7 +151,7 @@ export const User = () => {
     }
 
     useEffect(() => {
-        loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
+        if(zoneName) loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
     }, [currPage, perPage, filterUsername, order, orderBy])
 
     if (auth === null) {

@@ -25,6 +25,7 @@ export const ServerProvider = ({ children }) => {
     const [userTotal, setUserTotal] = useState(0);
     const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
     const [groupContext, setGroupContext] = useState(initialState);
+    const [groupUserContext, setGroupUserContext] = useState(new Map());
     const [groupTotal, setGroupTotal] = useState(0);
     const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
     const [rescContext, setRescContext] = useState(initialState);
@@ -63,14 +64,50 @@ export const ServerProvider = ({ children }) => {
         });
     }
 
-    const loadGroup = (offset, limit, name, order, orderBy) => {
+    // iterate through group results and load user counts
+    const loadGroupUserCounts = async (inputArray, offset, limit, order, orderBy) => {
+        // a map is used here to store the user counts we already know
+        let userCountMap = new Map(groupUserContext);
+        for (let i = 0; i < inputArray._embedded.length; i++) {
+            let thisGroupName = inputArray._embedded[i][0];
+            // check if the map already have the user data, if yes - get the data and add it to the array, or we need to make api calls to know the number
+            if (userCountMap.has(thisGroupName)) inputArray._embedded[i].push(userCountMap.get(thisGroupName))
+            else await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
+                    query_limit: 100,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                inputArray._embedded[i].push(res.data._embedded.length);
+                // add the number to the map so we don't need to ask again
+                userCountMap.set(thisGroupName, res.data._embedded.length)
+            }).catch(() => setIsLoadingGroupContext(false)
+            )
+        }
+        // sort by user count and handle pagination
+        if (orderBy === 'USER_COUNT') {
+            inputArray._embedded = inputArray._embedded.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[1] - b[1])).slice(offset, offset + limit)
+        }
+        setGroupContext(inputArray)
+        setGroupUserContext(userCountMap)
+        setIsLoadingGroupContext(false)
+    }
+
+    const loadGroup = async (offset, limit, name, order, orderBy) => {
         setIsLoadingGroupContext(true);
         let _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'`;
         if (name !== '') {
             _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
-        return axios({
+        await axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
@@ -78,18 +115,18 @@ export const ServerProvider = ({ children }) => {
             },
             params: {
                 query_string: _query,
-                query_limit: limit,
-                row_offset: offset,
+                query_limit: orderBy === 'USER_COUNT' ? 0 : limit,
+                row_offset: orderBy === 'USER_COUNT' ? 0 : offset,
                 query_type: 'general'
             }
         }).then((res) => {
-            setGroupContext(res.data);
             if (name === '') setGroupTotal(res.data.total)
-            setIsLoadingGroupContext(false);
+            loadGroupUserCounts(res.data, offset, limit, order, orderBy);
         }).catch(() => {
             setGroupContext(undefined)
             setIsLoadingGroupContext(false);
         });
+
     }
 
     // sort and remove duplicate resources
@@ -161,7 +198,7 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: base_query+` AND RESC_NAME LIKE '%${name}%'`,
+                    query_string: base_query + ` AND RESC_NAME LIKE '%${name}%'`,
                     query_limit: 500,
                     row_offset: 0,
                     query_type: 'general'
@@ -179,7 +216,7 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: base_query+` AND RESC_LOC LIKE '%${name}%'`,
+                    query_string: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
                     query_limit: 500,
                     row_offset: 0,
                     query_type: 'general'
@@ -263,7 +300,7 @@ export const ServerProvider = ({ children }) => {
                             resc_types.add(curr_server.plugins[i].name)
                         }
                     }
-                } 
+                }
                 let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
                 if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
@@ -328,7 +365,7 @@ export const ServerProvider = ({ children }) => {
         if (zoneName === undefined && localStorage.getItem('zmt-token') !== null) {
             loadData()
         }
-    })
+    }, [])
 
     return (
         <ServerContext.Provider value={{
