@@ -206,8 +206,8 @@ export const ResourceListView = () => {
                         <DialogContentText>
                             Resource Name: {rescName}<br />
                             Type: {rescType}<br />
-                            Vault Path: {rescLocation}<br />
-                            Zone: {zoneName}
+                            Hostname: {rescLocation}<br />
+                            Vault Path: {rescVaultPath}
                         </DialogContentText>
                         {isLoading === true ? <div className={classes.progress}>Creating in progress...<CircularProgress /></div> : <p>{addResult}</p>}
                     </DialogContent>
