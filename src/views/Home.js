@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import { useServer } from '../contexts/ServerContext';
-import { Logout } from './';
+import { navigate } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
     grid: {
@@ -28,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Home = () => {
-    const auth = localStorage.getItem('zmt-token')
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const { userContext, groupContext, rescContext, zoneContext } = useServer();
     const classes = useStyles();
     const [status, setStatus] = useState()
@@ -36,10 +37,6 @@ export const Home = () => {
     useEffect(() => {
         setStatus("OK");
     }, [])
-
-    if (auth === null) {
-        return <Logout />
-    }
 
     return (
         <Fragment>

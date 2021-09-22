@@ -4,7 +4,6 @@ export * from "./EditUser";
 export * from "./Group";
 export * from "./Home";
 export * from "./Landing";
-export * from "./Logout";
 export * from "./NotFound";
 export * from "./Server";
 export * from "./User";

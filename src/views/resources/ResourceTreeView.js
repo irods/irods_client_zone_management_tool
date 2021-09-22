@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Logout } from '../../views/Logout';
 import { useEnvironment, useServer } from '../../contexts';
 import { Tree } from '../../components/draggable-tree/tree';
 import { navigate } from '@reach/router';
@@ -8,7 +7,8 @@ import ListIcon from '@material-ui/icons/List';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
 export const ResourceTreeView = () => {
-    const auth = localStorage.getItem('zmt-token');
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const tab = 'tree';
     const { loadResource, rescContext } = useServer();
     const { deviceType } = useEnvironment();
@@ -43,10 +43,6 @@ export const ResourceTreeView = () => {
             setDataMap(dataMap);
         }
     }, [rescContext])
-
-    if (auth === null) {
-        return <Logout />
-    }
 
     return (
         <Fragment>

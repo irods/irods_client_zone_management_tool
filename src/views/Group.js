@@ -1,8 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from '@reach/router'
+import { Link, navigate } from '@reach/router'
 import { useEnvironment, useServer } from '../contexts';
-import { Logout } from './';
 import { makeStyles, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Input, Typography, LinearProgress } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
@@ -43,6 +42,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Group = () => {
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
@@ -53,14 +54,11 @@ export const Group = () => {
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [currGroup, setCurrGroup] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
-    let group_id = 0;
-
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
-
+    let group_id = 0;
 
     // load group from context provider,
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
@@ -152,10 +150,6 @@ export const Group = () => {
     const handleRemoveFormClose = () => {
         setRemoveFormOpen(false);
         setRemoveErrorMsg();
-    }
-
-    if (auth === null) {
-        return <Logout />
     }
 
     return (

@@ -1,9 +1,9 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { TabPanel } from '../components'
-import { Logout } from './';
 import { useServer } from '../contexts';
 import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@material-ui/core';
+import { navigate } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
     pagination: {
@@ -41,7 +41,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Server = () => {
-    const auth = localStorage.getItem('zmt-token');
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServer } = useServer();
     const [currPage, setCurrPage] = useState(1);
@@ -67,10 +68,6 @@ export const Server = () => {
             id: `simple-tab-${index}`,
             'aria-controls': `simple-tabpanel-${index}`,
         };
-    }
-
-    if (auth === null) {
-        return <Logout />
     }
 
     return (

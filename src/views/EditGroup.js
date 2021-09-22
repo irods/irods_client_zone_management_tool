@@ -1,9 +1,8 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Logout } from './';
 import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
 import { useEnvironment, useServer } from '../contexts';
 
@@ -20,9 +19,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const EditGroup = (props) => {
+    // navigate to groups page if no group info is passed along
+    if (!props.location.state) navigate('/groups')
+    // navigate to login page if no token is found
+    if (!localStorage.getItem('zmt-token')) navigate('/')
+    
     const auth = localStorage.getItem('zmt-token');
+    const currentGroup = props.location.state ? props.location.state.groupInfo : new Array(2);
     const { zoneName } = useServer();
-    const currentGroup = props.location.state.groupInfo;
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -71,16 +75,6 @@ export const EditGroup = (props) => {
             setLoading(false);
         })
     }, [auth, restApiLocation, filterUserName])
-
-    useEffect(() => {
-        loadCurrentGroupInfo()
-    }, [refresh, loadCurrentGroupInfo])
-
-    useEffect(() => {
-        loadFilteredUsers()
-    }, [loadFilteredUsers])
-
-
 
     async function removeUserFromGroup(user) {
         try {
@@ -146,9 +140,13 @@ export const EditGroup = (props) => {
         setFilterName(event.target.value);
     }
 
-    if (auth === null) {
-        return <Logout />
-    }
+    useEffect(() => {
+        if (currentGroup[0]) loadCurrentGroupInfo()
+    }, [refresh, loadCurrentGroupInfo])
+
+    useEffect(() => {
+        if (currentGroup[0]) loadFilteredUsers()
+    }, [loadFilteredUsers])
 
     return (
         <Fragment>

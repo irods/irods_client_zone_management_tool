@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
-import { Logout } from '../../views/Logout';
 import { makeStyles, Button, CircularProgress, Input, Select, TextField, LinearProgress } from '@material-ui/core';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
@@ -44,6 +43,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ResourceListView = () => {
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
     const tab = 'list';
@@ -134,10 +135,6 @@ export const ResourceListView = () => {
 
     const handlePageChange = (event, value) => {
         setCurrPage(value + 1);
-    }
-
-    if (auth === null) {
-        return <Logout />
     }
 
     return (
