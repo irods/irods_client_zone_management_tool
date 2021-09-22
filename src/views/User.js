@@ -1,12 +1,11 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import axios from 'axios';
 import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-import { Logout } from './';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -53,6 +52,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const User = () => {
+    if (!localStorage.getItem('zmt-token')) navigate('/');
+    
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
@@ -151,12 +152,8 @@ export const User = () => {
     }
 
     useEffect(() => {
-        if(zoneName) loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
+        loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
     }, [currPage, perPage, filterUsername, order, orderBy])
-
-    if (auth === null) {
-        return <Logout />
-    }
 
     return (
         <Fragment>

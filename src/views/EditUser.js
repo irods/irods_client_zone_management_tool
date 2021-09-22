@@ -1,9 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { Logout } from './';
 import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
 import { useEnvironment, useServer } from '../contexts';
 
@@ -21,8 +20,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const EditUser = (props) => {
+    // navigate to users page if no user info is passed along
+    if (!props.location.state) navigate('/users')
+    // navigate to login page if no token is found
+    if (!localStorage.getItem('zmt-token')) navigate('/')
+    
     const auth = localStorage.getItem('zmt-token');
-    const currentUser = props.location.state.userInfo;
+    const currentUser = props.location.state ? props.location.state.userInfo : new Array(2);
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -33,42 +37,46 @@ export const EditUser = (props) => {
     const [filterGroupNameResult, setFilterNameResult] = useState();
 
     useEffect(() => {
-        setLoading(true);
-        axios({
-            method: 'GET',
-            url: `${restApiLocation}/query`,
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': auth
-            },
-            params: {
-                query_string: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUser[0]}' AND USER_GROUP_NAME != '${currentUser[0]}'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            setGroupOfUser(res.data._embedded);
-            setLoading(false);
-        })
+        if (currentUser[0]) {
+            setLoading(true);
+            axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': auth
+                },
+                params: {
+                    query_string: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUser[0]}' AND USER_GROUP_NAME != '${currentUser[0]}'`,
+                    query_limit: 100,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                setGroupOfUser(res.data._embedded);
+                setLoading(false);
+            })
+        }
     }, [auth, currentUser, restApiLocation, refresh])
 
     useEffect(() => {
-        axios({
-            method: 'GET',
-            url: `${restApiLocation}/query`,
-            headers: {
-                'Authorization': auth,
-            },
-            params: {
-                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName}%' AND USER_TYPE = 'rodsgroup'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
-            }
-        }).then((res) => {
-            setFilterNameResult(res.data._embedded);
-        })
+        if (currentUser[0]) {
+            axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': auth,
+                },
+                params: {
+                    query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName}%' AND USER_TYPE = 'rodsgroup'`,
+                    query_limit: 100,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            }).then((res) => {
+                setFilterNameResult(res.data._embedded);
+            })
+        }
     }, [auth, restApiLocation, filterGroupName])
 
     async function removeGroupFromUser(group) {
@@ -130,10 +138,6 @@ export const EditUser = (props) => {
             }
         }
         return false;
-    }
-
-    if (auth === null) {
-        return <Logout />
     }
 
     return (

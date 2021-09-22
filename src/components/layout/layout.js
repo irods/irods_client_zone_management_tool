@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import { AppBar, CssBaseline, Drawer, Divider, Hidden, IconButton, List, ListItemText, MenuItem, Toolbar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
@@ -72,6 +72,11 @@ export const Layout = ({ children }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const { userTotal, groupTotal, rescTotal, zoneContext } = useServer();
 
+    const logoutHandler = () => {
+        localStorage.removeItem('zmt-token');
+        navigate('/');
+    }
+
     const drawer = (
         <div>
             <Divider />
@@ -95,7 +100,7 @@ export const Layout = ({ children }) => {
             </List>
             <Divider />
             <List>
-                <MenuItem button component={Link} to="/logout" key='logout'>
+                <MenuItem button onClick={() => logoutHandler()} key='logout'>
                     <ListItemText primary='Logout' />
                 </MenuItem>
             </List>
