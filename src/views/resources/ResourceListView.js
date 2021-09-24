@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
-import { makeStyles, Button, CircularProgress, Input, Select, TextField, LinearProgress } from '@material-ui/core';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow, TableSortLabel, Paper } from '@material-ui/core';
+import { makeStyles, Button, CircularProgress, Input, Select, TextField, LinearProgress, Tooltip } from '@material-ui/core';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow, TableSortLabel, Paper, IconButton } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import SaveIcon from '@material-ui/icons/Save';
 import CloseIcon from '@material-ui/icons/Close';
@@ -51,10 +51,10 @@ export const ResourceListView = () => {
     const [isLoading, setLoading] = useState(false);
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [addResult, setAddResult] = useState();
-    const [rescName, setRescName] = useState();
-    const [rescType, setRescType] = useState();
-    const [rescLocation, setRescLocation] = useState();
-    const [rescVaultPath, setRescVaultPath] = useState();
+    const [rescName, setRescName] = useState('');
+    const [rescType, setRescType] = useState('');
+    const [rescLocation, setRescLocation] = useState('');
+    const [rescVaultPath, setRescVaultPath] = useState('');
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("RESC_NAME");
     const [currPage, setCurrPage] = useState(1);
@@ -64,8 +64,14 @@ export const ResourceListView = () => {
     const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource } = useServer();
 
     useEffect(() => {
-        if(zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
+        if (zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
     }, [currPage, perPage, filterRescName, order, orderBy])
+
+    // validate resource hostname and vault path
+    // return FALSE if one of two attributes is empty string
+    const rescInputValidator = () => {
+        return !(rescLocation === '' ^ rescVaultPath === '')
+    }
 
     async function addResource() {
         setAddFormOpen(true);
@@ -81,7 +87,7 @@ export const ResourceListView = () => {
                 target: 'resource',
                 arg2: rescName,
                 arg3: rescType,
-                arg4: rescLocation + ":" + rescVaultPath,
+                arg4: rescLocation === '' && rescVaultPath === '' ? '' : rescLocation + ':' + rescVaultPath,
                 arg5: "",
                 arg6: zoneName
             }
@@ -189,10 +195,10 @@ export const ResourceListView = () => {
                                         onChange={handleRescLocationChange}></Input></TableCell>
                                     <TableCell><Input id="vault_path"
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
-                                    <TableCell><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addResource}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
+                                    <TableCell><ToggleButtonGroup size="small"><Tooltip title={rescInputValidator() ? '' : 'Hostname or Vault Path is not valid. Please check and try again.'}><span><IconButton value="save" disabled={!rescInputValidator()} onClick={addResource}><SaveIcon /></IconButton></span></Tooltip><span><IconButton value="close" onClick={handleAddRowClose}><CloseIcon /></IconButton></span></ToggleButtonGroup></TableCell>
                                 </TableRow>
                                 {!isLoadingRescContext && (rescContext._embedded.length === 0 ? <TableRow><TableCell colSpan={4}><div className="table_view_no_results_container">No results found for [{filterRescName}].</div></TableCell></TableRow> :
-                                rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />))}
+                                    rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />))}
                             </TableBody>
                         </Table>
                     </TableContainer>
