@@ -117,6 +117,10 @@ export const User = () => {
         }
     }
 
+    const handleKeyDown = (e) => {
+        if(e.keyCode === 13) addUser();
+    }
+
     const handleRemoveConfirmationOpen = (props) => {
         setCurrUser(props);
         setRemoveConfirmation(true);
@@ -187,10 +191,11 @@ export const User = () => {
                             </TableHead>
                             <TableBody>
                                 <TableRow id="add-user-row" style={{ display: 'none' }}>
-                                    <TableCell><Input className={classes.add_user_name} id="add-user-name" placeholder="Enter new User Name" /></TableCell>
+                                    <TableCell><Input className={classes.add_user_name} id="add-user-name" placeholder="Enter new User Name" onKeyDown={(event) => handleKeyDown(event)} /></TableCell>
                                     <TableCell><Select
                                         native
                                         id="add-user-type"
+                                        onKeyDown={(event) => handleKeyDown(event)}
                                     >
                                         {userTypes.map(this_user_type => <option key={this_user_type} value={this_user_type}>{this_user_type}</option>)}
                                     </Select></TableCell>

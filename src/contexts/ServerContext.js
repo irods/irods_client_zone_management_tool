@@ -32,7 +32,7 @@ export const ServerProvider = ({ children }) => {
     const [rescTypes, setRescTypes] = useState([]);
     const [rescTotal, setRescTotal] = useState(0);
     const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
-    const [editingRescID, setEditingRescID] = useState();
+    const [rescPanelStatus, setRescPanelStatus] = useState('idle');
     const [filteredServers, setFilteredServers] = useState();
 
     const loadUser = (offset, limit, name, order, orderBy) => {
@@ -231,8 +231,8 @@ export const ServerProvider = ({ children }) => {
         }
     }, [restApiLocation])
 
-    const editingResource = (id) => {
-        setEditingRescID(id);
+    const updatingRescPanelStatus = (text) => {
+        setRescPanelStatus(text);
     }
 
     const loadZoneName = () => {
@@ -372,7 +372,7 @@ export const ServerProvider = ({ children }) => {
             zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
             userTotal, userContext, loadUser,
             groupTotal, groupContext, loadGroup,
-            rescTotal, rescContext, rescTypes, editingRescID, editingResource, loadResource,
+            rescTotal, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
             loadData
         }}>

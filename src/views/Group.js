@@ -118,6 +118,10 @@ export const Group = () => {
         }
     }
 
+    const handleKeyDown = (e) => {
+        if(e.keyCode === 13) addGroup();
+    }
+
     const handleAddRowOpen = () => {
         document.getElementById('add-group-row').style["display"] = "contents";
     }
@@ -182,7 +186,7 @@ export const Group = () => {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow id="add-group-row" style={{ display: 'none' }}>
-                                        <TableCell><Input className={classes.add_group_name} placeholder="Enter new Group Name" id="add-group-name" /></TableCell>
+                                        <TableCell><Input className={classes.add_group_name} placeholder="Enter new Group Name" id="add-group-name" onKeyDown={(event) => handleKeyDown(event)} /></TableCell>
                                         <TableCell></TableCell>
                                         <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="add" onClick={addGroup}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                     </TableRow>

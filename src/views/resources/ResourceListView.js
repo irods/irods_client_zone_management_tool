@@ -61,11 +61,20 @@ export const ResourceListView = () => {
     const [perPage, setPerPage] = useState(10);
     const [filterRescName, setFilterName] = useState('');
     const { restApiLocation } = useEnvironment();
-    const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource } = useServer();
+    const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
         if (zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
     }, [currPage, perPage, filterRescName, order, orderBy])
+
+    useEffect(() => {
+        if(rescPanelStatus !== 'creation') {
+            setRescName('')
+            setRescType('')
+            setRescLocation('')
+            setRescVaultPath('')
+        }
+    }, [rescPanelStatus])
 
     // validate resource hostname and vault path
     // return FALSE if one of two attributes is empty string
@@ -101,8 +110,8 @@ export const ResourceListView = () => {
         })
     }
 
-    const handleAddRowOpen = () => {
-        document.getElementById("add_newrow").style["display"] = "contents";
+    const handleKeyDown = (e) => {
+        if (e.keyCode === 13) addResource();
     }
 
     const handleAddFormClose = () => {
@@ -110,7 +119,11 @@ export const ResourceListView = () => {
     }
 
     const handleAddRowClose = () => {
-        document.getElementById("add_newrow").style["display"] = "none";
+        setRescName('')
+        setRescType('')
+        setRescLocation('')
+        setRescVaultPath('')
+        updatingRescPanelStatus('idle')
     }
 
     const handleRemoveFormOpen = (resc) => {
@@ -160,7 +173,7 @@ export const ResourceListView = () => {
                         placeholder="Filter by Name or Hostname"
                         onChange={(e) => setFilterName(e.target.value)}
                     />
-                    <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
+                    <Button className={classes.add_button} variant="outlined" color="primary" onClick={() => updatingRescPanelStatus('creation')}>
                         Add New Resource
                     </Button>
                 </div>
@@ -179,21 +192,29 @@ export const ResourceListView = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow id="add_newrow" className={classes.add_hidden}>
+                                <TableRow id="add_newrow" style={{ display: rescPanelStatus === 'creation' ? 'contents' : 'none' }} className={classes.add_hidden}>
                                     <TableCell><Input id="name"
+                                        value={rescName}
+                                        onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescNameChange}></Input></TableCell>
                                     <TableCell><Select
                                         native
                                         id="zone-type-select"
                                         placeholder="Resource Type"
+                                        value={rescType}
+                                        onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescTypeChange}
                                     >
                                         <option aria-label="None" value="" />
                                         {rescTypes.length && rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}
                                     </Select></TableCell>
                                     <TableCell><Input id="location"
+                                        value={rescLocation}
+                                        onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescLocationChange}></Input></TableCell>
                                     <TableCell><Input id="vault_path"
+                                        value={rescVaultPath}
+                                        onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescVaultPathChange}></Input></TableCell>
                                     <TableCell><ToggleButtonGroup size="small"><Tooltip title={rescInputValidator() ? '' : 'Hostname or Vault Path is not valid. Please check and try again.'}><span><IconButton value="save" disabled={!rescInputValidator()} onClick={addResource}><SaveIcon /></IconButton></span></Tooltip><span><IconButton value="close" onClick={handleAddRowClose}><CloseIcon /></IconButton></span></ToggleButtonGroup></TableCell>
                                 </TableRow>
@@ -219,6 +240,6 @@ export const ResourceListView = () => {
                 </Dialog>
             </Fragment>
             }
-        </Fragment>
+        </Fragment >
     );
 }
