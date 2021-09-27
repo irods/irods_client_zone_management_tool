@@ -12,7 +12,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { useEnvironment, useServer } from '../contexts';
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
+import { makeStyles, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -62,6 +62,7 @@ function ResourceRows({ row }) {
   const { restApiLocation } = useEnvironment();
   const { rescTypes, rescPanelStatus, updatingRescPanelStatus } = useServer();
   const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [open, setOpen] = useState(false);
   const [successNotification, setSuccessNotification] = useState(false);
   const [failNotification, setFailNotification] = useState(false);
@@ -85,6 +86,7 @@ function ResourceRows({ row }) {
   }
 
   const saveResource = async () => {
+    setIsUpdating(true)
     let updatedResc = [...resc];
     try {
       if (currentResc[0] !== resc[0]) {
@@ -119,11 +121,13 @@ function ResourceRows({ row }) {
         await ModifyResourceController(currentResc[0], 'context', currentResc[9], restApiLocation);
         updatedResc[9] = currentResc[9];
       }
+      setIsUpdating(false);
       setResc(updatedResc);
       setSuccessNotification(true);
       closeEditFormHandler();
     }
     catch {
+      setIsUpdating(false);
       setResc(updatedResc);
       setCurrentResc(updatedResc);
       setFailNotification(true);
@@ -174,7 +178,7 @@ function ResourceRows({ row }) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className={classes.resource_container}>
               <Typography className={classes.row} variant="h6" gutterBottom component="div">
-                Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={checkIfChanged()} onClick={saveResource}><SaveIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip>}
+                Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={checkIfChanged() || isUpdating} onClick={saveResource}>{isUpdating ? <CircularProgress size={20} /> : <SaveIcon style={{ fontSize: 20 }} />}</IconButton></span></Tooltip>}
                   {isEditing ? <Tooltip title="Cancel"><IconButton onClick={closeEditFormHandler}><CancelIcon style={{ fontSize: 20 }} /></IconButton></Tooltip> : <Tooltip color="primary" title="Edit"><IconButton onClick={() => updatingRescPanelStatus(`editing-${resc[11]}`)}><EditIcon style={{ fontSize: 20 }} /></IconButton></Tooltip>}<Tooltip color="secondary" title="Delete"><span><IconButton disabled={isEditing} onClick={() => setRemoveForm(true)}><DeleteIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip></span>
               </Typography>
               <Table size="small" aria-label="purchases">
@@ -184,8 +188,8 @@ function ResourceRows({ row }) {
                     <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} select label="Type" defaultValue={currentResc[1]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(1, event.target.value) }} SelectProps={{ native: true }}>{rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}</TextField> : <span>Type: {resc[1]}</span>}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Hostname" defaultValue={currentResc[4]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(4, event.target.value) }} /> : <span>Hostname: {resc[4]}</span>}</TableCell>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Vault Path" defaultValue={currentResc[3]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(3, event.target.value) }} /> : <span>Vault Path: {resc[3]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Hostname" defaultValue={currentResc[4]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(4, event.target.value === '' ? 'EMPTY_RESC_HOST' : event.target.value) }} /> : <span>Hostname: {resc[4]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Vault Path" defaultValue={currentResc[3]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(3, event.target.value === '' ? 'EMPTY_RESC_PATH' : event.target.value) }} /> : <span>Vault Path: {resc[3]}</span>}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Information" defaultValue={currentResc[5]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(5, event.target.value) }} /> : <span>Information: {resc[5]}</span>}</TableCell>
