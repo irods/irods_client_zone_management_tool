@@ -130,11 +130,8 @@
 
 .resource_tree_header {
     display: flex;
-}
-
-.resource_tree_header_right {
-    position: absolute;
-    right: 50px;
+    justify-content: space-between;
+    margin: 0 10px;
 }
 
 .resource_tree_parent_info {
