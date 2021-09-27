@@ -167,7 +167,7 @@ export const ServerProvider = ({ children }) => {
         setIsLoadingRescContext(true);
         let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID WHERE RESC_NAME != 'bundleResc'`
         if (name === '') {
-            let _query = queryGenerator(base_query, "asc", "RESC_NAME");
+            let _query = queryGenerator(base_query, order, orderBy);
             return axios({
                 method: 'GET',
                 url: `${restApiLocation}/query`,
