@@ -9,7 +9,7 @@ import RedoIcon from '@material-ui/icons/Redo';
 import ReplayIcon from '@material-ui/icons/Replay';
 import SaveIcon from '@material-ui/icons/Save';
 import LowPriorityIcon from '@material-ui/icons/LowPriority';
-import { useEnvironment } from '../../contexts/EnvironmentContext';
+import { useEnvironment, useServer } from '../../contexts';
 import { AddChildRescourceController, RemoveChildRescourceController } from '../../controllers/ResourceController';
 import { MinusSquare, PlusSquare } from '../../icons';
 import { replacer, reviver } from '../../utils';
@@ -39,6 +39,7 @@ export const Tree = (props) => {
     let originalChildrenMap = JSON.stringify(childrenMap, replacer);
     let originalDataMap = JSON.stringify(dataMap, replacer);
     const { restApiLocation } = useEnvironment();
+    const { zoneName } = useServer();
     const [stagedChildrenMap, setStagedChildrenMap] = useState(JSON.parse(originalChildrenMap, reviver));
     const [stagedDataMap, setStagedDataMap] = useState(JSON.parse(originalDataMap, reviver));
     const [redo, setRedo] = useState([]);
@@ -76,7 +77,7 @@ export const Tree = (props) => {
         (async function asyncProcessTask() {
             for (let task of tasks_copy) {
                 try {
-                    if (task[1][0] !== 'tempZone') {
+                    if (task[1][0] !== zoneName) {
                         await RemoveChildRescourceController(task[1][0], task[0][0], restApiLocation);
                         task[3] = 'success'
                     }
@@ -91,7 +92,7 @@ export const Tree = (props) => {
                 }
                 setTasks(tasks_copy)
                 try {
-                    if (task[2][0] !== 'tempZone') {
+                    if (task[2][0] !== zoneName) {
                         await AddChildRescourceController(task[2][0], task[0][0], restApiLocation);
                         task[4] = 'success'
                     }
@@ -166,23 +167,24 @@ export const Tree = (props) => {
     }
 
     const renderTreeNode = (node) => {
-        const nodeId = node[0] === 'tempZone' ? "" : node[11];
+        const nodeName = `${node[0]}${node[0] !== zoneName ? `:${node[1]}` : ''}`
+        const nodeId = node[0] === zoneName ? "" : node[11];
         expanded.push(nodeId)
         const handleDragEnd = (e) => {
-            if (newParentNode !== undefined && e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && node[0] === e.target.children[0].children[1].innerHTML && node[11] !== newParentNode[11]) {
+            if (newParentNode !== undefined && e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && nodeName === e.target.children[0].children[1].innerHTML && node[11] !== newParentNode[11]) {
                 dragndropController(node, stagedDataMap.get(node[10]));
             }
         }
 
         const handleDragStart = (e) => {
-            if (e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && e.target.children[0].children[1].innerHTML === node[0]) {
+            if (e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && e.target.children[0].children[1].innerHTML === nodeName) {
                 setCurrNode(node);
             }
         }
 
         const handleDragOver = (e) => {
             e.preventDefault();
-            if (e.target.innerHTML === node[0]) {
+            if (e.target.innerHTML === nodeName) {
                 setTargetNode(node);
             }
         }
@@ -196,7 +198,7 @@ export const Tree = (props) => {
         }
 
         const handleDrop = (e) => {
-            if (e.target !== undefined && e.target.innerHTML === node[0]) {
+            if (e.target !== undefined && e.target.innerHTML === nodeName) {
                 setNewParentNode(node);
                 e.target.style.background = "";
                 setCurrNode();
@@ -208,7 +210,7 @@ export const Tree = (props) => {
             <StyledTreeItem
                 key={`tree-item-${nodeId}`}
                 nodeId={nodeId}
-                label={node[0]}
+                label={nodeName}
                 draggable={node[11] === '' ? false : true}
                 onDragEnter={e => handleDragEnter(e)}
                 onDragEnd={e => handleDragEnd(e)}
