@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link, navigate } from '@reach/router';
+import { Link, navigate, useLocation } from '@reach/router';
 import { AppBar, CssBaseline, Drawer, Divider, Hidden, IconButton, List, ListItemText, MenuItem, Toolbar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,6 +9,8 @@ import { useEnvironment, useServer } from '../../contexts';
 const drawerWidth = '200px';
 
 export const Layout = ({ children }) => {
+    // load first part of a url path
+    const pathname = useLocation().pathname.split('/')[1];
     const environment = useEnvironment();
     const useStyles = makeStyles((theme) => ({
         root: {
@@ -81,20 +83,20 @@ export const Layout = ({ children }) => {
         <div>
             <Divider />
             <List>
-                <MenuItem button component={Link} to="/home" key='home'>
+                <MenuItem button selected={pathname === 'home'} component={Link} to="/home" key='home'>
                     <ListItemText primary='Home' />
                 </MenuItem>
-                <MenuItem button component={Link} to="/servers" key='server'>
+                <MenuItem button selected={pathname === 'servers'} component={Link} to="/servers" key='server'>
                     <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
                 </MenuItem>
-                <MenuItem button component={Link} to="/resources" key='resource'>
+                <MenuItem button selected={pathname === 'resources'} component={Link} to="/resources" key='resource'>
                     <ListItemText>Resources ({rescTotal})</ListItemText>
                 </MenuItem>
 
-                <MenuItem button component={Link} to="/users" key='user'>
+                <MenuItem button selected={pathname === 'users'} component={Link} to="/users" key='user'>
                     <ListItemText>Users ({userTotal})</ListItemText>
                 </MenuItem>
-                <MenuItem button component={Link} to="/groups" key='group'>
+                <MenuItem button selected={pathname === 'groups'} component={Link} to="/groups" key='group'>
                     <ListItemText>Groups ({groupTotal})</ListItemText>
                 </MenuItem>
             </List>
