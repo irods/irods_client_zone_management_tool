@@ -47,7 +47,7 @@ export const AddChildRescourceController = async (parent, child, restApiLocation
             target: 'childtoresc',
             arg2: parent,
             arg3: child,
-            arg4: 'add_child'
+            arg4: ''
         }
     })
 }
@@ -64,7 +64,7 @@ export const RemoveChildRescourceController = async (parent, child, restApiLocat
             target: 'childfromresc',
             arg2: parent,
             arg3: child,
-            arg4: 'remove_child'
+            arg4: ''
         }
     })
 }
