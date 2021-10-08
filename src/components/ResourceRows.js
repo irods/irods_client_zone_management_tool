@@ -199,6 +199,9 @@ function ResourceRows({ row }) {
                     <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Comment" defaultValue={currentResc[7]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(7, event.target.value) }} /> : <span>Comment: {resc[7]}</span>}</TableCell>
                     <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Context" defaultValue={currentResc[9]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(9, event.target.value) }} /> : <span>Context: {resc[9]}</span>}</TableCell>
                   </TableRow>
+                  {currentResc[10] !== '' && <TableRow>
+                    <TableCell className={classes.table_cell}>Parent Context: {currentResc[12]}</TableCell>
+                  </TableRow>}
                 </TableBody>
               </Table>
             </div>
