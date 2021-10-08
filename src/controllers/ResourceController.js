@@ -35,7 +35,7 @@ export const RemoveResourceController = async (name, restApiLocation) => {
     })
 }
 
-export const AddChildRescourceController = async (parent, child, restApiLocation) => {
+export const AddChildRescourceController = async (parent, child, restApiLocation, parent_context_string) => {
     return axios({
         method: 'POST',
         url: `${restApiLocation}/admin`,
@@ -47,7 +47,7 @@ export const AddChildRescourceController = async (parent, child, restApiLocation
             target: 'childtoresc',
             arg2: parent,
             arg3: child,
-            arg4: ''
+            arg4: parent_context_string
         }
     })
 }

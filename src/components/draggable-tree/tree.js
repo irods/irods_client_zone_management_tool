@@ -64,7 +64,9 @@ export const Tree = (props) => {
                 updateParentID(currNode, newParentNode);
                 removeChild(prevParentNode, currNode);
                 addChild(newParentNode, currNode);
-                new_tasks.push([currNode, prevParentNode, newParentNode, 'pending', 'pending']);
+                // pass in default parent context string for each dnd operation
+                // 'cache' for compound child resource, empty string for the rest
+                setTasks([...new_tasks, [currNode, prevParentNode, newParentNode, 'pending', 'pending', newParentNode[1] === 'compound' ? 'cache' : '']])
             }
             else {
                 setAlertOpen(true);
@@ -93,7 +95,7 @@ export const Tree = (props) => {
                 setTasks(tasks_copy)
                 try {
                     if (task[2][0] !== zoneName) {
-                        await AddChildRescourceController(task[2][0], task[0][0], restApiLocation);
+                        await AddChildRescourceController(task[2][0], task[0][0], restApiLocation, task[5]);
                         task[4] = 'success'
                     }
                     else {
@@ -284,6 +286,13 @@ export const Tree = (props) => {
                                     <span> Add new parent: {task[2][0]}</span>
                                     {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
                                 </div>
+                                {task[2][1] === 'compound' &&
+                                    <div className="resource_tree_parent_info">
+                                        {console.log(task)}
+                                        <span> Parent Context: <select defaultValue={task[5]} onChange={(e) => task[5] = e.target.value}><option value='cache'>Cache</option><option value='archive'>Archive</option></select></span>
+                                        {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
+                                    </div>
+                                }
                             </div>
                             )}
                         </DialogContent>
