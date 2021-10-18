@@ -1,77 +1,65 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Paper, Typography } from '@material-ui/core';
-import { useServer } from '../contexts/ServerContext';
+import React, { useState } from 'react';
+import { useCheck } from '../contexts';
 import { navigate } from '@reach/router';
+import { Check } from '../components/checks/check';
+import { makeStyles, CircularProgress, Fade, Paper } from '@material-ui/core';
+import BuildIcon from '@material-ui/icons/Build'
+import CheckIcon from '@material-ui/icons/Check'
+import ErrorIcon from '@material-ui/icons/Error'
+import WarningIcon from '@material-ui/icons/Warning'
 
-const useStyles = makeStyles((theme) => ({
-    grid: {
-        padding: '10px 20px'
+const useStyles = makeStyles({
+    root: {
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '10px',
     },
-    gridItem: {
-        padding: '10px'
+    paperContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        padding: '10px',
+        height: '100px',
+        width: '250px',
+        cursor: 'pointer'
     },
-    paper: {
-        height: 170,
-        width: 180,
-        padding: theme.spacing(1)
+    paperTitle: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-around'
     },
-    paper_title: {
-        fontSize: 20
+    paperDetail: {
+        display: 'flex',
+        justifyContent: 'space-around'
     },
-    paper_content: {
-        paddingTop: 20,
-        textAlign: 'center',
-        color: '#18bc9c',
-        fontSize: 50,
+    paperStatus: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '0 5px'
     }
-}));
+});
 
 export const Home = () => {
-    if (!localStorage.getItem('zmt-token')) navigate('/');
-
-    const { userContext, groupContext, rescContext, zoneContext } = useServer();
-    const classes = useStyles();
-    const [status, setStatus] = useState()
-
-    useEffect(() => {
-        setStatus("OK");
-    }, [])
+    if (!localStorage.getItem('zmt-token')) navigate('/')
+    const classes = useStyles()
+    const { statusResult } = useCheck()
+    const [open, setOpen] = useState('warning' in statusResult || 'critical' in statusResult ? 'check' : '') // check if there are any warnings or errors, if yes, health check dashboard will be open by default
 
     return (
-        <Fragment>
-            <Grid className={classes.grid} container>
-                <Grid item xs className={classes.gridItem}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.paper_title}>Zone Status</Typography>
-                        <Typography className={classes.paper_content}>{status}</Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs className={classes.gridItem}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.paper_title}>Servers</Typography>
-                        <Typography className={classes.paper_content}>{zoneContext === undefined ? 0 : zoneContext.length}</Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs className={classes.gridItem}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.paper_title}>Resources</Typography>
-                        <Typography className={classes.paper_content}>{rescContext === undefined ? 0 : rescContext.total}</Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs className={classes.gridItem}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.paper_title}>Users</Typography>
-                        <Typography className={classes.paper_content}>{userContext === undefined ? 0 : userContext.total}</Typography>
-                    </Paper>
-                </Grid>
-                <Grid item xs className={classes.gridItem}>
-                    <Paper className={classes.paper}>
-                        <Typography className={classes.paper_title}>Groups</Typography>
-                        <Typography className={classes.paper_content}>{groupContext === undefined ? 0 : groupContext.total}</Typography>
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Fragment>
+        <div className={classes.root}>
+            <Paper className={classes.paperContainer} square onClick={() => setOpen(open !== 'check' && Object.keys(statusResult).length > 0 ? 'check' : '')}>
+                <div className={classes.paperStatus}><BuildIcon style={{ fontSize: 50 }} /></div>
+                <div className={classes.paperTitle}>
+                    <span style={{ fontSize: 18 }}>Health Check</span>
+                    <div className={classes.paperDetail}>{Object.keys(statusResult).length === 0 ? <CircularProgress size="1.5rem" /> : Object.keys(statusResult).map(status => status === 'healthy' ? <span key={`status-${status}`} className={classes.paperStatus}><CheckIcon style={{ color: 'green' }} />{statusResult[status]}</span> : (status === 'error' ? <span key={`status-${status}`} className={classes.paperStatus}><ErrorIcon style={{ color: 'red' }} />{statusResult[status]}</span> : <span key={`status-${status}`} className={classes.paperStatus}><WarningIcon style={{ color: 'orange' }} />{statusResult[status]}</span>))}</div>
+                </div>
+            </Paper>
+            <br />
+            <div>
+                <Fade in={open === 'check'}><div><Check /></div></Fade>
+            </div>
+        </div>
     );
 };

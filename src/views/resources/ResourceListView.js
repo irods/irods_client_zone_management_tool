@@ -10,7 +10,7 @@ import '../../App.css';
 import ResourceRows from '../../components/ResourceRows';
 import ListIcon from '@material-ui/icons/List';
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
-import { navigate } from '@reach/router';
+import { navigate, useLocation } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({
     dialog_action: {
@@ -44,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const ResourceListView = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-
+    const location = useLocation()
+    const params = new URLSearchParams(location.search)
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
     const tab = 'list';
@@ -59,16 +60,16 @@ export const ResourceListView = () => {
     const [orderBy, setOrderBy] = useState("RESC_NAME");
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [filterRescName, setFilterName] = useState('');
+    const [filterRescName, setFilterName] = useState(params.get('initalRescNameFilter') ? params.get('initalRescNameFilter') : '');
     const { restApiLocation } = useEnvironment();
     const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
-        if (zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
+        if(zoneName)loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
     }, [currPage, perPage, filterRescName, order, orderBy])
 
     useEffect(() => {
-        if(rescPanelStatus !== 'creation') {
+        if (rescPanelStatus !== 'creation') {
             setRescName('')
             setRescType('')
             setRescLocation('')
@@ -170,6 +171,7 @@ export const ResourceListView = () => {
                         className={classes.filter}
                         id="filter-term"
                         label="Filter"
+                        value={filterRescName}
                         placeholder="Filter by Name or Hostname"
                         onChange={(e) => setFilterName(e.target.value)}
                     />

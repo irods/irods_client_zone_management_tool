@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { useEnvironment } from './EnvironmentContext';
+import { useEnvironment } from './';
 
 export const ServerContext = createContext();
 
@@ -30,6 +30,7 @@ export const ServerProvider = ({ children }) => {
     const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
     const [rescContext, setRescContext] = useState(initialState);
     const [rescTypes, setRescTypes] = useState([]);
+    const [rescAll, setRescAll] = useState([])
     const [rescTotal, setRescTotal] = useState(0);
     const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
     const [rescPanelStatus, setRescPanelStatus] = useState('idle');
@@ -164,6 +165,7 @@ export const ServerProvider = ({ children }) => {
     }
 
     const loadResource = useCallback(async (offset, limit, name, order, orderBy) => {
+        console.log(name)
         setIsLoadingRescContext(true);
         let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`
         if (name === '') {
@@ -183,6 +185,7 @@ export const ServerProvider = ({ children }) => {
             }).then((res) => {
                 setRescContext(res.data);
                 setRescTotal(res.data.total)
+                if(res.data.count === res.data.total) setRescAll(res.data)
                 setIsLoadingRescContext(false);
             }).catch(() => {
                 setRescContext(undefined)
@@ -357,7 +360,7 @@ export const ServerProvider = ({ children }) => {
         loadServers();
         loadUser(0, 10, '', 'asc', 'USER_NAME');
         loadGroup(0, 10, '', 'asc', 'USER_NAME');
-        loadResource(0, 10, '', 'asc', 'RESC_NAME');
+        loadResource(0, 0, '', 'asc', 'RESC_NAME');
     }
 
     // load all zone data at each render if user is logged in
@@ -372,7 +375,7 @@ export const ServerProvider = ({ children }) => {
             zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
             userTotal, userContext, loadUser,
             groupTotal, groupContext, loadGroup,
-            rescTotal, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
+            rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
             loadData
         }}>
