@@ -39,6 +39,14 @@
     flex-grow: 1;
 }
 
+.check_result_link {
+    color: #146af5;
+}
+
+.check_result_link:hover {
+    opacity: 0.7;
+}
+
 .connection_container {
     display: flex;
     flex-direction: column;
