@@ -9,4 +9,6 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN chmod 777 /usr/src/app/node_modules
+
 CMD ["npm", "start"]
