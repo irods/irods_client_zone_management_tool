@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { Link, navigate } from '@reach/router';
+import { Link, navigate, useLocation } from '@reach/router';
 import axios from 'axios';
 import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
@@ -53,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const User = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-    
+    const location = useLocation()
+    const params = new URLSearchParams(location.search)
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
@@ -65,7 +66,7 @@ export const User = () => {
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [filterUsername, setFilterName] = useState('');
+    const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const { isLoadingUserContext, userContext, zoneName, loadUser } = useServer();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
@@ -155,6 +156,13 @@ export const User = () => {
         setOrderBy(props);
     }
 
+    const handleFilterChange = (e) => {
+        setFilterName(e.target.value)
+        // update the path without reload, filter is also encoded 
+        if(e.target.value === '') window.history.replaceState('', '', '/users')
+        else window.history.replaceState('', '', `/users?filter=${encodeURIComponent(e.target.value)}`)
+    }
+
     useEffect(() => {
         loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
     }, [currPage, perPage, filterUsername, order, orderBy])
@@ -171,7 +179,7 @@ export const User = () => {
                             id="filter-term"
                             label="Filter"
                             placeholder="Filter by User Name"
-                            onChange={(event) => setFilterName(event.target.value)}
+                            onChange={handleFilterChange}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New User

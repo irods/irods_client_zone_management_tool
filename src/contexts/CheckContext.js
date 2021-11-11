@@ -30,7 +30,6 @@ export const CheckProvider = ({ children }) => {
         value.timestamp = new Date()
         updatedMap.set(check.id, [check, value])
         setCheckResult(updatedMap)
-        // localStorage.setItem('zmt-checkResult', JSON.stringify(updatedMap, replacer))
     }
 
     const runAllCheck = () => {
@@ -38,7 +37,7 @@ export const CheckProvider = ({ children }) => {
         let newMap = new Map()
         let newStatusResult = {}
         let newCheckObject = {}
-        defaultChecks.forEach((check,index) => {
+        defaultChecks.forEach((check, index) => {
             (async function () {
                 // catch error if check function is not working correctly
                 try {
@@ -60,9 +59,6 @@ export const CheckProvider = ({ children }) => {
                     setCheckResult(newMap)
                     setStatusResult(newStatusResult)
                     setCheckObject(newCheckObject)
-                    // localStorage.setItem('zmt-checkObject', JSON.stringify(newCheckObject))
-                    // localStorage.setItem('zmt-statusResult', JSON.stringify(newStatusResult))
-                    // localStorage.setItem('zmt-checkResult', JSON.stringify(newMap, replacer))
                     setIsChecking(false)
                 }
             })()

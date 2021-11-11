@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, navigate } from '@reach/router'
+import { Link, navigate, useLocation } from '@reach/router'
 import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Input, Typography, LinearProgress } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Paper } from '@material-ui/core';
@@ -43,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const Group = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-
+    const location = useLocation()
+    const params = new URLSearchParams(location.search)
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
@@ -53,7 +54,7 @@ export const Group = () => {
     const [addFormOpen, setAddFormOpen] = useState(false);
     const [removeFormOpen, setRemoveFormOpen] = useState(false);
     const [currGroup, setCurrGroup] = useState([]);
-    const [filterGroupName, setFilterName] = useState('');
+    const [filterGroupName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [order, setOrder] = useState("asc");
@@ -156,6 +157,13 @@ export const Group = () => {
         setRemoveErrorMsg();
     }
 
+    const handleFilterChange = (e) => {
+        setFilterName(e.target.value)
+        // update the path without reload, filter is also encoded 
+        if(e.target.value === '') window.history.replaceState('', '', '/groups')
+        else window.history.replaceState('', '', `/groups?filter=${encodeURIComponent(e.target.value)}`)
+    }
+
     return (
         <Fragment>
             {isLoadingGroupContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
@@ -168,7 +176,7 @@ export const Group = () => {
                             id="filter-term"
                             label="Filter"
                             placeholder="Filter by Group Name"
-                            onChange={(event) => setFilterName(event.target.value)}
+                            onChange={handleFilterChange}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New Group
