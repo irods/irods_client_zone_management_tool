@@ -60,12 +60,12 @@ export const ResourceListView = () => {
     const [orderBy, setOrderBy] = useState("RESC_NAME");
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [filterRescName, setFilterName] = useState(params.get('initalRescNameFilter') ? params.get('initalRescNameFilter') : '');
+    const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const { restApiLocation } = useEnvironment();
     const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
-        if(zoneName)loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
+        if(zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
     }, [currPage, perPage, filterRescName, order, orderBy])
 
     useEffect(() => {
@@ -157,6 +157,13 @@ export const ResourceListView = () => {
         setCurrPage(value + 1);
     }
 
+    const handleFilterChange = (e) => {
+        setFilterName(e.target.value)
+        // update the path without reload, filter is also encoded 
+        if(e.target.value === '') window.history.replaceState('', '', '/resources')
+        else window.history.replaceState('', '', `/resources?filter=${encodeURIComponent(e.target.value)}`)
+    }
+
     return (
         <Fragment>
             {isLoadingRescContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
@@ -173,7 +180,7 @@ export const ResourceListView = () => {
                         label="Filter"
                         value={filterRescName}
                         placeholder="Filter by Name or Hostname"
-                        onChange={(e) => setFilterName(e.target.value)}
+                        onChange={handleFilterChange}
                     />
                     <Button className={classes.add_button} variant="outlined" color="primary" onClick={() => updatingRescPanelStatus('creation')}>
                         Add New Resource

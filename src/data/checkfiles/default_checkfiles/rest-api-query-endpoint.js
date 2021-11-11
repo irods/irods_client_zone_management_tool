@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const restApiQueryEndpoint = {
     "name": "iRODS Client REST API - /query endpoint",
-    "description": "/query endpoint should return a status code rather than 5xx.",
+    "description": `Checks ${process.env.REACT_APP_REST_API_URL}/query for non-5xx.`,
     "min_server_version": "4.2.0",
     "max_server_version": "4.2.10",
     "checker": async function () {

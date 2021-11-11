@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export const restApiAuthEndpoint = {
     "name": "iRODS Client REST API - /auth endpoint",
-    "description": "/auth endpoint should return a status code rather than 5xx.",
+    "description": `Checks ${process.env.REACT_APP_REST_API_URL}/auth for non-5xx.`,
     "min_server_version": "4.2.0",
     "max_server_version": "4.2.10",
     "checker": async function () {
