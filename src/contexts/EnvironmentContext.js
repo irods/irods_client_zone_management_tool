@@ -22,7 +22,7 @@ export const EnvironmentProvider = ({ children }) => {
     return (
         <EnvironmentContext.Provider value={{
             deviceType: deviceType,
-            restApiLocation: process.env.REACT_APP_REST_API_URL + '/irods-rest/1.0.0',
+            restApiLocation: process.env.REACT_APP_REST_API_URL,
             restApiTimeout: process.env.REACT_APP_REST_API_CONNECTION_TIMEOUT_SECOND,
             primaryColor: process.env.REACT_APP_PRIMARY_COLOR,
             appbarLogo: process.env.REACT_APP_APPBAR_LOGO,
