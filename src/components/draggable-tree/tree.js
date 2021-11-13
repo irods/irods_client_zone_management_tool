@@ -10,7 +10,7 @@ import ReplayIcon from '@material-ui/icons/Replay';
 import SaveIcon from '@material-ui/icons/Save';
 import LowPriorityIcon from '@material-ui/icons/LowPriority';
 import { useEnvironment, useServer } from '../../contexts';
-import { AddChildRescourceController, RemoveChildRescourceController } from '../../controllers/ResourceController';
+import { AddChildResourceController, RemoveChildResourceController } from '../../controllers/ResourceController';
 import { MinusSquare, PlusSquare } from '../../icons';
 import { replacer, reviver } from '../../utils';
 
@@ -80,7 +80,7 @@ export const Tree = (props) => {
             for (let task of tasks_copy) {
                 try {
                     if (task[1][0] !== zoneName) {
-                        await RemoveChildRescourceController(task[1][0], task[0][0], restApiLocation);
+                        await RemoveChildResourceController(task[1][0], task[0][0], restApiLocation);
                         task[3] = 'success'
                     }
                     else {
@@ -95,7 +95,7 @@ export const Tree = (props) => {
                 setTasks(tasks_copy)
                 try {
                     if (task[2][0] !== zoneName) {
-                        await AddChildRescourceController(task[2][0], task[0][0], restApiLocation, task[5]);
+                        await AddChildResourceController(task[2][0], task[0][0], restApiLocation, task[5]);
                         task[4] = 'success'
                     }
                     else {

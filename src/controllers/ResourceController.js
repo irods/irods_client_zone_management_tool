@@ -35,7 +35,7 @@ export const RemoveResourceController = async (name, restApiLocation) => {
     })
 }
 
-export const AddChildRescourceController = async (parent, child, restApiLocation, parent_context_string) => {
+export const AddChildResourceController = async (parent, child, restApiLocation, parent_context_string) => {
     return axios({
         method: 'POST',
         url: `${restApiLocation}/admin`,
@@ -52,7 +52,7 @@ export const AddChildRescourceController = async (parent, child, restApiLocation
     })
 }
 
-export const RemoveChildRescourceController = async (parent, child, restApiLocation) => {
+export const RemoveChildResourceController = async (parent, child, restApiLocation) => {
     return axios({
         method: 'POST',
         url: `${restApiLocation}/admin`,
