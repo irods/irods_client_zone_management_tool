@@ -6,6 +6,8 @@ export const checkZMTVersion = {
     "description": "Checks if ZMT is running the latest version",
     "min_server_version": "4.2.0",
     "max_server_version": "4.2.10",
+    "interval_in_seconds": 300,
+    "active": true,
     "checker": async function () {
         const latestTag = await axios.get('https://api.github.com/repos/irods/irods_client_zone_management_tool/releases/latest')
         let result = {

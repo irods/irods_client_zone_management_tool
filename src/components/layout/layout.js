@@ -76,9 +76,8 @@ export const Layout = ({ children }) => {
 
     const logoutHandler = () => {
         localStorage.removeItem('zmt-token');
-        localStorage.removeItem('zmt-checkResult')
-        localStorage.removeItem('zmt-checkObject')
-        localStorage.removeItem('zmt-statusResult')
+        localStorage.removeItem('zmt-inactiveChecks') 
+        localStorage.removeItem('zmt-checkIntervals') 
         navigate('/');
     }
 
