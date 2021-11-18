@@ -5,6 +5,8 @@ export const restApiAuthEndpoint = {
     "description": `Checks ${process.env.REACT_APP_REST_API_URL}/auth for non-5xx.`,
     "min_server_version": "4.2.0",
     "max_server_version": "4.2.10",
+    "interval_in_seconds": 300,
+    "active": true,
     "checker": async function () {
         let result = {
             status: '',

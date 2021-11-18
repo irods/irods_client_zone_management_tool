@@ -35,6 +35,7 @@ export const ServerProvider = ({ children }) => {
     const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
     const [rescPanelStatus, setRescPanelStatus] = useState('idle');
     const [filteredServers, setFilteredServers] = useState();
+    const [serverVersions, setServerVersions] = useState([])
 
     const loadUser = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
@@ -165,7 +166,6 @@ export const ServerProvider = ({ children }) => {
     }
 
     const loadResource = useCallback(async (offset, limit, name, order, orderBy) => {
-        console.log(name)
         setIsLoadingRescContext(true);
         let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`
         if (name === '') {
@@ -185,7 +185,7 @@ export const ServerProvider = ({ children }) => {
             }).then((res) => {
                 setRescContext(res.data);
                 setRescTotal(res.data.total)
-                if(res.data.count === res.data.total) setRescAll(res.data)
+                if (res.data.count === res.data.total) setRescAll(res.data)
                 setIsLoadingRescContext(false);
             }).catch(() => {
                 setRescContext(undefined)
@@ -308,6 +308,10 @@ export const ServerProvider = ({ children }) => {
                 if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
             }
+            setServerVersions(fullServersArray.reduce((prev, curr) => {
+                prev.push(curr['version']['irods_version'])
+                return prev
+            }, []).sort(irodsVersionComparator))
             setRescTypes([...resc_types].sort())
             setZoneContext(fullServersArray)
             setFilteredServers(fullServersArray.slice(0, 10));
@@ -377,6 +381,7 @@ export const ServerProvider = ({ children }) => {
             groupTotal, groupContext, loadGroup,
             rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
+            serverVersions, irodsVersionComparator,
             loadData
         }}>
             {children}
