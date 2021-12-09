@@ -40,9 +40,9 @@ export const ServerProvider = ({ children }) => {
 
     const loadUser = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
-        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup'`;
+        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'RODSGROUP'`;
         if (name !== '') {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'rodsgroup' and USER_NAME LIKE '%${name}%'`
+            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
         return axios({
@@ -55,11 +55,12 @@ export const ServerProvider = ({ children }) => {
                 query_string: _query,
                 query_limit: limit,
                 row_offset: offset,
-                query_type: 'general'
+                query_type: 'general',
+                case_sensitive: 0
             }
         }).then((res) => {
-            setUserContext(res.data);
             if (name === '') setUserTotal(res.data.total)
+            setUserContext(res.data);
             setIsLoadingUserContext(false);
         }).catch(() => {
             setUserContext(undefined);
@@ -105,9 +106,9 @@ export const ServerProvider = ({ children }) => {
 
     const loadGroup = async (offset, limit, name, order, orderBy) => {
         setIsLoadingGroupContext(true);
-        let _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup'`;
+        let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
         if (name !== '') {
-            _query = `SELECT USER_NAME WHERE USER_TYPE = 'rodsgroup' and USER_NAME LIKE '%${name}%'`
+            _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
         await axios({
@@ -120,7 +121,8 @@ export const ServerProvider = ({ children }) => {
                 query_string: _query,
                 query_limit: orderBy === 'USER_COUNT' ? 0 : limit,
                 row_offset: orderBy === 'USER_COUNT' ? 0 : offset,
-                query_type: 'general'
+                query_type: 'general',
+                case_sensitive: 0
             }
         }).then((res) => {
             if (name === '') setGroupTotal(res.data.total)
@@ -202,10 +204,11 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: base_query + ` AND RESC_NAME LIKE '%${name}%'`,
+                    query_string: base_query + ` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
                     query_limit: 500,
                     row_offset: 0,
-                    query_type: 'general'
+                    query_type: 'general',
+                    case_sensitive: 0
                 }
             }).then((res) => {
                 filteredResults = res.data;

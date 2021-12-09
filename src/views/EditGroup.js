@@ -65,10 +65,11 @@ export const EditGroup = (props) => {
                 'Authorization': auth,
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName}%' AND USER_TYPE != 'rodsgroup'`,
+                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName.toUpperCase()}%' AND USER_TYPE != 'RODSGROUP'`,
                 query_limit: 10,
                 row_offset: 0,
-                query_type: 'general'
+                query_type: 'general',
+                case_sensitive: 0
             }
         }).then((res) => {
             setFilterNameResult(res.data._embedded);
