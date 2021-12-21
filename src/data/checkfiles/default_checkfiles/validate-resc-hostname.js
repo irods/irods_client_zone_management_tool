@@ -9,16 +9,13 @@ export const validateRescHostname = {
     "interval_in_seconds": 300,
     "active": false,
     "checker": function () {
-        let validHostSet = new Set()
-        validHostSet.add('EMPTY_RESC_HOST')
         let result = {
             status: '',
             message: '',
             success: 0,
             failed: []
         }
-        this.zoneContext.forEach(server => validHostSet.add(server['host_system_information']['hostname']))
-        this.rescAll._embedded.forEach(resc => validHostSet.has(resc[4]) ? result.success++ : result.failed.push(resc))
+        this.rescAll._embedded.forEach(resc => this.validServerHosts.has(resc[4]) ? result.success++ : result.failed.push(resc))
         result.status = result.failed.length === 0 ? 'healthy' : 'warning'
         result.message = result.status === 'warning' ? <span><span>Failed on: </span>{result.failed.map((failedResc, index) => <span key={`rescCheckFailed-${index}`}>{index !== 0 && ', '}<Link className="check_result_link" to={`/resources?filter=${encodeURIComponent(failedResc[0])}`}>{`${failedResc[0]}:${failedResc[1]}`}</Link> ({failedResc[4]})</span>)}</span> : 'All resources have a valid hostname.'
         return result

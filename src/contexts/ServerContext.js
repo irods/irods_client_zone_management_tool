@@ -36,6 +36,7 @@ export const ServerProvider = ({ children }) => {
     const [rescPanelStatus, setRescPanelStatus] = useState('idle');
     const [filteredServers, setFilteredServers] = useState();
     const [serverVersions, setServerVersions] = useState([])
+    const [validServerHosts, setValidServerHosts] = useState(new Set(['EMPTY_RESC_HOST']))
 
     const loadUser = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
@@ -295,6 +296,7 @@ export const ServerProvider = ({ children }) => {
             let resc_types = new Set();
             let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
             let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
+            let newValidHostSet = new Set(['EMPTY_RESC_HOST'])
             for (let curr_server of fullServersArray) {
                 // check and load resource plugins from zone report
                 if (curr_server.plugins) {
@@ -304,10 +306,12 @@ export const ServerProvider = ({ children }) => {
                         }
                     }
                 }
+                newValidHostSet.add(curr_server['host_system_information']['hostname'])
                 let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
                 if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
             }
+            setValidServerHosts(newValidHostSet)
             setServerVersions(fullServersArray.reduce((prev, curr) => {
                 prev.push(curr['version']['irods_version'])
                 return prev
@@ -381,7 +385,7 @@ export const ServerProvider = ({ children }) => {
             groupTotal, groupContext, loadGroup,
             rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
-            serverVersions, irodsVersionComparator,
+            serverVersions, validServerHosts, irodsVersionComparator,
             loadData
         }}>
             {children}

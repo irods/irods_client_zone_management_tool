@@ -7,12 +7,13 @@ import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
+import WarningIcon from '@material-ui/icons/Warning';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import { useEnvironment, useServer } from '../contexts';
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
+import { makeStyles, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, Icon, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -45,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 15
   },
   cell: {
-    fontSize: '1rem'
+    fontSize: '1rem',
   },
   resource_container: {
     display: 'flex',
@@ -57,10 +58,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function ResourceRows({ row }) {
+function ResourceRows({ row, validServerHosts }) {
   const classes = useStyles();
   const { restApiLocation } = useEnvironment();
-  const { rescTypes, rescPanelStatus, updatingRescPanelStatus } = useServer();
+  const { rescTypes, rescPanelStatus, updatingRescPanelStatus, isLoadingZoneContext } = useServer();
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [open, setOpen] = useState(false);
@@ -167,7 +168,7 @@ function ResourceRows({ row }) {
       <TableRow hover={true} onClick={() => setOpen(!open)}>
         <TableCell className={classes.cell} align="left">{resc[0]}</TableCell>
         <TableCell className={classes.cell} align="left">{resc[1]}</TableCell>
-        <TableCell className={classes.cell} align="left">{resc[4]}</TableCell>
+        <TableCell className={classes.cell} align="left"><div style={{ display: 'flex', alignItems: 'center'}}>{!isLoadingZoneContext && !validServerHosts.has(resc[4]) && <Tooltip title="Resource hostname does not match a known server."><Icon><WarningIcon style={{color: 'orange', fontSize: 22 }} /></Icon></Tooltip>}{resc[4]}</div></TableCell>
         <TableCell className={classes.cell} align="left">{resc[3]}</TableCell>
         <TableCell className={classes.cell} align="right"><IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -222,5 +223,6 @@ function ResourceRows({ row }) {
 export default ResourceRows;
 
 ResourceRows.propTypes = {
-  row: PropTypes.array
+  row: PropTypes.array,
+  validServerHosts: PropTypes.object
 }

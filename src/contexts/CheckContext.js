@@ -15,9 +15,9 @@ export const CheckProvider = ({ children }) => {
     const [checkIntervals, setCheckIntervals] = useState(localStorage.getItem('zmt-checkIntervals') ? JSON.parse(localStorage.getItem('zmt-checkIntervals')) : {})
     const [checkTimers, setCheckTimers] = useState({})
     const [statusResult, setStatusResult] = useState({})
-    const { zoneContext, rescAll, serverVersions, irodsVersionComparator, isLoadingZoneContext } = useServer()
+    const { zoneContext, rescAll, serverVersions, irodsVersionComparator, isLoadingZoneContext, validServerHosts } = useServer()
     const { restApiLocation, restApiTimeout } = useEnvironment()
-    let context = { zoneContext, rescAll, restApiLocation, restApiTimeout }
+    let context = { rescAll, restApiLocation, restApiTimeout, validServerHosts, zoneContext }
     const callBackFn = useRef(null)
     const [timeStamp, setTimeStamp] = useState()
 
