@@ -62,10 +62,12 @@ export const ResourceListView = () => {
     const [perPage, setPerPage] = useState(10);
     const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const { restApiLocation } = useEnvironment();
-    const { isLoadingRescContext, zoneName, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
+    const { isLoadingRescContext, zoneName, validServerHosts, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
-        if(zoneName) loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy);
+        if(zoneName) {
+            loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
+        }
     }, [currPage, perPage, filterRescName, order, orderBy])
 
     useEffect(() => {
@@ -228,7 +230,7 @@ export const ResourceListView = () => {
                                     <TableCell><ToggleButtonGroup size="small"><Tooltip title={rescInputValidator() ? '' : 'Hostname or Vault Path is not valid. Please check and try again.'}><span><IconButton value="save" disabled={!rescInputValidator()} onClick={addResource}><SaveIcon /></IconButton></span></Tooltip><span><IconButton value="close" onClick={handleAddRowClose}><CloseIcon /></IconButton></span></ToggleButtonGroup></TableCell>
                                 </TableRow>
                                 {!isLoadingRescContext && (rescContext._embedded.length === 0 ? <TableRow><TableCell colSpan={4}><div className="table_view_no_results_container">No results found for [{filterRescName}].</div></TableCell></TableRow> :
-                                    rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} handleRemoveFormOpen={handleRemoveFormOpen} />))}
+                                    rescContext._embedded.map(this_resc => <ResourceRows key={this_resc[0]} row={this_resc} validServerHosts={validServerHosts} handleRemoveFormOpen={handleRemoveFormOpen} />))}
                             </TableBody>
                         </Table>
                     </TableContainer>
