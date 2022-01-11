@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Link, navigate } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
+import { makeStyles, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@material-ui/core';
 import { useEnvironment, useServer } from '../contexts';
+import MuiAlert from '@material-ui/lab/Alert';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
-
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
     link_button: {
         textDecoration: "none"
     },
@@ -16,28 +18,81 @@ const useStyles = makeStyles(() => ({
     },
     add_button: {
         color: '#04bdaf'
+    },
+    user_info_container: {
+        display: 'grid',
+        gridTemplateColumns: '40% auto',
+        gridGap: '15px',
+        width: '100%',
+        padding: '10px',
+        height: '100%'
+    },
+    user_info: {
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '0px 20px 20px 20px',
+        maxHeight: '100%',
+        overflowY: 'auto'
+    },
+    margin: {
+        margin: theme.spacing(1),
     }
 }));
 
-export const EditUser = (props) => {
-    // navigate to users page if no user info is passed along
-    if (!props.location.state) navigate('/users')
+export const EditUser = () => {
     // navigate to login page if no token is found
     if (!localStorage.getItem('zmt-token')) navigate('/')
-    
     const auth = localStorage.getItem('zmt-token');
-    const currentUser = props.location.state ? props.location.state.userInfo : new Array(2);
+    const loggedUserName = localStorage.getItem('zmt-username')
+    const params = new URLSearchParams(location.search)
+    const [currentUserName, currentUserZone] = params.get('user') ? params.get('user').split('#') : [undefined, undefined]
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const { restApiLocation } = useEnvironment();
-    const { localZoneName } = useServer();
+    const { loadUser } = useServer();
     const [groupsOfUser, setGroupOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
+    const [passwordConfirmation, setPasswordConfirmation] = useState(false)
+    const [userType, setUserType] = useState({
+        value: '',
+        status: ''
+    })
+    const [password, setPassword] = useState({
+        newPassword: '',
+        confirmPassword: '',
+        showPassword: false,
+        showConfirmPassword: false,
+        status: ''
+    })
 
     useEffect(() => {
-        if (currentUser[0]) {
+        // hide this interface for the current rodsadmin user or user that does not have name or zone
+        if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) navigate('/users')
+        axios({
+            method: 'GET',
+            url: `${restApiLocation}/query`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': auth
+            },
+            params: {
+                query_string: `SELECT USER_TYPE WHERE USER_NAME = '${currentUserName}' AND USER_ZONE = '${currentUserZone}'`,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }).then(res => {
+            // navigate back to /user if the username provided does not exist
+            res.data.total > 0 ? setUserType({ ...userType, value: res.data._embedded[0][0] }) : navigate('/users')
+        }).catch(() => {
+            navigate('/users')
+        })
+    }, [currentUserName])
+
+    useEffect(() => {
+        if (currentUserName) {
             setLoading(true);
             axios({
                 method: 'GET',
@@ -47,7 +102,7 @@ export const EditUser = (props) => {
                     'Authorization': auth
                 },
                 params: {
-                    query_string: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUser[0]}' AND USER_GROUP_NAME != '${currentUser[0]}'`,
+                    query_string: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUserName}' AND USER_GROUP_NAME != '${currentUserName}'`,
                     query_limit: 100,
                     row_offset: 0,
                     query_type: 'general'
@@ -57,10 +112,10 @@ export const EditUser = (props) => {
                 setLoading(false);
             })
         }
-    }, [auth, currentUser, restApiLocation, refresh])
+    }, [refresh])
 
     useEffect(() => {
-        if (currentUser[0]) {
+        if (currentUserName) {
             axios({
                 method: 'GET',
                 url: `${restApiLocation}/query`,
@@ -90,8 +145,8 @@ export const EditUser = (props) => {
                     target: 'group',
                     arg2: group[0],
                     arg3: 'remove',
-                    arg4: currentUser[0],
-                    arg5: localZoneName
+                    arg4: currentUserName,
+                    arg5: currentUserZone
                 },
                 headers: {
                     'Authorization': auth,
@@ -116,8 +171,8 @@ export const EditUser = (props) => {
                     target: 'group',
                     arg2: group[0],
                     arg3: 'add',
-                    arg4: currentUser[0],
-                    arg5: localZoneName
+                    arg4: currentUserName,
+                    arg5: currentUserZone
                 },
                 headers: {
                     'Authorization': auth,
@@ -132,6 +187,75 @@ export const EditUser = (props) => {
         }
     }
 
+    const resetPwdHandler = () => {
+        if (password.newPassword !== password.confirmPassword) {
+            // throw error if two password fields do not match
+            setPassword({ ...password, status: 'Passwords do not match.' })
+        } else if (password.newPassword === '' && password.confirmPassword === '') {
+            // pop up confirmation dialog if passwords are empty
+            setPasswordConfirmation(true)
+        } else resetPwd()
+    }
+
+    const resetPwd = () => {
+        axios({
+            method: 'POST',
+            url: `${restApiLocation}/admin`,
+            params: {
+                action: 'modify', // arg0
+                target: 'user', // arg1
+                arg2: `${currentUserName}#${currentUserZone}`, // user#zone
+                arg3: 'password',
+                arg4: password.confirmPassword,
+            },
+            headers: {
+                'Authorization': auth,
+                'Accept': 'application/json'
+            }
+        }).then(() => {
+            setPasswordConfirmation(false)
+            setPassword({
+                newPassword: '',
+                confirmPassword: '',
+                showPassword: false,
+                showConfirmPassword: false,
+                status: 'changed'
+            })
+        }).catch(() => {
+            setPassword({
+                newPassword: '',
+                confirmPassword: '',
+                showPassword: false,
+                showConfirmPassword: false,
+                status: 'failed'
+            })
+        })
+    }
+
+    const updateUserType = (newType) => {
+        axios({
+            method: 'POST',
+            url: `${restApiLocation}/admin`,
+            params: {
+                action: 'modify',
+                target: 'user',
+                arg2: currentUserName,
+                arg3: 'type',
+                arg4: newType,
+            },
+            headers: {
+                'Authorization': auth,
+                'Accept': 'application/json'
+            }
+        }).then(() => {
+            setUserType({ value: newType, status: 'changed' })
+            loadUser(0, 0, '', 'asc', 'USER_NAME')
+        }).catch(() => {
+            setUserType({ ...userType, status: 'failed' })
+        })
+    }
+
+
     const checkGroup = (group) => {
         for (let i = 0; i < groupsOfUser.length; i++) {
             if (groupsOfUser[i][0] === group[0]) {
@@ -144,38 +268,125 @@ export const EditUser = (props) => {
     return (
         <Fragment>
             {isLoading === true ? <div><LinearProgress /></div> : <div className="table_view_spinner_holder" />}
-            <Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link>
-            {currentUser[0]}
-            <div className="edit_filter_bar">
-                <Typography>Find Group</Typography>
-                <TextField
-                    id="filterGroupName"
-                    label="Filter"
-                    placeholder="Filter by Group Name"
-                    className={classes.filter_textfield}
-                    onChange={(e) => setFilterName(e.target.value)}
-                />
+            <div><Link to="/users" className={classes.link_button}><Button><ArrowBackIcon /></Button></Link></div>
+            <div className={classes.user_info_container}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Paper className={classes.user_info}>
+                        <h2>Basic Information</h2>
+                        <div style={{ wordWrap: 'break-word' }}><Typography>User: {currentUserName}#{currentUserZone}</Typography></div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}><Typography>User Type: </Typography>
+                            <Select style={{ marginLeft: '10px' }} value={userType.value} onChange={(e) => updateUserType(e.target.value)}>
+                                <MenuItem value="rodsuser">rodsuser</MenuItem>
+                                <MenuItem value="rodsadmin">rodsadmin</MenuItem>
+                                <MenuItem value="groupadmin">groupadmin</MenuItem>
+                            </Select>
+                        </div>
+                    </Paper>
+                    <br />
+                    <Paper className={classes.user_info}>
+                        <h2>Password Management</h2>
+                        <FormControl className={classes.margin}>
+                            <InputLabel htmlFor="user-new-password">Create New Password</InputLabel>
+                            <Input
+                                id="user-new-password"
+                                type={password.showPassword ? "text" : "password"}
+                                value={password.newPassword}
+                                onChange={(e) => setPassword({ ...password, newPassword: e.target.value })}
+                                endAdornment={
+                                    password.newPassword !== '' && <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() => setPassword({ ...password, showPassword: !password.showPassword })}
+                                        >
+                                            {password.showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                            />
+                        </FormControl>
+                        <br />
+                        <FormControl error={password.status === 'Passwords do not match.'} className={classes.margin}>
+                            <InputLabel htmlFor="confirm-new-password">Confirm New Password</InputLabel>
+                            <Input
+                                id="confirm-new-password"
+                                type={password.showConfirmPassword ? "text" : "password"}
+                                value={password.confirmPassword}
+                                onChange={(e) => setPassword({ ...password, confirmPassword: e.target.value })}
+                                endAdornment={
+                                    password.confirmPassword !== '' && <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle confirm password visibility"
+                                            onClick={() => setPassword({ ...password, showConfirmPassword: !password.showConfirmPassword })}
+                                        >
+                                            {password.showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                            />
+                            <FormHelperText id="confirm-new-password-error">{password.status === 'Passwords do not match.' ? password.status : ''}</FormHelperText>
+                        </FormControl>
+                        <br />
+                        <Button variant="outlined" color="primary" style={{ textTransform: 'none' }} onClick={() => resetPwdHandler()}>Set Password</Button>
+                    </Paper>
+                </div>
+                <div>
+                    <Paper className={classes.user_info}>
+                        <h2>User Group Management</h2>
+                        <div className="edit_filter_bar">
+                            <Typography>Find Group</Typography>
+                            <TextField
+                                id="filterGroupName"
+                                label="Filter"
+                                placeholder="Filter by Group Name"
+                                className={classes.filter_textfield}
+                                onChange={(e) => setFilterName(e.target.value)}
+                            />
+                        </div>
+                        <br />
+                        <div className="edit_container">
+                            {filterGroupNameResult &&
+                                <TableContainer component={Paper}>
+                                    <Table className={classes.user_table} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell><b>Group Name</b></TableCell>
+                                                <TableCell align="right"><b>Status</b></TableCell>
+                                                <TableCell align="right"><b>Action</b></TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {filterGroupNameResult.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
+                                                <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
+                                                <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
+                                                <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
+                                            </TableRow>)}
+                                        </TableBody>
+                                    </Table></TableContainer>}
+                        </div>
+                    </Paper>
+                </div>
             </div>
-            <br />
-            <div className="edit_container">
-                {filterGroupNameResult &&
-                    <Table className={classes.user_table} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell><b>Group Name</b></TableCell>
-                                <TableCell align="right"><b>Status</b></TableCell>
-                                <TableCell align="right"><b>Action</b></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filterGroupNameResult.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
-                                <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
-                                <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
-                                <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
-                            </TableRow>)}
-                        </TableBody>
-                    </Table>}
-            </div>
+            <Snackbar open={userType.status === 'changed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><MuiAlert elevation={6} variant="filled" severity="success">Success! User type changed to {userType.value}.</MuiAlert></Snackbar>
+            <Snackbar open={userType.status === 'failed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><MuiAlert elevation={6} variant="filled" severity="error">Failed to change user type.</MuiAlert></Snackbar>
+            <Snackbar open={password.status === 'changed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><MuiAlert elevation={6} variant="filled" severity="success">Success! Password changed.</MuiAlert></Snackbar>
+            <Snackbar open={password.status === 'failed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><MuiAlert elevation={6} variant="filled" severity="error">Failed to change password.</MuiAlert></Snackbar>
+            <Dialog
+                open={passwordConfirmation}
+                onClose={() => setPasswordConfirmation(false)}
+                aria-labelledby="password-confirmation-dialog-title"
+                aria-describedby='password-confirmation-dialog'
+            >
+                <DialogTitle>WARNING: </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <div>Passwords are empty.</div>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="secondary" onClick={() => setPasswordConfirmation(false)}>Cancel</Button>
+                    <Button color="primary" onClick={() => resetPwd()} autoFocus>Confirm</Button>
+                </DialogActions>
+            </Dialog>
         </Fragment>
     );
 }

@@ -67,6 +67,7 @@ export const Authenticate = () => {
             }).then((res) => {
                 if (res.status === 200) {
                     localStorage.setItem('zmt-token', res.data);
+                    localStorage.setItem('zmt-username', username);
                     navigate('/home', { replace: true });
                     renderLayout();
                     loadData();
