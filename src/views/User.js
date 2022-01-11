@@ -52,6 +52,7 @@ export const User = () => {
     const params = new URLSearchParams(location.search)
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
+    const loggedUserName = localStorage.getItem('zmt-username');
     const classes = useStyles();
     const [currUser, setCurrUser] = useState([]);
     const [addFormOpen, setAddFormOpen] = useState(false);
@@ -218,7 +219,7 @@ export const User = () => {
                                             <TableCell className={classes.table_cell} style={{ width: '40%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[2]}</TableCell>
                                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[1]}</TableCell>
-                                            <TableCell className={classes.table_cell} style={{ width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                            <TableCell className={classes.table_cell} style={{ width: '20%' }} align="right"> {(this_user[0] === loggedUserName || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to={`/users/edit?user=${encodeURIComponent(this_user[0]+'#'+this_user[2])}`}><Button color="primary">Edit</Button></Link>
                                                 <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     ))}
