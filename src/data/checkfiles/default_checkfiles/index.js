@@ -4,6 +4,7 @@ import { restApiAdminEndpoint } from './rest-api-admin-endpoint'
 import { restApiAuthEndpoint } from './rest-api-auth-endpoint'
 import { restApiQueryEndpoint } from './rest-api-query-endpoint'
 import { restApiZoneReportEndpoint } from './rest-api-zone_report-endpoint'
+import { compoundRescChildren } from './compound-resc-children'
 
 // TODO
 // 1. see if we can only import file in the context provider and not using index.js
@@ -14,5 +15,6 @@ export const defaultChecks = [
     restApiAuthEndpoint,
     restApiQueryEndpoint,
     restApiZoneReportEndpoint,
-    validateRescHostname
+    validateRescHostname,
+    compoundRescChildren
 ]
