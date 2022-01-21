@@ -65,7 +65,7 @@ export const ResourceListView = () => {
     const { isLoadingRescContext, zoneName, validServerHosts, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
-        if(zoneName) {
+        if (zoneName) {
             loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
         }
     }, [currPage, perPage, filterRescName, order, orderBy])
@@ -162,7 +162,7 @@ export const ResourceListView = () => {
     const handleFilterChange = (e) => {
         setFilterName(e.target.value)
         // update the path without reload, filter is also encoded 
-        if(e.target.value === '') window.history.replaceState('', '', '/resources')
+        if (e.target.value === '') window.history.replaceState('', '', '/resources')
         else window.history.replaceState('', '', `/resources?filter=${encodeURIComponent(e.target.value)}`)
     }
 
@@ -190,16 +190,14 @@ export const ResourceListView = () => {
                 </div>
                 <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(rescContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
-                        <Table aria-label="simple table">
+                        <Table style={{ width: '100%', tableLayout: 'fixed'}} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
                                     <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="8" align="left"><TableSortLabel active={orderBy === 'RESC_LOC'} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }}><b>Hostname</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '1%' }} align="right"></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ fontSize: '1.1rem', width: '5%' }} align="right"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>

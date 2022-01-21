@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   table_cell: {
     width: '50%',
     fontSize: 15,
+    wordWrap: 'break-word',
     height: 40
   },
   remove_button: {
@@ -46,7 +47,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 15
   },
   cell: {
-    fontSize: '1rem',
+    fontSize: '1.1rem',
+    wordWrap: 'break-word'
   },
   resource_container: {
     display: 'flex',
@@ -168,7 +170,7 @@ function ResourceRows({ row, validServerHosts }) {
       <TableRow hover={true} onClick={() => setOpen(!open)}>
         <TableCell className={classes.cell} align="left">{resc[0]}</TableCell>
         <TableCell className={classes.cell} align="left">{resc[1]}</TableCell>
-        <TableCell className={classes.cell} align="left"><div style={{ display: 'flex', alignItems: 'center'}}>{!isLoadingZoneContext && !validServerHosts.has(resc[4]) && <Tooltip title="Resource hostname does not match a known server."><Icon><WarningIcon style={{color: 'orange', fontSize: 22 }} /></Icon></Tooltip>}{resc[4]}</div></TableCell>
+        <TableCell className={classes.cell} align="left">{!isLoadingZoneContext && !validServerHosts.has(resc[4]) && <Tooltip title="Resource hostname does not match a known server."><Icon><WarningIcon style={{color: 'orange', fontSize: 22 }} /></Icon></Tooltip>}{resc[4]}</TableCell>
         <TableCell className={classes.cell} align="left">{resc[3]}</TableCell>
         <TableCell className={classes.cell} align="right"><IconButton>
           {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -182,7 +184,7 @@ function ResourceRows({ row, validServerHosts }) {
                 Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={checkIfChanged() || isUpdating} onClick={saveResource}>{isUpdating ? <CircularProgress size={20} /> : <SaveIcon style={{ fontSize: 20 }} />}</IconButton></span></Tooltip>}
                   {isEditing ? <Tooltip title="Cancel"><IconButton onClick={closeEditFormHandler}><CancelIcon style={{ fontSize: 20 }} /></IconButton></Tooltip> : <Tooltip color="primary" title="Edit"><IconButton onClick={() => updatingRescPanelStatus(`editing-${resc[11]}`)}><EditIcon style={{ fontSize: 20 }} /></IconButton></Tooltip>}<Tooltip color="secondary" title="Delete"><span><IconButton disabled={isEditing} onClick={() => setRemoveForm(true)}><DeleteIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip></span>
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table style={{ width: '100%', tableLayout: 'fixed'}} size="small" aria-label="purchases">
                 <TableBody>
                   <TableRow>
                     <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Name" defaultValue={currentResc[0]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(0, event.target.value) }} /> : <span>Name: {resc[0]}</span>}</TableCell>
