@@ -5,7 +5,7 @@ export const checkZMTVersion = {
     "name": "ZMT is running the latest version",
     "description": "Checks if ZMT is running the latest version",
     "min_server_version": "4.2.0",
-    "max_server_version": "4.2.10",
+    "max_server_version": "",
     "interval_in_seconds": 300,
     "active": true,
     "checker": async function () {

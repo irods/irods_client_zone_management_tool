@@ -9,7 +9,6 @@ export const CheckContext = createContext({})
 export const CheckProvider = ({ children }) => {
     const [isChecking, setIsChecking] = useState(false)
     const checks = [...defaultChecks, ...customChecks]
-    const [inactiveChecks, setInactiveChecks] = useState(localStorage.getItem('zmt-inactiveChecks') ? new Set(JSON.parse(localStorage.getItem('zmt-inactiveChecks'))) : new Set(checks.filter(check => !check.active).map((check, index) => `zmt-${index}`)))
     const [checkObject, setCheckObject] = useState({})
     const [checkResults, setCheckResults] = useState({})
     const [checkIntervals, setCheckIntervals] = useState(localStorage.getItem('zmt-checkIntervals') ? JSON.parse(localStorage.getItem('zmt-checkIntervals')) : {})
@@ -17,9 +16,15 @@ export const CheckProvider = ({ children }) => {
     const [statusResult, setStatusResult] = useState({})
     const { zoneContext, rescAll, serverVersions, irodsVersionComparator, isLoadingZoneContext, validServerHosts } = useServer()
     const { restApiLocation, restApiTimeout } = useEnvironment()
+    const [timeStamp, setTimeStamp] = useState()
+    const [inactiveChecks, setInactiveChecks] = useState(localStorage.getItem('zmt-inactiveChecks') ? new Set(JSON.parse(localStorage.getItem('zmt-inactiveChecks'))) : new Set(checks.reduce((prev, check, index) => {
+        if (!check.active) {
+            prev.push(`zmt-${index}`)
+        }
+        return prev
+    }, [])))
     let context = { rescAll, restApiLocation, restApiTimeout, validServerHosts, zoneContext }
     const callBackFn = useRef(null)
-    const [timeStamp, setTimeStamp] = useState()
 
     useEffect(() => {
         if (localStorage.getItem('zmt-token') && Object.keys(statusResult).length === 0 && zoneContext.length > 0 && !isChecking && !isLoadingZoneContext) {
@@ -30,8 +35,9 @@ export const CheckProvider = ({ children }) => {
 
     const checkServerVersion = (check) => {
         if ('min_server_version' in check && 'max_server_version' in check) {
-            if (irodsVersionComparator(check['min_server_version'], serverVersions[0]) > 0) return serverVersions[0]
-            if (irodsVersionComparator(check['max_server_version'], serverVersions[serverVersions.length - 1])) return serverVersions[serverVersions.length - 1]
+            // compare min and max server version if specified in checkfile
+            if (check['min_server_version'] !== '' && irodsVersionComparator(check['min_server_version'], serverVersions[0]) > 0) return serverVersions[0]
+            if (check['max_server_version'] !== '' && irodsVersionComparator(check['max_server_version'], serverVersions[serverVersions.length - 1]) < 0) return serverVersions[serverVersions.length - 1]
             return true
         }
     }
