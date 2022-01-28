@@ -27,7 +27,6 @@ export const ServerProvider = ({ children }) => {
     const [userTotal, setUserTotal] = useState(0);
     const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
     const [groupContext, setGroupContext] = useState(initialState);
-    const [groupUserContext, setGroupUserContext] = useState(new Map());
     const [groupTotal, setGroupTotal] = useState(0);
     const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
     const [rescContext, setRescContext] = useState(initialState);
@@ -72,37 +71,34 @@ export const ServerProvider = ({ children }) => {
 
     // iterate through group results and load user counts
     const loadGroupUserCounts = async (inputArray, offset, limit, order, orderBy) => {
-        // a map is used here to store the user counts we already know
-        let userCountMap = new Map(groupUserContext);
-        for (let i = 0; i < inputArray._embedded.length; i++) {
-            let thisGroupName = inputArray._embedded[i][0];
-            // check if the map already have the user data, if yes - get the data and add it to the array, or we need to make api calls to know the number
-            if (userCountMap.has(thisGroupName)) inputArray._embedded[i].push(userCountMap.get(thisGroupName))
-            else await axios({
-                method: 'GET',
-                url: `${restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query_string: `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_GROUP_NAME = '${thisGroupName}' AND USER_TYPE != 'rodsgroup'`,
-                    query_limit: 100,
-                    row_offset: 0,
-                    query_type: 'general'
-                }
-            }).then((res) => {
-                inputArray._embedded[i].push(res.data._embedded.length);
-                // add the number to the map so we don't need to ask again
-                userCountMap.set(thisGroupName, res.data._embedded.length)
-            }).catch(() => setIsLoadingGroupContext(false)
-            )
-        }
-        // sort by user count and handle pagination
+        let groupUserCountPromises = inputArray._embedded.map(group => axios({
+            method: 'GET',
+            url: `${restApiLocation}/query`,
+            headers: {
+                'Authorization': localStorage.getItem('zmt-token')
+            },
+            params: {
+                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'general'
+            }
+        }))
+
+        // wait until all promises are resolved so we can get all user counts
+        await Promise.all(groupUserCountPromises).then(resolvedPromises => {
+            resolvedPromises.forEach((resolvedPromise, index) => {
+                inputArray._embedded[index].push(resolvedPromise.data.total);
+            })
+        }).catch(() => {
+            setGroupContext(undefined)
+            setIsLoadingGroupContext(false)
+        })
+
         if (orderBy === 'USER_COUNT') {
             inputArray._embedded = inputArray._embedded.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[1] - b[1])).slice(offset, offset + limit)
         }
         setGroupContext(inputArray)
-        setGroupUserContext(userCountMap)
         setIsLoadingGroupContext(false)
     }
 
@@ -260,7 +256,7 @@ export const ServerProvider = ({ children }) => {
                 query_type: 'general'
             }
         })
-        if(zoneData.status === 200) {
+        if (zoneData.status === 200) {
             setLocalZoneName(zoneData.data._embedded.filter(a => a[1] === 'local')[0][0])
             zonesRes = zoneData.data._embedded.map(zone => { return { name: zone[0], type: zone[1], hostname: zone[2] && zone[2].split(':')[0], port: zone[2] && zone[2].split(':')[1], comment: zone[3] } })
         } else {
@@ -284,7 +280,7 @@ export const ServerProvider = ({ children }) => {
                     query_type: 'general'
                 }
             })
-        }) 
+        })
         const zoneUserData = await Promise.all(zoneUserDataPromises)
         zonesRes.forEach((zone, index) => zone.users = zoneUserData[index].data.total)
         setZones(zonesRes)
@@ -398,11 +394,11 @@ export const ServerProvider = ({ children }) => {
     }
 
     const loadData = () => {
-        loadZones();
-        loadServers();
-        loadUsers(0, 10, '', 'asc', 'USER_NAME');
-        loadGroups(0, 10, '', 'asc', 'USER_NAME');
-        loadResources(0, 0, '', 'asc', 'RESC_NAME');
+        !isLoadingZones && loadZones();
+        !isLoadingZoneContext && loadServers();
+        !isLoadingUserContext && loadUsers(0, 10, '', 'asc', 'USER_NAME');
+        !isLoadingGroupContext && loadGroups(0, 10, '', 'asc', 'USER_NAME');
+        !isLoadingRescContext && loadResources(0, 0, '', 'asc', 'RESC_NAME');
     }
 
     // load all zone data at each render if user is logged in

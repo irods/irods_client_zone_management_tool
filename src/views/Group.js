@@ -65,7 +65,7 @@ export const Group = () => {
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
     useEffect(() => {
-        if(localZoneName) loadGroups((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
+        if(localZoneName && !isLoadingGroupContext) loadGroups((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
     }, [currPage, perPage, filterGroupName, order, orderBy])
 
     async function addGroup() {
