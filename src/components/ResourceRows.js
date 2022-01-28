@@ -83,7 +83,8 @@ function ResourceRows({ row, validServerHosts }) {
   }, [rescPanelStatus])
 
   const handleKeyDown = event => {
-    if (event.keyCode === 13) {
+    // support key event if any field has been changed
+    if (event.keyCode === 13 && checkIfChanged()) {
       saveResource();
     }
   }
@@ -138,7 +139,7 @@ function ResourceRows({ row, validServerHosts }) {
   }
 
   const checkIfChanged = () => {
-    return currentResc[0] === resc[0] && currentResc[1] === resc[1] && currentResc[3] === resc[3] && currentResc[4] === resc[4] && currentResc[5] === resc[5] && currentResc[6] === resc[6] && currentResc[7] === resc[7] && currentResc[9] === resc[9];
+    return !(currentResc[0] === resc[0] && currentResc[1] === resc[1] && currentResc[3] === resc[3] && currentResc[4] === resc[4] && currentResc[5] === resc[5] && currentResc[6] === resc[6] && currentResc[7] === resc[7] && currentResc[9] === resc[9]);
   }
 
   const removeResource = async (name) => {
@@ -181,7 +182,7 @@ function ResourceRows({ row, validServerHosts }) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <div className={classes.resource_container}>
               <Typography className={classes.row} variant="h6" gutterBottom component="div">
-                Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={checkIfChanged() || isUpdating} onClick={saveResource}>{isUpdating ? <CircularProgress size={20} /> : <SaveIcon style={{ fontSize: 20 }} />}</IconButton></span></Tooltip>}
+                Resource Details<span className={classes.remove_button}>{isEditing && <Tooltip color="primary" title="Save"><span><IconButton disabled={!checkIfChanged() || isUpdating} onClick={saveResource}>{isUpdating ? <CircularProgress size={20} /> : <SaveIcon style={{ fontSize: 20 }} />}</IconButton></span></Tooltip>}
                   {isEditing ? <Tooltip title="Cancel"><IconButton onClick={closeEditFormHandler}><CancelIcon style={{ fontSize: 20 }} /></IconButton></Tooltip> : <Tooltip color="primary" title="Edit"><IconButton onClick={() => updatingRescPanelStatus(`editing-${resc[11]}`)}><EditIcon style={{ fontSize: 20 }} /></IconButton></Tooltip>}<Tooltip color="secondary" title="Delete"><span><IconButton disabled={isEditing} onClick={() => setRemoveForm(true)}><DeleteIcon style={{ fontSize: 20 }} /></IconButton></span></Tooltip></span>
               </Typography>
               <Table style={{ width: '100%', tableLayout: 'fixed'}} size="small" aria-label="purchases">
