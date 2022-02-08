@@ -19,7 +19,9 @@ const queryGenerator = (_query, order, orderBy) => {
 export const ServerProvider = ({ children }) => {
     const { restApiLocation } = useEnvironment();
     const [zoneContext, setZoneContext] = useState([]);
-    const [zoneName, setZoneName] = useState();
+    const [localZoneName, setLocalZoneName] = useState()
+    const [zones, setZones] = useState()
+    const [isLoadingZones, setIsLoadingZones] = useState(false)
     const [isLoadingZoneContext, setIsLoadingZoneContext] = useState(false);
     const [userContext, setUserContext] = useState(initialState);
     const [userTotal, setUserTotal] = useState(0);
@@ -38,11 +40,11 @@ export const ServerProvider = ({ children }) => {
     const [serverVersions, setServerVersions] = useState([])
     const [validServerHosts, setValidServerHosts] = useState(new Set(['EMPTY_RESC_HOST']))
 
-    const loadUser = (offset, limit, name, order, orderBy) => {
+    const loadUsers = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
-        let _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'RODSGROUP'`;
+        let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
         if (name !== '') {
-            _query = `SELECT USER_NAME, USER_TYPE WHERE USER_TYPE != 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
+            _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
         }
         _query = queryGenerator(_query, order, orderBy);
         return axios({
@@ -104,7 +106,7 @@ export const ServerProvider = ({ children }) => {
         setIsLoadingGroupContext(false)
     }
 
-    const loadGroup = async (offset, limit, name, order, orderBy) => {
+    const loadGroups = async (offset, limit, name, order, orderBy) => {
         setIsLoadingGroupContext(true);
         let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
         if (name !== '') {
@@ -168,7 +170,7 @@ export const ServerProvider = ({ children }) => {
         setRescContext(filteredRescContext);
     }
 
-    const loadResource = useCallback(async (offset, limit, name, order, orderBy) => {
+    const loadResources = useCallback(async (offset, limit, name, order, orderBy) => {
         setIsLoadingRescContext(true);
         let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`
         if (name === '') {
@@ -242,22 +244,51 @@ export const ServerProvider = ({ children }) => {
         setRescPanelStatus(text);
     }
 
-    const loadZoneName = () => {
-        return axios({
+    const loadZones = async () => {
+        setIsLoadingZones(true)
+        let zonesRes = []
+        const zoneData = await axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: 'SELECT ZONE_NAME',
-                query_limit: 100,
+                query_string: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
+                query_limit: 0,
                 row_offset: 0,
                 query_type: 'general'
             }
-        }).then((res) => {
-            setZoneName(res.data._embedded[0][0]);
-        });
+        })
+        if(zoneData.status === 200) {
+            setLocalZoneName(zoneData.data._embedded.filter(a => a[1] === 'local')[0][0])
+            zonesRes = zoneData.data._embedded.map(zone => { return { name: zone[0], type: zone[1], hostname: zone[2] && zone[2].split(':')[0], port: zone[2] && zone[2].split(':')[1], comment: zone[3] } })
+        } else {
+            // handle error if the request failed
+            setZones([])
+            setIsLoadingZones(false)
+            return
+        }
+        // make each request for the number of users in each zone
+        const zoneUserDataPromises = zoneData.data._embedded.map(zone => {
+            return axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query_string: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
+                    query_limit: 0,
+                    row_offset: 0,
+                    query_type: 'general'
+                }
+            })
+        }) 
+        const zoneUserData = await Promise.all(zoneUserDataPromises)
+        zonesRes.forEach((zone, index) => zone.users = zoneUserData[index].data.total)
+        setZones(zonesRes)
+        setIsLoadingZones(false)
     }
 
     const loadZoneReport = () => {
@@ -339,7 +370,7 @@ export const ServerProvider = ({ children }) => {
     }
 
     // handle servers page pagination and sorting
-    const loadCurrServer = async (offset, perPage, order, orderBy) => {
+    const loadCurrServers = async (offset, perPage, order, orderBy) => {
         if (zoneContext !== undefined && zoneContext.length !== 0) {
             let tem_servers = zoneContext;
             let orderSyntax = order === 'asc' ? 1 : -1;
@@ -367,27 +398,27 @@ export const ServerProvider = ({ children }) => {
     }
 
     const loadData = () => {
-        loadZoneName();
+        loadZones();
         loadServers();
-        loadUser(0, 10, '', 'asc', 'USER_NAME');
-        loadGroup(0, 10, '', 'asc', 'USER_NAME');
-        loadResource(0, 0, '', 'asc', 'RESC_NAME');
+        loadUsers(0, 10, '', 'asc', 'USER_NAME');
+        loadGroups(0, 10, '', 'asc', 'USER_NAME');
+        loadResources(0, 0, '', 'asc', 'RESC_NAME');
     }
 
     // load all zone data at each render if user is logged in
     useEffect(() => {
-        if (zoneName === undefined && localStorage.getItem('zmt-token') !== null) {
+        if (localZoneName === undefined && localStorage.getItem('zmt-token') !== null) {
             loadData()
         }
     }, [])
 
     return (
         <ServerContext.Provider value={{
-            zoneContext, zoneName, loadZoneName, loadZoneReport, filteredServers, loadCurrServer,
-            userTotal, userContext, loadUser,
-            groupTotal, groupContext, loadGroup,
-            rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResource,
-            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext,
+            zoneContext, localZoneName, zones, loadZones, loadZoneReport, filteredServers, loadCurrServers,
+            userTotal, userContext, loadUsers,
+            groupTotal, groupContext, loadGroups,
+            rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResources,
+            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext, isLoadingZones,
             serverVersions, validServerHosts, irodsVersionComparator,
             loadData
         }}>

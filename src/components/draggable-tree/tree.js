@@ -39,7 +39,7 @@ export const Tree = (props) => {
     let originalChildrenMap = JSON.stringify(childrenMap, replacer);
     let originalDataMap = JSON.stringify(dataMap, replacer);
     const { restApiLocation } = useEnvironment();
-    const { zoneName } = useServer();
+    const { localZoneName } = useServer();
     const [stagedChildrenMap, setStagedChildrenMap] = useState(JSON.parse(originalChildrenMap, reviver));
     const [stagedDataMap, setStagedDataMap] = useState(JSON.parse(originalDataMap, reviver));
     const [redo, setRedo] = useState([]);
@@ -79,7 +79,7 @@ export const Tree = (props) => {
         (async function asyncProcessTask() {
             for (let task of tasks_copy) {
                 try {
-                    if (task[1][0] !== zoneName) {
+                    if (task[1][0] !== localZoneName) {
                         await RemoveChildResourceController(task[1][0], task[0][0], restApiLocation);
                         task[3] = 'success'
                     }
@@ -94,7 +94,7 @@ export const Tree = (props) => {
                 }
                 setTasks(tasks_copy)
                 try {
-                    if (task[2][0] !== zoneName) {
+                    if (task[2][0] !== localZoneName) {
                         await AddChildResourceController(task[2][0], task[0][0], restApiLocation, task[5]);
                         task[4] = 'success'
                     }
@@ -169,8 +169,8 @@ export const Tree = (props) => {
     }
 
     const renderTreeNode = (node) => {
-        const nodeName = `${node[0]}${node[0] !== zoneName ? `:${node[1]}` : ''}`
-        const nodeId = node[0] === zoneName ? "" : node[11];
+        const nodeName = `${node[0]}${node[0] !== localZoneName ? `:${node[1]}` : ''}`
+        const nodeId = node[0] === localZoneName ? "" : node[11];
         expanded.push(nodeId)
         const handleDragEnd = (e) => {
             if (newParentNode !== undefined && e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && nodeName === e.target.children[0].children[1].innerHTML && node[11] !== newParentNode[11]) {

@@ -31,7 +31,7 @@ export const EditUser = (props) => {
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const { restApiLocation } = useEnvironment();
-    const { zoneName } = useServer();
+    const { localZoneName } = useServer();
     const [groupsOfUser, setGroupOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
@@ -91,7 +91,7 @@ export const EditUser = (props) => {
                     arg2: group[0],
                     arg3: 'remove',
                     arg4: currentUser[0],
-                    arg5: zoneName
+                    arg5: localZoneName
                 },
                 headers: {
                     'Authorization': auth,
@@ -117,7 +117,7 @@ export const EditUser = (props) => {
                     arg2: group[0],
                     arg3: 'add',
                     arg4: currentUser[0],
-                    arg5: zoneName
+                    arg5: localZoneName
                 },
                 headers: {
                     'Authorization': auth,

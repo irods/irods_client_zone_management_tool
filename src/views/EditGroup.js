@@ -26,7 +26,7 @@ export const EditGroup = (props) => {
     
     const auth = localStorage.getItem('zmt-token');
     const currentGroup = props.location.state ? props.location.state.groupInfo : new Array(2);
-    const { zoneName } = useServer();
+    const { localZoneName } = useServer();
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -88,7 +88,7 @@ export const EditGroup = (props) => {
                     arg2: currentGroup[0],
                     arg3: 'remove',
                     arg4: user[0],
-                    arg5: zoneName
+                    arg5: localZoneName
                 },
                 headers: {
                     'Authorization': auth,
@@ -113,7 +113,7 @@ export const EditGroup = (props) => {
                     arg2: currentGroup[0],
                     arg3: 'add',
                     arg4: user[0],
-                    arg5: zoneName
+                    arg5: localZoneName
                 },
                 headers: {
                     'Authorization': auth,
