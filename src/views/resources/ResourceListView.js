@@ -62,11 +62,11 @@ export const ResourceListView = () => {
     const [perPage, setPerPage] = useState(10);
     const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const { restApiLocation } = useEnvironment();
-    const { isLoadingRescContext, zoneName, validServerHosts, rescContext, rescTypes, loadResource, rescPanelStatus, updatingRescPanelStatus } = useServer();
+    const { isLoadingRescContext, localZoneName, validServerHosts, rescContext, rescTypes, loadResources, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
-        if (zoneName) {
-            loadResource((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
+        if (localZoneName) {
+            loadResources((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
         }
     }, [currPage, perPage, filterRescName, order, orderBy])
 
@@ -101,7 +101,7 @@ export const ResourceListView = () => {
                 arg3: rescType,
                 arg4: rescLocation === '' && rescVaultPath === '' ? '' : rescLocation + ':' + rescVaultPath,
                 arg5: "",
-                arg6: zoneName
+                arg6: localZoneName
             }
         }).then(() => {
             window.location.reload();
@@ -193,22 +193,22 @@ export const ResourceListView = () => {
                         <Table style={{ width: '100%', tableLayout: 'fixed'}} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }} key="8" align="left"><TableSortLabel active={orderBy === 'RESC_LOC'} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }}><b>Hostname</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '5%' }} align="right"></TableCell>
+                                    <TableCell style={{ width: '25%' }} key="0" ><TableSortLabel active={orderBy === 'RESC_NAME'} direction={orderBy === 'RESC_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_NAME') }} ><b>Name</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '25%' }} key="1" align="left"><TableSortLabel active={orderBy === 'RESC_TYPE_NAME'} direction={orderBy === 'RESC_TYPE_NAME' ? order : 'asc'} onClick={() => { handleSort('RESC_TYPE_NAME') }}><b>Type</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '25%' }} key="8" align="left"><TableSortLabel active={orderBy === 'RESC_LOC'} direction={orderBy === 'RESC_LOC' ? order : 'asc'} onClick={() => { handleSort('RESC_LOC') }}><b>Hostname</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '20%' }} key="3" align="left"><TableSortLabel active={orderBy === 'RESC_VAULT_PATH'} direction={orderBy === 'RESC_VAULT_PATH' ? order : 'asc'} onClick={() => { handleSort('RESC_VAULT_PATH') }}><b>Vault Path</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '5%' }} align="right"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow id="add_newrow" style={{ display: rescPanelStatus === 'creation' ? 'contents' : 'none' }} className={classes.add_hidden}>
-                                    <TableCell><Input id="name"
+                                <TableRow id="add_resc_newrow" style={{ display: rescPanelStatus === 'creation' ? 'contents' : 'none' }} className={classes.add_hidden}>
+                                    <TableCell><Input id="new_resc_name"
                                         value={rescName}
                                         onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescNameChange}></Input></TableCell>
                                     <TableCell><Select
                                         native
-                                        id="zone-type-select"
+                                        id="new_resc_type"
                                         placeholder="Resource Type"
                                         value={rescType}
                                         onKeyDown={(event) => handleKeyDown(event)}
@@ -217,11 +217,11 @@ export const ResourceListView = () => {
                                         <option aria-label="None" value="" />
                                         {rescTypes.length && rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}
                                     </Select></TableCell>
-                                    <TableCell><Input id="location"
+                                    <TableCell><Input id="new_resc_loc"
                                         value={rescLocation}
                                         onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescLocationChange}></Input></TableCell>
-                                    <TableCell><Input id="vault_path"
+                                    <TableCell><Input id="new_resc_name_path"
                                         value={rescVaultPath}
                                         onKeyDown={(event) => handleKeyDown(event)}
                                         onChange={handleRescVaultPathChange}></Input></TableCell>

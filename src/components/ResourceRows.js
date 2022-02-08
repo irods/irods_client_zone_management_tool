@@ -47,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 15
   },
   cell: {
-    fontSize: '1.1rem',
     wordWrap: 'break-word'
   },
   resource_container: {

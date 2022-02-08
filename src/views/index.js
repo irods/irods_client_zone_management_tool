@@ -8,3 +8,4 @@ export * from "./NotFound";
 export * from "./Server";
 export * from "./User";
 export * from "./resources";
+export * from "./Zone";

@@ -10,15 +10,15 @@ export const ResourceTreeView = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
 
     const tab = 'tree';
-    const { loadResource, rescContext } = useServer();
+    const { loadResources, rescContext } = useServer();
     const { deviceType } = useEnvironment();
     const [childrenMap, setChildrenMap] = useState();
     const [dataMap, setDataMap] = useState();
 
     // load all resources to render the hierachy  
     useEffect(() => {
-        loadResource(0, 0, '', 'asc', 'RESC_NAME');
-    }, [loadResource])
+        loadResources(0, 0, '', 'asc', 'RESC_NAME');
+    }, [loadResources])
 
     useEffect(() => {
         if (rescContext && rescContext.total !== 0 && rescContext.total === rescContext.count) {

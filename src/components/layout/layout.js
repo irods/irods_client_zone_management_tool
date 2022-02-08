@@ -69,7 +69,7 @@ export const Layout = ({ children }) => {
         }
     }))
     const classes = useStyles();
-    const { zoneName } = useServer();
+    const { localZoneName, zones } = useServer();
     const AppBarLogo = require(`../../img/${environment.appbarLogo}`).default;
     const [mobileOpen, setMobileOpen] = useState(false);
     const { userTotal, groupTotal, rescTotal, zoneContext } = useServer();
@@ -87,6 +87,9 @@ export const Layout = ({ children }) => {
             <List>
                 <MenuItem button selected={pathname === 'home'} component={Link} to="/home" key='home'>
                     <ListItemText primary='Home' />
+                </MenuItem>
+                <MenuItem button selected={pathname === 'zones'} component={Link} to="/zones" key='zone'>
+                    <ListItemText>Zones ({zones === undefined ? 0 : zones.length})</ListItemText>
                 </MenuItem>
                 <MenuItem button selected={pathname === 'servers'} component={Link} to="/servers" key='server'>
                     <ListItemText>Servers ({zoneContext === undefined ? 0 : zoneContext.length})</ListItemText>
@@ -120,7 +123,7 @@ export const Layout = ({ children }) => {
                         <img alt="Branding Icon" className={classes.logo} src={AppBarLogo}></img></a>
                     <Hidden xsDown>
                         <Typography variant="h6"> {environment.brandingName}</Typography>
-                        <Typography className={classes.rightToolbar} variant="h6" noWrap > {zoneName} </Typography>
+                        <Typography className={classes.rightToolbar} variant="h6" noWrap > {localZoneName} </Typography>
                     </Hidden>
                     <Hidden smUp>
                         <IconButton

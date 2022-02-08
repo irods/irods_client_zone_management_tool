@@ -48,7 +48,7 @@ export const Group = () => {
     const { restApiLocation } = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
-    const { isLoadingGroupContext, zoneName, groupContext, loadGroup } = useServer();
+    const { isLoadingGroupContext, localZoneName, groupContext, loadGroups } = useServer();
     const [addErrorMsg, setAddErrorMsg] = useState();
     const [removeErrorMsg, setRemoveErrorMsg] = useState();
     const [addFormOpen, setAddFormOpen] = useState(false);
@@ -65,7 +65,7 @@ export const Group = () => {
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
     useEffect(() => {
-        if(zoneName) loadGroup((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
+        if(localZoneName) loadGroups((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
     }, [currPage, perPage, filterGroupName, order, orderBy])
 
     async function addGroup() {
@@ -78,7 +78,7 @@ export const Group = () => {
                     target: 'user',
                     arg2: document.getElementById('add-group-name').value,
                     arg3: 'rodsgroup',
-                    arg4: zoneName,
+                    arg4: localZoneName,
                     arg5: ''
                 },
                 headers: {
@@ -104,7 +104,7 @@ export const Group = () => {
                     action: 'rm',
                     target: 'user',
                     arg2: currGroup[0],
-                    arg3: zoneName,
+                    arg3: localZoneName,
                 },
                 headers: {
                     'Authorization': auth,
@@ -187,9 +187,9 @@ export const Group = () => {
                             <Table aria-label="simple table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }}><TableSortLabel active={orderBy === "USER_COUNT"} direction={orderBy === "USER_COUNT" ? order : 'asc'} onClick={() => { handleSort("USER_COUNT") }}><b>Users</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align="right"><b>Action</b></TableCell>
+                                        <TableCell style={{ width: '30%' }}><TableSortLabel active={orderBy === "USER_NAME"} direction={orderBy === "USER_NAME" ? order : 'asc'} onClick={() => { handleSort("USER_NAME") }}><b>Group Name</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ width: '30%' }}><TableSortLabel active={orderBy === "USER_COUNT"} direction={orderBy === "USER_COUNT" ? order : 'asc'} onClick={() => { handleSort("USER_COUNT") }}><b>Users</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ width: '30%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -200,9 +200,9 @@ export const Group = () => {
                                     </TableRow>
                                     {!isLoadingGroupContext && (groupContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : groupContext._embedded.map((group) =>
                                         <TableRow key={group_id}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} component="th" scope="row">{group[1]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
+                                            <TableCell style={{ width: '30%' }} component="th" scope="row">{group[0]}</TableCell>
+                                            <TableCell style={{ width: '30%' }} component="th" scope="row">{group[1]}</TableCell>
+                                            <TableCell style={{ width: '30%' }} align='right'><Link className={classes.link_button} to='/groups/edit' state={{ groupInfo: group }}><Button color="primary">Edit</Button></Link> {group[0] === 'public' ? <span id={group_id++}></span> : <Button id={group_id++} color="secondary" onClick={() => handleRemoveAction(group)}>Remove</Button>}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -44,7 +44,7 @@ export const Server = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
 
     const classes = useStyles();
-    const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServer } = useServer();
+    const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [tabValue, setTabValue] = useState(0);
@@ -54,7 +54,7 @@ export const Server = () => {
     const [orderBy, setOrderBy] = useState("role");
 
     useEffect(() => {
-        loadCurrServer(perPage * (currPage - 1), perPage, order, orderBy);
+        loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
     }, [perPage, currPage, order, orderBy])
 
     const handleSort = props => {
@@ -81,24 +81,24 @@ export const Server = () => {
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }}><b>Role</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '15%' }}><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version") }}><b>iRODS Version</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '25%' }}><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }}><b>Hostname</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '10%' }}><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }}><b>Resources</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }}><b>OS Distribution</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ fontSize: '1.1rem', width: '5%' }} align="right"></TableCell>
+                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }}><b>Role</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '15%' }}><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version") }}><b>iRODS Version</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }}><b>Hostname</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '10%' }}><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }}><b>Resources</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }}><b>OS Distribution</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '5%' }} align="right"></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {!isLoadingZoneContext && filteredServers && (filteredServers.length === 0 ? <TableRow><TableCell colSpan={6}><div className="table_view_no_results_container">No results found.</div></TableCell></TableRow> :
                                     filteredServers.map((server) =>
                                         <TableRow key={server['host_system_information']['hostname']}>
-                                            <TableCell style={{ padding: 0, fontSize: '1.1rem', width: '25%' }}><div className="server_role_container"><div className={`server_${server['server_config']['catalog_service_role']}`} />{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</div></TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '15%' }}>{server['version']['irods_version']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '25%' }}>{server['host_system_information']['hostname']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '10%' }}>{server['resources']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '5%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Details</Button></TableCell>
+                                            <TableCell style={{ borderLeft: `25px solid ${server['server_config']['catalog_service_role'] === 'provider'? '#04d1c2' : '#808080'}`, width: '25%' }}>{server['server_config']['catalog_service_role'] === 'provider' ? "Catalog Service Provider" : "Catalog Service Consumer"}</TableCell>
+                                            <TableCell style={{ width: '15%' }}>{server['version']['irods_version']}</TableCell>
+                                            <TableCell style={{ width: '25%' }}>{server['host_system_information']['hostname']}</TableCell>
+                                            <TableCell style={{ width: '10%' }}>{server['resources']}</TableCell>
+                                            <TableCell style={{ width: '20%' }}>{server['host_system_information']['os_distribution_name'] + " " + server['host_system_information']['os_distribution_version']}</TableCell>
+                                            <TableCell style={{ width: '5%' }} align='right'><Button color="primary" onClick={() => { setCurrServer(server); setOpenDetails(true); }}>Details</Button></TableCell>
                                         </TableRow>
                                     ))}
                             </TableBody>

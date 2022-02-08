@@ -67,7 +67,7 @@ export const User = () => {
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
-    const { isLoadingUserContext, userContext, zoneName, loadUser } = useServer();
+    const { isLoadingUserContext, userContext, localZoneName, loadUsers } = useServer();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
 
@@ -84,7 +84,7 @@ export const User = () => {
                     target: 'user',
                     arg2: document.getElementById('add-user-name').value,
                     arg3: document.getElementById('add-user-type').value,
-                    arg4: zoneName,
+                    arg4: localZoneName,
                     arg5: '',
                 }
             }).then(() => {
@@ -108,7 +108,7 @@ export const User = () => {
                     action: 'rm',
                     target: 'user',
                     arg2: currUser[0],
-                    arg3: zoneName
+                    arg3: localZoneName
                 }
             }).then(() => {
                 window.location.reload();
@@ -164,7 +164,7 @@ export const User = () => {
     }
 
     useEffect(() => {
-        loadUser(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
+        loadUsers(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
     }, [currPage, perPage, filterUsername, order, orderBy])
 
     return (
@@ -191,9 +191,9 @@ export const User = () => {
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>User Name</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"><b>Action</b></TableCell>
+                                        <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>User Name</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
+                                        <TableCell style={{ width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </StylesProvider>
                             </TableHead>
@@ -212,9 +212,9 @@ export const User = () => {
                                 {!isLoadingUserContext && (userContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterUsername}].</div></TableCell></TableRow> :
                                     userContext._embedded.map((this_user) =>
                                         <TableRow key={this_user[0]}>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }}>{this_user[1]}</TableCell>
-                                            <TableCell style={{ fontSize: '1.1rem', width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                            <TableCell style={{ width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
+                                            <TableCell style={{ width: '20%' }}>{this_user[1]}</TableCell>
+                                            <TableCell style={{ width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                                 <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     ))}
