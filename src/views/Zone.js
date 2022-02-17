@@ -97,9 +97,8 @@ export const Zone = () => {
         setConfirmationDialog({ state: 'remove', visibility: true })
     }
     const deleteZoneHandler = async () => {
-        setStatus('is-removing')
         const res = await DeleteZoneController(currZone.name, restApiLocation)
-        setConfirmationDialog({ state: '', visibility: false })
+        setConfirmationDialog({ state: 'remove', visibility: false })
         if (res.status === 200) {
             setStatus('remove-success')
             loadZones()
@@ -194,7 +193,7 @@ export const Zone = () => {
                                 <TableCell><Select className={classes.fontInherit} native id="new_zone_type" value="remote" onKeyDown={(e) => keyEventHandler(e)}><option value="remote">remote</option></Select></TableCell>
                                 <TableCell></TableCell>
                                 <TableCell><Input id="new_zone_host_input" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, hostname: e.target.value })} /></TableCell>
-                                <TableCell><Input id="new_zone_port_input" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, port: e.target.value })} /></TableCell>
+                                <TableCell><Input id="new_zone_port_input" type="number" min="1" max="65535" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, port: e.target.value })} /></TableCell>
                                 <TableCell><Input id="new_zone_comment_input" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, comment: e.target.value })} /></TableCell>
                                 <TableCell>
                                     <Fragment>
@@ -209,7 +208,7 @@ export const Zone = () => {
                             <TableCell className={classes.table_cell}>{zone.type}</TableCell>
                             <TableCell className={classes.table_cell}>{zone.users}</TableCell>
                             <TableCell className={classes.table_cell}>{(status === 'edit-mode' || isLoadingZones) && currZone.name === zone.name ? <Input id="edit-zone-host-input" className={classes.fontInherit} defaultValue={currZone.hostname} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setModifiedCurrZone({ ...modifiedCurrZone, hostname: e.target.value })} /> : zone.hostname}</TableCell>
-                            <TableCell className={classes.table_cell}>{(status === 'edit-mode' || isLoadingZones) && currZone.name === zone.name ? <Input id="edit-zone-port-input" className={classes.fontInherit} defaultValue={currZone.port} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setModifiedCurrZone({ ...modifiedCurrZone, port: e.target.value })} /> : zone.port}</TableCell>
+                            <TableCell className={classes.table_cell}>{(status === 'edit-mode' || isLoadingZones) && currZone.name === zone.name ? <Input id="edit-zone-port-input" type="number" min="1" max="65535" className={classes.fontInherit} defaultValue={currZone.port} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setModifiedCurrZone({ ...modifiedCurrZone, port: e.target.value })} /> : zone.port}</TableCell>
                             <TableCell className={classes.table_cell}>{(status === 'edit-mode' || isLoadingZones) && currZone.name === zone.name ? <Input id="edit-zone-comment-input" className={classes.fontInherit} defaultValue={currZone.comment} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setModifiedCurrZone({ ...modifiedCurrZone, comment: e.target.value })} /> : zone.comment}</TableCell>
                             <TableCell>
                                 <Fragment>
@@ -232,7 +231,7 @@ export const Zone = () => {
             <Dialog open={confirmationDialog.visibility} onClose={() => setConfirmationDialog({ state: '', visibility: false })} aria-labelledby="form-dialog-title">
                 <DialogTitle>Confirmation</DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure to {confirmationDialog.state === 'remove' ? 'remove' : 'modify'} zone <b>{currZone.name}</b>?</Typography>
+                    <Typography>{confirmationDialog.state === 'remove' ? 'Removing' : 'Modifying'} zone <b>{currZone.name}</b>?</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => { confirmationDialog.state === 'remove' ? deleteZoneHandler() : editZoneHandler() }} color="secondary">{confirmationDialog.state === 'remove' ? 'Remove' : 'Modify'}</Button>
