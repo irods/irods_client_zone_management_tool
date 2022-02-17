@@ -8,17 +8,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120
-    },
-    itemsControl: {
-        marginLeft: 30,
-        minWidth: 120
-    },
-    table: {
-        minWidth: 650
-    },
     tableContainer: {
         marginTop: 20
     },
@@ -48,6 +37,12 @@ const useStyles = makeStyles((theme) => ({
     },
     add_button: {
         marginLeft: 30
+    },
+    fontInherit: {
+        font: 'inherit'
+    },
+    table_cell: {
+        wordWrap: 'break-word'
     }
 }));
 
@@ -67,7 +62,7 @@ export const User = () => {
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
-    const { isLoadingUserContext, userContext, localZoneName, loadUsers } = useServer();
+    const { isLoadingUserContext, userContext, localZoneName, loadUsers, zones } = useServer();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
 
@@ -82,10 +77,9 @@ export const User = () => {
                 params: {
                     action: 'add',
                     target: 'user',
-                    arg2: document.getElementById('add-user-name').value,
+                    arg2: `${document.getElementById('add-user-name').value}#${document.getElementById('add-user-zone').value}`, // format: username#userzone
                     arg3: document.getElementById('add-user-type').value,
-                    arg4: localZoneName,
-                    arg5: '',
+                    arg4: ''
                 }
             }).then(() => {
                 window.location.reload();
@@ -119,7 +113,7 @@ export const User = () => {
     }
 
     const handleKeyDown = (e) => {
-        if(e.keyCode === 13) addUser();
+        if (e.keyCode === 13) addUser();
     }
 
     const handleRemoveConfirmationOpen = (props) => {
@@ -138,6 +132,7 @@ export const User = () => {
     const handleAddRowClose = () => {
         document.getElementById('add-user-row').style["display"] = "none";
         document.getElementById('add-user-name').value = "";
+        document.getElementById('add-user-zone').value = localZoneName;
         document.getElementById('add-user-type').value = "rodsuser";
     }
 
@@ -159,7 +154,7 @@ export const User = () => {
     const handleFilterChange = (e) => {
         setFilterName(e.target.value)
         // update the path without reload, filter is also encoded 
-        if(e.target.value === '') window.history.replaceState('', '', '/users')
+        if (e.target.value === '') window.history.replaceState('', '', '/users')
         else window.history.replaceState('', '', `/users?filter=${encodeURIComponent(e.target.value)}`)
     }
 
@@ -187,21 +182,29 @@ export const User = () => {
                     </div>
                     <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(userContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
-                        <Table className={classes.table} aria-label="simple table">
+                        <Table style={{ width: '100%', tableLayout: 'fixed' }} aria-label="User table">
                             <TableHead>
                                 <StylesProvider injectFirst>
                                     <TableRow>
-                                        <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>User Name</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
-                                        <TableCell style={{ width: '20%' }} align="right"><b>Action</b></TableCell>
+                                        <TableCell className={classes.table_cell} style={{ width: '40%' }}><TableSortLabel active={orderBy === 'USER_NAME'} direction={orderBy === 'USER_NAME' ? order : 'asc'} onClick={() => { handleSort('USER_NAME') }}><b>User Name</b></TableSortLabel></TableCell>
+                                        <TableCell className={classes.table_cell} style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_ZONE'} direction={orderBy === 'USER_ZONE' ? order : 'asc'} onClick={() => { handleSort('USER_ZONE') }}><b>Zone</b></TableSortLabel></TableCell>
+                                        <TableCell className={classes.table_cell} style={{ width: '20%' }}><TableSortLabel active={orderBy === 'USER_TYPE'} direction={orderBy === 'USER_TYPE' ? order : 'asc'} onClick={() => { handleSort('USER_TYPE') }}><b>Type</b></TableSortLabel></TableCell>
+                                        <TableCell className={classes.table_cell} style={{ width: '20%' }} align="right"><b>Action</b></TableCell>
                                     </TableRow>
                                 </StylesProvider>
                             </TableHead>
                             <TableBody>
                                 <TableRow id="add-user-row" style={{ display: 'none' }}>
-                                    <TableCell><Input className={classes.add_user_name} id="add-user-name" placeholder="Enter new User Name" onKeyDown={(event) => handleKeyDown(event)} /></TableCell>
+                                    <TableCell><Input className={classes.add_user_name, classes.fontInherit} id="add-user-name" placeholder="Enter new User Name" onKeyDown={(event) => handleKeyDown(event)} /></TableCell>
                                     <TableCell><Select
                                         native
+                                        className={classes.fontInherit}
+                                        id="add-user-zone"
+                                        onKeyDown={(event) => handleKeyDown(event)}
+                                    >{zones && zones.map(zone => <option key={`zone-option-${zone.name}`} value={zone.name}>{zone.name}</option>)}</Select></TableCell>
+                                    <TableCell><Select
+                                        native
+                                        className={classes.fontInherit}
                                         id="add-user-type"
                                         onKeyDown={(event) => handleKeyDown(event)}
                                     >
@@ -212,9 +215,10 @@ export const User = () => {
                                 {!isLoadingUserContext && (userContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterUsername}].</div></TableCell></TableRow> :
                                     userContext._embedded.map((this_user) =>
                                         <TableRow key={this_user[0]}>
-                                            <TableCell style={{ width: '20%' }} component="th" scope="row">{this_user[0]}</TableCell>
-                                            <TableCell style={{ width: '20%' }}>{this_user[1]}</TableCell>
-                                            <TableCell style={{ width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
+                                            <TableCell className={classes.table_cell} style={{ width: '40%' }} component="th" scope="row">{this_user[0]}</TableCell>
+                                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[2]}</TableCell>
+                                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[1]}</TableCell>
+                                            <TableCell className={classes.table_cell} style={{ width: '20%' }} align="right"> {(this_user[0] === 'rods' || this_user[0] === 'public') ? <p></p> : <span><Link className={classes.link_button} to='/users/edit' state={{ userInfo: this_user }}><Button color="primary">Edit</Button></Link>
                                                 <Button color="secondary" onClick={() => { handleRemoveConfirmationOpen(this_user) }}>Remove</Button></span>}</TableCell>
                                         </TableRow>
                                     ))}
