@@ -1,22 +1,8 @@
-import { validateRescHostname } from './validate-resc-hostname'
-import { checkZMTVersion } from './check-zmt-version'
-import { restApiAdminEndpoint } from './rest-api-admin-endpoint'
-import { restApiAuthEndpoint } from './rest-api-auth-endpoint'
-import { restApiQueryEndpoint } from './rest-api-query-endpoint'
-import { restApiZoneReportEndpoint } from './rest-api-zone_report-endpoint'
-import { compoundRescChildren } from './compound-resc-children'
-import { validateRescNameLength } from './validate-resc-name-length'
+import { importAll } from "../../../utils"
 
-// TODO
-// 1. see if we can only import file in the context provider and not using index.js
-
-export const defaultChecks = [
-    checkZMTVersion,
-    restApiAdminEndpoint,
-    restApiAuthEndpoint,
-    restApiQueryEndpoint,
-    restApiZoneReportEndpoint,
-    validateRescHostname,
-    compoundRescChildren,
-    validateRescNameLength
-]
+export const defaultChecks = importAll(require.context('./', false, /\.js$/)).reduce((checks, currCheck) => {
+    if (Object.keys(currCheck).length === 1 && Object.keys(currCheck)[0] !== 'defaultChecks') {
+        checks.push(currCheck[Object.keys(currCheck)[0]])
+    }
+    return checks
+}, [])

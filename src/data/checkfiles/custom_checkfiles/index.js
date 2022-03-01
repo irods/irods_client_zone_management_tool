@@ -1,8 +1,8 @@
-// 1. import your custom check file
-// e.g. import { xxx } from './xxx.js'
+import { importAll } from "../../../utils"
 
-
-export const customChecks = [
-    // 2. put your check object name here
-    // e.g. xxx
-]
+export const customChecks = importAll(require.context('./', false, /\.js$/)).reduce((checks, currCheck) => {
+    if (Object.keys(currCheck).length === 1 && Object.keys(currCheck)[0] !== 'customChecks') {
+        checks.push(currCheck[Object.keys(currCheck)[0]])
+    }
+    return checks
+}, [])

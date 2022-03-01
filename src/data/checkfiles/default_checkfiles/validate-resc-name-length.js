@@ -2,13 +2,13 @@ import React from 'react'
 import { Link } from '@reach/router'
 
 export const validateRescNameLength = {
-    "name": "Each resource has a valid name length",
-    "description": `Checks if the length of each resource is within 63 characters.`,
-    "min_server_version": "4.2.0",
-    "max_server_version": "",
-    "interval_in_seconds": 300,
-    "active": true,
-    "checker": function () {
+    name: "Each resource has a valid name length",
+    description: `Checks if the length of each resource is within 63 characters.`,
+    min_server_version: "4.2.0",
+    max_server_version: "",
+    interval_in_seconds: 300,
+    active: true,
+    checker: function () {
         let result = {
             status: '',
             message: '',
