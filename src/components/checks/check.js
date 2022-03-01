@@ -28,7 +28,7 @@ export const Check = () => {
             if (statusFilter == 'All' && titleFilter === '') newFilteredResults = Object.entries(checkResults)
             else {
                 // case-insensitive filtering
-                for (const [id, details] of checkResults.entries()) {
+                for (const [id, details] of Object.entries(checkResults)) {
                     if ((details[1]['status'] === statusFilter || statusFilter === 'All') && details[0]['name'].toLowerCase().includes(titleFilter.toLowerCase())) newFilteredResults.push([id, details])
                 }
             }
