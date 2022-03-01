@@ -23,7 +23,7 @@ export const CheckProvider = ({ children }) => {
         }
         return prev
     }, [])))
-    let context = { rescAll, restApiLocation, restApiTimeout, validServerHosts, zoneContext }
+    let context = { rescAll, restApiLocation, restApiTimeout, validServerHosts, zoneContext } // zmt context that can be accessed in checkfile, i.e. this.zoneContext
     const callBackFn = useRef(null)
 
     useEffect(() => {
