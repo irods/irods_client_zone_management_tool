@@ -163,3 +163,8 @@
 .table_view_no_results_container {
     text-align: center;
 }
+
+/*  Hide the error overlay so healthcheck dashboard can gracefully show possible syntax error  */
+body > iframe {
+    display: none;
+}

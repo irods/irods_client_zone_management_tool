@@ -127,9 +127,8 @@ export const CheckProvider = ({ children }) => {
                         }
                         // catch error if check function is not working correctly
                     } catch (e) {
-                        console.log(e)
                         newStatusResult['error']++
-                        newCheckResults[check['id']] = [check, { status: 'error', timestamp: new Date() }]
+                        newCheckResults[check['id']] = [check, { status: 'error', message: `Error - ${e.message}`, timestamp: new Date() }]
                     }
                 } else {
                     newCheckResults[check['id']] = [check, { status: 'inactive', timestamp: 'N/A' }]
