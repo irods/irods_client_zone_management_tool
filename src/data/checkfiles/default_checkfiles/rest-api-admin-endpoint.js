@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-export const restApiAdminEndpoint = {
+export default {
     name: "iRODS Client REST API - /admin endpoint",
     description: `Checks ${process.env.REACT_APP_REST_API_URL}/admin for non-5xx.`,
-    min_server_version: "4.2.0",
-    max_server_version: "",
+    minimum_server_version: "4.2.0",
+    maximum_server_version: "",
     interval_in_seconds: 300,
     active: true,
     checker: async function () {

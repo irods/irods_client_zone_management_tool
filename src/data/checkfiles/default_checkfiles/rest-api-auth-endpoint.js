@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-export const restApiAuthEndpoint = {
+export default {
     name: "iRODS Client REST API - /auth endpoint",
     description: `Checks ${process.env.REACT_APP_REST_API_URL}/auth for non-5xx.`,
-    min_server_version: "4.2.0",
-    max_server_version: "",
+    minimum_server_version: "4.2.0",
+    maximum_server_version: "",
     interval_in_seconds: 300,
     active: true,
     checker: async function () {

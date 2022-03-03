@@ -3,18 +3,38 @@ import PropTypes from 'prop-types'
 import { useEnvironment, useServer } from '.'
 import { defaultChecks } from '../data/checkfiles/default_checkfiles'
 import { customChecks } from '../data/checkfiles/custom_checkfiles'
+import { irodsVersionComparator } from '../utils'
+
+// prior to running any check, zmt will validate all health checks following these rules:
+// 1. check's name is non-empty, 
+// 2. description is non-empty, 
+// 3. interval_in_seconds is a positive value
+// 4. checker function is defined
+// 5. minimum_server_version is smaller than maximum_server_version (if minimum_server_version and maximum_server_version are specified)
+
+const validateChecks = (checks) => {
+    return checks.reduce((acc, curr) => {
+        if (!curr.name || !curr.description || !curr.interval_in_seconds || curr.interval_in_seconds < 0 || !curr.checker || (curr.minimum_server_version && curr.maximum_server_version && irodsVersionComparator(curr.maximum_server_version,curr.minimum_server_version) < 0)) {
+            curr.isValid = false
+            curr.active = false
+        }
+        else curr.isValid = true
+        acc.push(curr)
+        return acc
+    }, [])
+}
 
 export const CheckContext = createContext({})
 
 export const CheckProvider = ({ children }) => {
     const [isChecking, setIsChecking] = useState(false)
-    const checks = [...defaultChecks, ...customChecks]
+    const checks = validateChecks([...defaultChecks, ...customChecks])
     const [checkObject, setCheckObject] = useState({})
     const [checkResults, setCheckResults] = useState({})
     const [checkIntervals, setCheckIntervals] = useState(localStorage.getItem('zmt-checkIntervals') ? JSON.parse(localStorage.getItem('zmt-checkIntervals')) : {})
     const [checkTimers, setCheckTimers] = useState({})
     const [statusResult, setStatusResult] = useState({})
-    const { zoneContext, rescAll, serverVersions, irodsVersionComparator, isLoadingZoneContext, validServerHosts } = useServer()
+    const { zoneContext, rescAll, serverVersions, isLoadingZoneContext, validServerHosts } = useServer()
     const { restApiLocation, restApiTimeout } = useEnvironment()
     const [timeStamp, setTimeStamp] = useState()
     const [inactiveChecks, setInactiveChecks] = useState(localStorage.getItem('zmt-inactiveChecks') ? new Set(JSON.parse(localStorage.getItem('zmt-inactiveChecks'))) : new Set(checks.reduce((prev, check, index) => {
@@ -34,10 +54,10 @@ export const CheckProvider = ({ children }) => {
     }, [zoneContext, rescAll, isLoadingZoneContext])
 
     const checkServerVersion = (check) => {
-        if ('min_server_version' in check && 'max_server_version' in check) {
+        if ('minimum_server_version' in check && 'maximum_server_version' in check) {
             // compare min and max server version if specified in checkfile
-            if (check['min_server_version'] !== '' && irodsVersionComparator(check['min_server_version'], serverVersions[0]) > 0) return serverVersions[0]
-            if (check['max_server_version'] !== '' && irodsVersionComparator(check['max_server_version'], serverVersions[serverVersions.length - 1]) < 0) return serverVersions[serverVersions.length - 1]
+            if (check['minimum_server_version'] !== '' && irodsVersionComparator(check['minimum_server_version'], serverVersions[0]) > 0) return serverVersions[0]
+            if (check['maximum_server_version'] !== '' && irodsVersionComparator(check['maximum_server_version'], serverVersions[serverVersions.length - 1]) < 0) return serverVersions[serverVersions.length - 1]
             return true
         }
     }
@@ -67,11 +87,13 @@ export const CheckProvider = ({ children }) => {
             if (checkServerVersion(check) === true) {
                 result = await check.checker.apply(context)
                 result.timestamp = new Date()
+                if (!result.status || (result.status !== 'healthy' && result.status !== 'warning' && result.status !== 'error')) {
+                    result = { status: 'error', message: `Error - this check returned an invalid result object.`, timestamp: new Date() }
+                }
             } else {
-                result = { status: 'unavailable', message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.min_server_version} - ${check.max_server_version}).`, timestamp: new Date() }
+                result = { status: 'unavailable', message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.minimum_server_version} - ${check.maximum_server_version}).`, timestamp: new Date() }
             }
         } catch (e) {
-            console.log(e)
             result = { status: 'error', message: 'Error when running the check.', timestamp: new Date() }
         }
         finally {
@@ -109,28 +131,41 @@ export const CheckProvider = ({ children }) => {
             (async function () {
                 check.id = `zmt-${index}`
                 newCheckObject[check['id']] = check
-                newCheckIntervals[check['id']] = check.id in checkIntervals ? checkIntervals[check.id] : ('interval_in_seconds' in check ? check['interval_in_seconds'] : 300)
+                newCheckIntervals[check['id']] = check.id in checkIntervals ? checkIntervals[check.id] : ('interval_in_seconds' in check ? check['interval_in_seconds'] : 'N/A')
+                // if the check is invalid
+                if (!check.isValid) {
+                    newStatusResult['error']++
+                    newCheckResults[check['id']] = [check, { status: 'error', message: `Error - checkfile is invalid.`, timestamp: new Date() }]
+                }
                 // if active, run the check
-                if (!inactiveChecks.has(`zmt-${index}`)) {
+                else if (!inactiveChecks.has(`zmt-${index}`)) {
                     try {
                         // enforce minimum/maximum server version
                         if (checkServerVersion(check) === true) {
                             let value = await check.checker.apply(context)
-                            value.timestamp = new Date()
-                            let id = setTimeout(() => callBackFn.current(check), 1000 * newCheckIntervals[check['id']])
-                            newCheckTimers[check['id']] = id
-                            newCheckResults[check['id']] = [check, value]
-                            newStatusResult[value.status]++
+                            if (!value.status || (value.status !== 'healthy' && value.status !== 'warning' && value.status !== 'error')) {
+                                newStatusResult['error']++
+                                newCheckResults[check['id']] = [check, { status: 'error', message: `Error - this check returned an invalid result object.`, timestamp: new Date() }]
+                            }
+                            else {
+                                value.timestamp = new Date()
+                                let id = setTimeout(() => callBackFn.current(check), 1000 * newCheckIntervals[check['id']])
+                                newCheckTimers[check['id']] = id
+                                newCheckResults[check['id']] = [check, value]
+                                newStatusResult[value.status]++
+                            }
                         } else {
                             newStatusResult['unavailable']++
-                            newCheckResults[check['id']] = [check, { status: 'unavailable', message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.min_server_version} - ${check.max_server_version}).`, timestamp: new Date() }]
+                            newCheckResults[check['id']] = [check, { status: 'unavailable', message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.minimum_server_version} - ${check.maximum_server_version}).`, timestamp: new Date() }]
                         }
                         // catch error if check function is not working correctly
                     } catch (e) {
                         newStatusResult['error']++
                         newCheckResults[check['id']] = [check, { status: 'error', message: `Error - ${e.message}`, timestamp: new Date() }]
                     }
-                } else {
+                } 
+                // if the check is valid but inactive
+                else {
                     newCheckResults[check['id']] = [check, { status: 'inactive', timestamp: 'N/A' }]
                     newStatusResult['inactive']++
                 }

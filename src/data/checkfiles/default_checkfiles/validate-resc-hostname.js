@@ -1,11 +1,11 @@
 import { Link } from '@reach/router'
 import React from 'react'
 
-export const validateRescHostname = {
+export default {
     name: "Each resource has a valid hostname",
     description: "Checks if each resource hostname matches a known server",
-    min_server_version: "4.2.0",
-    max_server_version: "",
+    minimum_server_version: "4.2.0",
+    maximum_server_version: "",
     interval_in_seconds: 300,
     active: true,
     checker: function () {

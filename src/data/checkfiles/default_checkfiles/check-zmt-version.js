@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { version } from '../../../../package.json'
 
-export const checkZMTVersion = {
+export default {
     name: "ZMT is running the latest version",
     description: "Checks if ZMT is running the latest version",
-    min_server_version: "4.2.0",
-    max_server_version: "",
+    minimum_server_version: "4.2.0",
+    maximum_server_version: "",
     interval_in_seconds: 300,
     active: true,
     checker: async function () {
