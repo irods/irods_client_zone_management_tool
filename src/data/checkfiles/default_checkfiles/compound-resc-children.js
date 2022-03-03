@@ -1,8 +1,8 @@
-export const compoundRescChildren = {
+export default {
     name: "Each compound resource has two valid children",
     description: `Checks if each compound resource has exactly one cache and one archive as children.`,
-    min_server_version: "4.2.0",
-    max_server_version: "",
+    minimum_server_version: "4.2.0",
+    maximum_server_version: "",
     interval_in_seconds: 300,
     active: true,
     checker: function () {

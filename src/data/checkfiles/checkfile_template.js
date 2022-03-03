@@ -1,16 +1,23 @@
-export const checkfile_template = {
-    name: "",
-    description: "",
+export default {
+    name: "template",
+    description: "template",
     minimum_server_version: "", // optional
     maximum_server_version: "", // optional
-    interval_in_seconds: "",
+    interval_in_seconds: 1,
     active: true,
-    checker: function() {
-        // @returns{object} {
-        //   status: '<ok,unexpected,warning,bad>',
-        //   message: 'message that will be displayed on homepage'
-        // }
-    
+    checker: function () {
+        // default result object
+        let result = {
+            status: 'healthy', // <healthy, warning, error>
+            message: '',
+            success: 0, // optional
+            failed: [] // optional
+        }
         // your code here
+
+
+
+        // return
+        return result
     }
 }

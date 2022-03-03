@@ -44,16 +44,16 @@ export const CheckResult = ({ status, check, result }) => {
                 <TableCell><IconButton size="small" onClick={() => setExpanded(!expanded)}>{expanded ? <ExpandMoreIcon /> : <KeyboardArrowRightIcon />}</IconButton></TableCell>
                 <TableCell style={{ cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>{result[0].name}</TableCell>
                 <TableCell><i>{result[1].timestamp === 'N/A' ? 'N/A' : <TimeAgo datetime={result[1].timestamp} />}</i></TableCell>
-                <TableCell align="center"><input defaultChecked={!inactiveChecks.has(result[0].id)} type="checkbox" onClick={() => modifyCheckActivity(result[0].id)} /></TableCell>
-                <TableCell align="center">{checkIntervals[check.id]} seconds</TableCell>
-                <TableCell align="center"><Tooltip title={inactiveChecks.has(result[0].id) ? "This check is inactive" : "Run this check again"}><span><IconButton size="small" disabled={inactiveChecks.has(result[0].id)} onClick={() => runOneCheck(check)}><LoopIcon /></IconButton></span></Tooltip></TableCell>
+                <TableCell align="center"><input defaultChecked={!inactiveChecks.has(result[0].id)} disabled={!check.isValid} type="checkbox" onClick={() => modifyCheckActivity(result[0].id)} /></TableCell>
+                <TableCell align="center">{checkIntervals[check.id]} {checkIntervals[check.id]!== 'N/A' && 'seconds'}</TableCell>
+                <TableCell align="center"><Tooltip title={inactiveChecks.has(result[0].id) ? "This check is inactive" : "Run this check again"}><span><IconButton size="small" disabled={inactiveChecks.has(result[0].id) || !check.isValid} onClick={() => runOneCheck(check)}><LoopIcon /></IconButton></span></Tooltip></TableCell>
                 <TableCell style={{ paddingLeft: '20px' }}>{status === 'healthy' ? <CheckIcon style={{ color: 'green' }} /> : (status === 'error' ? <ErrorIcon style={{ color: 'red' }} /> : (status === 'warning' ? <WarningIcon style={{ color: 'orange' }} /> : (status === 'unavailable' ? <HighlightOffIcon /> : <BlockIcon />)))}</TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                         <div style={{ padding: '10px 0' }}>
-                            <div><b>Interval:</b> {isEditingInterval ? <Fragment><Input onKeyDown={(event) => handleKeyDown(event)} style={{ width: '50px'}} onChange={(e) => setInterval(e.target.value)} /> seconds<IconButton size="small" onClick={() => intervalHandler()}><CheckIcon /></IconButton><IconButton size="small" onClick={() => setIsEditingInterval(false)}><CloseIcon /></IconButton></Fragment> : <span>{interval} seconds <IconButton size="small" onClick={() => setIsEditingInterval(true)}><EditIcon /></IconButton></span>}</div>
+                            <div><b>Interval:</b> {isEditingInterval ? <Fragment><Input type="number" inputProps={{ "step": 0.01, "min": 1 }} onKeyDown={(event) => handleKeyDown(event)} style={{ width: '50px' }} onChange={(e) => setInterval(e.target.value)} /> seconds<IconButton size="small" onClick={() => intervalHandler()}><CheckIcon /></IconButton><IconButton size="small" onClick={() => setIsEditingInterval(false)}><CloseIcon /></IconButton></Fragment> : <span>{interval} seconds <IconButton size="small" disabled={!check.active || !check.isValid} onClick={() => setIsEditingInterval(true)}><EditIcon /></IconButton></span>}</div>
                             <div><b>Description:</b> {result[0].description}</div>
                             <div><b>Result:</b> {result[1].message}</div>
                         </div>

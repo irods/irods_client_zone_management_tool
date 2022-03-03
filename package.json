@@ -1,5 +1,5 @@
 {
-  "name": "irods_admin",
+  "name": "irods_client_zone_management_tool",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
