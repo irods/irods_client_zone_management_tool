@@ -9,3 +9,4 @@ export * from "./Server";
 export * from "./User";
 export * from "./resources";
 export * from "./Zone";
+export * from "./SpecificQuery"

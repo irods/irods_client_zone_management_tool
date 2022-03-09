@@ -171,7 +171,6 @@ export const Zone = () => {
             {zones === undefined || isLoadingZones ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
             <Button variant="outlined" color="primary" onClick={() => addNewZoneRow()}>Add new Zone</Button>
             <br />
-
             <br />
             <TableContainer component={Paper}>
                 <Table style={{ width: '100%', tableLayout: 'fixed' }}>

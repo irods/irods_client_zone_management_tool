@@ -39,6 +39,9 @@ export const ServerProvider = ({ children }) => {
     const [filteredServers, setFilteredServers] = useState();
     const [serverVersions, setServerVersions] = useState([])
     const [validServerHosts, setValidServerHosts] = useState(new Set(['EMPTY_RESC_HOST']))
+    const [isLoadingSpecificQueryContext, setIsLoadingSpecificQueryContext] = useState(false)
+    const [specificQueryContext, setSpecificQueryContext] = useState(initialState)
+    const [specificQueryTotal, setSpecificQueryTotal] = useState(0)
 
     const loadUsers = (offset, limit, name, order, orderBy) => {
         setIsLoadingUserContext(true);
@@ -382,12 +385,43 @@ export const ServerProvider = ({ children }) => {
         }
     }
 
+    const loadSpecificQueries = (term) => {
+        let _query = 'select alias, sqlStr from R_SPECIFIC_QUERY'
+        if (term !== '') {
+            _query += ` where alias like '${term}'`
+        }
+        setIsLoadingSpecificQueryContext(true)
+        axios({
+            method: 'GET',
+            url: `${restApiLocation}/query`,
+            headers: {
+                'Authorization': localStorage.getItem('zmt-token')
+            },
+            params: {
+                query_string: _query,
+                query_limit: 100,
+                row_offset: 0,
+                query_type: 'specific',
+            }
+        }).then(res => {
+            setSpecificQueryTotal(res.data.total)
+            setSpecificQueryContext(res.data)
+            setIsLoadingSpecificQueryContext(false)
+        }).catch(() => {
+            setSpecificQueryTotal(0)
+            setSpecificQueryContext(undefined)
+            setIsLoadingSpecificQueryContext(false)
+        })
+    }
+
+
     const loadData = () => {
         !isLoadingZones && loadZones();
         !isLoadingZoneContext && loadServers();
         !isLoadingUserContext && loadUsers(0, 10, '', 'asc', 'USER_NAME');
         !isLoadingGroupContext && loadGroups(0, 10, '', 'asc', 'USER_NAME');
         !isLoadingRescContext && loadResources(0, 0, '', 'asc', 'RESC_NAME');
+        !isLoadingSpecificQueryContext && loadSpecificQueries('')
     }
 
     // load all zone data at each render if user is logged in
@@ -405,6 +439,7 @@ export const ServerProvider = ({ children }) => {
             rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResources,
             isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext, isLoadingZones,
             serverVersions, validServerHosts, irodsVersionComparator,
+            specificQueryContext, isLoadingSpecificQueryContext, specificQueryTotal, loadSpecificQueries,
             loadData
         }}>
             {children}
