@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { LocationProvider, Router } from '@reach/router';
 import { Layout, Footer } from './components';
-import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, User, Zone } from './views';
+import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone } from './views';
 import { CheckProvider, EnvironmentProvider, ServerProvider } from './contexts';
 import './App.css';
 
@@ -24,6 +24,7 @@ class App extends Component {
                       <ResourceListView path='/resources' />
                       <ResourceTreeView path='/resources/tree' />
                       <Server path='/servers' />
+                      <SpecificQuery path='/specific-query' />
                       <Zone path='/zones' />
                       <Landing path="/" />
                       <NotFound default />

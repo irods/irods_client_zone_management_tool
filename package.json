@@ -16,6 +16,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-spring": "^9.1.2",
+    "sql-formatter": "^4.0.2",
     "timeago-react": "^3.0.4"
   },
   "devDependencies": {
