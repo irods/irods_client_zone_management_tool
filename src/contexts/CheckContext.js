@@ -122,7 +122,7 @@ export const CheckProvider = ({ children }) => {
         }
         setIsChecking(true)
         let newCheckResults = {}
-        let newStatusResult = { 'error': 0, 'warning': 0, 'healthy': 0, 'inactive': 0, 'unavailable': 0 }
+        let newStatusResult = { 'error': 0, 'invalid': 0, 'warning': 0, 'healthy': 0, 'inactive': 0, 'unavailable': 0 }
         let newCheckObject = {}
         let newCheckTimers = {}
         let newCheckIntervals = {}
@@ -134,8 +134,8 @@ export const CheckProvider = ({ children }) => {
                 newCheckIntervals[check['id']] = check.id in checkIntervals ? checkIntervals[check.id] : ('interval_in_seconds' in check ? check['interval_in_seconds'] : 'N/A')
                 // if the check is invalid
                 if (!check.isValid) {
-                    newStatusResult['error']++
-                    newCheckResults[check['id']] = [check, { status: 'error', message: `Error - checkfile is invalid.`, timestamp: new Date() }]
+                    newStatusResult['invalid']++
+                    newCheckResults[check['id']] = [check, { status: 'invalid', message: `Checkfile is invalid.`, timestamp: new Date() }]
                 }
                 // if active, run the check
                 else if (!inactiveChecks.has(`zmt-${index}`)) {

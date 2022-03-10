@@ -9,6 +9,7 @@ import ErrorIcon from '@material-ui/icons/Error'
 import BlockIcon from '@material-ui/icons/Block'
 import WarningIcon from '@material-ui/icons/Warning'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
+import CancelIcon from '@material-ui/icons/Cancel'
 
 const useStyles = makeStyles({
     root: {
@@ -69,7 +70,7 @@ export const Home = () => {
                 <div className={classes.paperStatus}><BuildIcon style={{ fontSize: 50 }} /></div>
                 <div className={classes.paperTitle}>
                     <span style={{ fontSize: 18 }}>Health Check</span>
-                    <div className={classes.paperDetail}>{Object.keys(statusResult).length === 0 ? <CircularProgress size="1.5rem" /> : Object.keys(statusResult).filter(status => statusResult[status] > 0).map(status => status === 'healthy' ? <span key={`status-${status}`} className={classes.paperStatus}><CheckIcon style={{ color: 'green' }} />{statusResult[status]}</span> : (status === 'error' ? <span key={`status-${status}`} className={classes.paperStatus}><ErrorIcon style={{ color: 'red' }} />{statusResult[status]}</span> : (status === 'warning' ? <span key={`status-${status}`} className={classes.paperStatus}><WarningIcon style={{ color: 'orange' }} />{statusResult[status]}</span> : (status === 'unavailable' ? <span key={`status-${status}`} className={classes.paperStatus}><HighlightOffIcon />{statusResult[status]}</span> : <span key={`status-${status}`} className={classes.paperStatus}><BlockIcon />{statusResult[status]}</span>))))}</div>
+                    <div className={classes.paperDetail}>{Object.keys(statusResult).length === 0 ? <CircularProgress size="1.5rem" /> : Object.keys(statusResult).filter(status => statusResult[status] > 0).map(status => status === 'healthy' ? <span key={`status-${status}`} className={classes.paperStatus}><CheckIcon style={{ color: 'green' }} />{statusResult[status]}</span> : (status === 'error' ? <span key={`status-${status}`} className={classes.paperStatus}><ErrorIcon style={{ color: 'red' }} />{statusResult[status]}</span> : (status === 'warning' ? <span key={`status-${status}`} className={classes.paperStatus}><WarningIcon style={{ color: 'orange' }} />{statusResult[status]}</span> : (status === 'unavailable' ? <span key={`status-${status}`} className={classes.paperStatus}><HighlightOffIcon />{statusResult[status]}</span> : (status === 'invalid' ? <span key={`status-${status}`} className={classes.paperStatus}><CancelIcon style={{ color: 'red' }} />{statusResult[status]}</span> : <span key={`status-${status}`} className={classes.paperStatus}><BlockIcon />{statusResult[status]}</span>)))))}</div>
                 </div>
             </Paper>
             <br />

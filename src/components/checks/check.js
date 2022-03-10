@@ -7,6 +7,7 @@ import ErrorIcon from '@material-ui/icons/Error'
 import WarningIcon from '@material-ui/icons/Warning'
 import BlockIcon from '@material-ui/icons/Block'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
+import CancelIcon from '@material-ui/icons/Cancel'
 
 export const Check = () => {
     const { isChecking, checks, runAllCheck, checkObject, checkResults, statusResult, timeStamp } = useCheck()
@@ -45,7 +46,7 @@ export const Check = () => {
             <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'space-between' }}>
                 <span>
                     <Chip style={{ margin: '5px' }} variant={statusFilter === 'All' ? 'default' : 'outlined'} label={`All ${checks.length}`} color='default' clickable={true} onClick={() => setStatusFilter('All')} />
-                    {Object.keys(statusResult).length > 0 && [...Object.keys(statusResult)].filter(status => statusResult[status] !== 0).map(status => <Chip style={{ margin: '5px', padding: '2px' }} key={status} variant={statusFilter === status ? 'default' : 'outlined'} color='default' label={`${status} ${statusResult[status]}`} icon={status === 'healthy' ? <CheckIcon style={{ color: 'green' }} /> : (status === 'error' ? <ErrorIcon style={{ color: 'red' }} /> : (status === 'warning' ? <WarningIcon style={{ color: 'orange' }} /> : (status === 'unavailable' ? <HighlightOffIcon /> : <BlockIcon />)))} clickable={true} onClick={() => setStatusFilter(status)} />)}
+                    {Object.keys(statusResult).length > 0 && [...Object.keys(statusResult)].filter(status => statusResult[status] !== 0).map(status => <Chip style={{ margin: '5px', padding: '2px' }} key={status} variant={statusFilter === status ? 'default' : 'outlined'} color='default' label={`${status} ${statusResult[status]}`} icon={status === 'healthy' ? <CheckIcon style={{ color: 'green' }} /> : (status === 'error' ? <ErrorIcon style={{ color: 'red' }} /> : (status === 'warning' ? <WarningIcon style={{ color: 'orange' }} /> : (status === 'unavailable' ? <HighlightOffIcon /> : (status === 'invalid' ? <CancelIcon style={{ color: 'red'}} /> : <BlockIcon />))))} clickable={true} onClick={() => setStatusFilter(status)} />)}
                 </span>
                 <TextField style={{ width: '200px' }} value={titleFilter} placeholder="Filter by title..." onChange={(e) => setTitleFilter(e.target.value)} />
             </div>
