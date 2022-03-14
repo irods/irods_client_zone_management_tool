@@ -15,7 +15,9 @@ git clone https://github.com/irods/irods_client_zone_management_tool
 ```
 
 ### 3. Deploy the iRODS Client REST Mid-Tier API 
-Please refer to [iRODS Client REST API](https://github.com/irods/irods_client_rest_cpp) and build this repository. You will need the hostname and port of this service.
+Please refer to [iRODS Client REST API](https://github.com/irods/irods_client_rest_cpp) and build this repository. You will need the hostname, port, and version of this service.
+
+The C++ REST API must be version 0.9.1 or later.
 
 ### 4. Setup Environment Variables
 Create a file named '.env' and place under the root directory. Please refer to sample.env file, setup the following environment variables and save the file.
@@ -53,21 +55,41 @@ docker-compose down
 ```
 
 ## Health checks in ZMT
-ZMT will load all health checks from checkfile directory. Each checkfile represents a health check. Default checks are provided to you and those include checks for REST endpoints, resources, and more. To turn off a health check, set the active property to false in each checkfile or uncheck its checkbox in the table view. Results of each check are presented as status in ZMT, it could be 'healthy', 'warning', 'error', or 'inactive', along with detailed messages if you click on each table row.
+ZMT will load its health checks from two checkfile directories (default and custom).  Default checks are included and on by default.
 
-ZMT will hold your setting for each checkfile (interval, active) in localStorage unless you log out.
+Results of each check are presented as 'healthy', 'warning', 'error', 'invalid', 'inactive', or 'unavailable'.
 
-### Create your custom health checks
-You can make your custom health check in ZMT. Name, description, interval and checker function are required for each checkfile. You can also specify the min/max irods server version if needed. ZMT will validate each checkfile before running it, if you happen to provide an invalid checkfile, you will see an error status in the table view and a detailed error message in your console.
+### localStorage
 
-#### 1. Make a new checkfile
-Create a javascript file (i.e. abcd.js) and place it under /src/data/checkfiles/custom_checkfiles directory. Please refer to the checkfile_template.js file.
+- `active` - Each health check's status.  Can be set to 'false' to no longer run.
 
-#### 2. Create name, description, interval, checker function for the new health check
-In your newly created javascript object, add value for name, description, interval_in_seconds and checker property. Make sure the value of name, description property is non-empty string, and the value of interval_in_seconds is positive value. Specify minimum_server_version and maximum_server_version if needed. If ZMT encounters issues when running your check, you will see an error message in both the table view and console.
+- `interval` - Each health check's interval between reaching out to the server, in seconds.
 
-#### 3. Refresh ZMT
-A refresh will let ZMT reload health checks and run all checks again.
+ZMT will hold each checkfile's settings in localStorage until Logout.
+
+### Custom health checks
+Additional health checks can be added to your ZMT deployment.
+
+On startup, ZMT will validate each checkfile and provide any errors in the table view (with additional information in the browser console).
+
+#### 1. Create a new checkfile
+Copy `src/data/checkfiles/checkfile_template.js` into the `src/data/checkfiles/custom_checkfiles` directory.  The name of the new checkfile does not matter.
+
+#### 2. Fill in the required values
+
+Required:
+- `name` - non-empty string
+- `description` - non-empty string
+- `interval_in_seconds` - positive integer
+- `active` - true or false
+- `checker` - javascript object which returns a `result` object
+
+Optional:
+- `minimum_server_version` - string representing `major.minor.patch` level of the iRODS server
+- `maximum_server_version` - string representing `major.minor.patch` level of the iRODS server
+
+#### 3. Restart ZMT
+ZMT will re-validate and re-run each defined checkfile.
 
 ## Built With
   - [React](https://reactjs.org/) - Reactive frontend framework built by Facebook
