@@ -6,7 +6,7 @@ export default {
     description: `Checks if the length of each resource is within 63 characters.`,
     minimum_server_version: "4.2.0",
     maximum_server_version: "",
-    interval_in_seconds: 300,
+    interval_in_seconds: 3600,
     active: true,
     checker: function () {
         let result = {
