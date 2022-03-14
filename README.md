@@ -21,12 +21,22 @@ Please refer to [iRODS Client REST API](https://github.com/irods/irods_client_re
 Create a file named '.env' and place under the root directory. Please refer to sample.env file, setup the following environment variables and save the file.
 
 ```
-LISTEN_PORT=
-REACT_APP_REST_API_URL=protocol://host:port
+#######################################
+# Location of the iRODS Client REST API
+# <protocol>://<host>:<port>/irods-rest/<rest_api_version>
+#
+# e.g. https://example.org:8080/irods-rest/0.9.1
+
+REACT_APP_REST_API_URL=
+
+#######################################
+# Defaults
+
+LISTEN_PORT=9000
 REACT_APP_APPBAR_LOGO=iRODS-logo.jpg
 REACT_APP_LOGIN_LOGO=iRODS-logo-1.png
 REACT_APP_BRANDING_NAME=Zone Management Tool
-REACT_APP_PRIMARY_COLOR='#04bdaf'
+REACT_APP_PRIMARY_COLOR=#04bdaf
 ```
 
 ### 5. Deploy the ZMT via Docker Compose
