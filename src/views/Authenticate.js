@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Box, Button, Container, TextField, Typography } from '@material-ui/core';
+import { Button, Container, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from '@reach/router';
 import { useEnvironment, useServer } from '../contexts';
@@ -116,9 +116,6 @@ export const Authenticate = () => {
                     className={classes.login_button}
                     onClick={handleAuthenticate}>Login</Button>
                 <br />
-                <Box mt={8}>
-                    Copyright © iRODS Consortium 2021
-                </Box>
             </div>
         </Container>
     );
