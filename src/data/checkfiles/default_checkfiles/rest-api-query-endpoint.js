@@ -14,7 +14,7 @@ export default {
         }
         await axios({
             url: `${this.restApiLocation}/query`,
-            method: 'POST',
+            method: 'GET',
             timeout: this.restApiTimeout * 1000
         }).catch(e => {
             if (!e.response || e.response.status >= 500) {

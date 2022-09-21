@@ -57,11 +57,11 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: _query,
-                query_limit: limit,
-                row_offset: offset,
-                query_type: 'general',
-                case_sensitive: 0
+                query: _query,
+                limit: limit,
+                offset: offset,
+                type: 'general',
+                'case-sensitive': 0
             }
         }).then((res) => {
             if (name === '') setUserTotal(res.data.total)
@@ -82,10 +82,10 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
+                query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
+                limit: 100,
+                offset: 0,
+                type: 'general'
             }
         }))
 
@@ -120,11 +120,11 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: _query,
-                query_limit: orderBy === 'USER_COUNT' ? 0 : limit,
-                row_offset: orderBy === 'USER_COUNT' ? 0 : offset,
-                query_type: 'general',
-                case_sensitive: 0
+                query: _query,
+                limit: orderBy === 'USER_COUNT' ? 0 : limit,
+                offset: orderBy === 'USER_COUNT' ? 0 : offset,
+                type: 'general',
+                'case-sensitive': 0
             }
         }).then((res) => {
             if (name === '') setGroupTotal(res.data.total)
@@ -182,10 +182,10 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: _query,
-                    query_limit: limit,
-                    row_offset: offset,
-                    query_type: 'general'
+                    query: _query,
+                    limit: limit,
+                    offset: offset,
+                    type: 'general'
                 }
             }).then((res) => {
                 setRescContext(res.data);
@@ -206,11 +206,11 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: base_query + ` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
-                    query_limit: 500,
-                    row_offset: 0,
-                    query_type: 'general',
-                    case_sensitive: 0
+                    query: base_query + ` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
+                    limit: 500,
+                    offset: 0,
+                    type: 'general',
+                    'case-sensitive': 0
                 }
             }).then((res) => {
                 filteredResults = res.data;
@@ -225,10 +225,10 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
-                    query_limit: 500,
-                    row_offset: 0,
-                    query_type: 'general'
+                    query: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
+                    limit: 500,
+                    offset: 0,
+                    type: 'general'
                 }
             }).then((res) => {
                 resourceSortRemoveDuplicatesHelper([...filteredResults._embedded, ...res.data._embedded], offset, limit, order, orderBy);
@@ -254,10 +254,10 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
-                query_limit: 0,
-                row_offset: 0,
-                query_type: 'general'
+                query: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
+                limit: 0,
+                offset: 0,
+                type: 'general'
             }
         })
         if (zoneData.status === 200) {
@@ -278,10 +278,10 @@ export const ServerProvider = ({ children }) => {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
                 params: {
-                    query_string: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
-                    query_limit: 0,
-                    row_offset: 0,
-                    query_type: 'general'
+                    query: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
+                    limit: 0,
+                    offset: 0,
+                    type: 'general'
                 }
             })
         })
@@ -293,8 +293,8 @@ export const ServerProvider = ({ children }) => {
 
     const loadZoneReport = () => {
         return axios({
-            method: 'POST',
-            url: `${restApiLocation}/zone_report`,
+            method: 'GET',
+            url: `${restApiLocation}/zonereport`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': localStorage.getItem('zmt-token')
@@ -314,10 +314,10 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
+                query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
+                limit: 100,
+                offset: 0,
+                type: 'general'
             }
         })
     }
@@ -398,10 +398,10 @@ export const ServerProvider = ({ children }) => {
                 'Authorization': localStorage.getItem('zmt-token')
             },
             params: {
-                query_string: _query,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'specific',
+                query: _query,
+                limit: 100,
+                offset: 0,
+                type: 'specific',
             }
         }).then(res => {
             setSpecificQueryTotal(res.data.total)

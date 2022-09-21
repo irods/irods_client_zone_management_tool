@@ -45,10 +45,10 @@ export const EditGroup = (props) => {
                 'Authorization': auth
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
+                query: `SELECT USER_NAME, USER_TYPE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
+                limit: 100,
+                offset: 0,
+                type: 'general'
             }
         }).then((res) => {
             setUsersInGroup(res.data._embedded);
@@ -65,11 +65,11 @@ export const EditGroup = (props) => {
                 'Authorization': auth,
             },
             params: {
-                query_string: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName.toUpperCase()}%' AND USER_TYPE != 'RODSGROUP'`,
-                query_limit: 10,
-                row_offset: 0,
-                query_type: 'general',
-                case_sensitive: 0
+                query: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName.toUpperCase()}%' AND USER_TYPE != 'RODSGROUP'`,
+                limit: 10,
+                offset: 0,
+                type: 'general',
+                'case-sensitive': 0
             }
         }).then((res) => {
             setFilterNameResult(res.data._embedded);
