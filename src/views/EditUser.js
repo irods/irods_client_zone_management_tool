@@ -78,10 +78,10 @@ export const EditUser = () => {
                 'Authorization': auth
             },
             params: {
-                query_string: `SELECT USER_TYPE WHERE USER_NAME = '${currentUserName}' AND USER_ZONE = '${currentUserZone}'`,
-                query_limit: 100,
-                row_offset: 0,
-                query_type: 'general'
+                query: `SELECT USER_TYPE WHERE USER_NAME = '${currentUserName}' AND USER_ZONE = '${currentUserZone}'`,
+                limit: 100,
+                offset: 0,
+                type: 'general'
             }
         }).then(res => {
             // navigate back to /user if the username provided does not exist
@@ -102,10 +102,10 @@ export const EditUser = () => {
                     'Authorization': auth
                 },
                 params: {
-                    query_string: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUserName}' AND USER_GROUP_NAME != '${currentUserName}'`,
-                    query_limit: 100,
-                    row_offset: 0,
-                    query_type: 'general'
+                    query: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUserName}' AND USER_GROUP_NAME != '${currentUserName}'`,
+                    limit: 100,
+                    offset: 0,
+                    type: 'general'
                 }
             }).then((res) => {
                 setGroupOfUser(res.data._embedded);
@@ -123,11 +123,11 @@ export const EditUser = () => {
                     'Authorization': auth,
                 },
                 params: {
-                    query_string: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName.toUpperCase()}%' AND USER_TYPE = 'RODSGROUP'`,
-                    query_limit: 100,
-                    row_offset: 0,
-                    query_type: 'general',
-                    case_sensitive: 0
+                    query: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName.toUpperCase()}%' AND USER_TYPE = 'RODSGROUP'`,
+                    limit: 100,
+                    offset: 0,
+                    type: 'general',
+                    'case-sensitive': 0
                 }
             }).then((res) => {
                 setFilterNameResult(res.data._embedded);
