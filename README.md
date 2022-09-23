@@ -17,7 +17,7 @@ git clone https://github.com/irods/irods_client_zone_management_tool
 ### 3. Deploy the iRODS Client REST Mid-Tier API 
 Please refer to [iRODS Client REST API](https://github.com/irods/irods_client_rest_cpp) and build this repository. You will need the hostname, port, and version of this service.
 
-The C++ REST API must be version 0.9.1 or later.
+The C++ REST API must be version 0.9.2 or later.
 
 ### 4. Setup Environment Variables
 Create a file named '.env' and place under the root directory. Please refer to sample.env file, setup the following environment variables and save the file.
@@ -27,7 +27,7 @@ Create a file named '.env' and place under the root directory. Please refer to s
 # Location of the iRODS Client REST API
 # <protocol>://<host>:<port>/irods-rest/<rest_api_version>
 #
-# e.g. https://example.org:8080/irods-rest/0.9.1
+# e.g. https://example.org:8080/irods-rest/0.9.2
 
 REACT_APP_REST_API_URL=
 
