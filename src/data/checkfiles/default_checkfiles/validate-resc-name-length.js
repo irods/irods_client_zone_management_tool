@@ -16,7 +16,7 @@ export default {
             failed: []
         }
         this.rescAll._embedded.forEach(resc => {
-            resc[0].length > 63 ? result.failed.push(resc[0]) : result.success += 1
+            (resc[0].length < 1 || resc[0].length > 63) ? result.failed.push(resc[0]) : result.success += 1
         })
         result.status = result.failed.length > 0 ? 'warning' : 'healthy'
         result.message = result.failed.length > 0 ? <span><span>Failed on: </span>{result.failed.map((failedResc,index) => <span key={`rescNameCheckFailed-${index}`}>{index !== 0 && ', '}<Link className="check_result_link" to={`/resources?filter=${encodeURIComponent(failedResc)}`}>{failedResc}</Link></span>)}</span> : 'All resource names have a valid length.'
