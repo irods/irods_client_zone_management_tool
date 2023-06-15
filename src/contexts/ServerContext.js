@@ -78,7 +78,7 @@ export const ServerProvider = ({ children }) => {
 
     const loadTickets = (offset, limit, order, orderBy) => {
         setIsLoadingTicketContext(true);
-        let _query = "SELECT TICKET_TYPE, TICKET_USER_ID, TICKET_STRING, TICKET_OBJECT_TYPE"
+        let _query = "SELECT TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY"
 
         _query = queryGenerator(_query, order, orderBy);
         return axios({
