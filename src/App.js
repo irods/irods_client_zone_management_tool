@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { LocationProvider, Router } from '@reach/router';
 import { Layout, Footer } from './components';
-import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone } from './views';
+import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone, Ticket} from './views';
 import { CheckProvider, EnvironmentProvider, ServerProvider } from './contexts';
 import './App.css';
 
@@ -27,6 +27,8 @@ class App extends Component {
                       <SpecificQuery path='/specific-query' />
                       <Zone path='/zones' />
                       <Landing path="/" />
+                      <Ticket path='/tickets' />
+                      
                       <NotFound default />
                     </Router>
                   </Layout>

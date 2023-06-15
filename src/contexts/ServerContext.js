@@ -27,6 +27,9 @@ export const ServerProvider = ({ children }) => {
     const [userContext, setUserContext] = useState(initialState);
     const [userTotal, setUserTotal] = useState(0);
     const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
+    const [ticketContext, setTicketContext] = useState(initialState);
+    const [ticketTotal, setTicketTotal] = useState(0);
+    const [isLoadingTicketContext, setIsLoadingTicketContext] = useState(false);
     const [groupContext, setGroupContext] = useState(initialState);
     const [groupTotal, setGroupTotal] = useState(0);
     const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
@@ -71,6 +74,36 @@ export const ServerProvider = ({ children }) => {
             setUserContext(undefined);
             setIsLoadingUserContext(false);
         });
+    }
+
+    const loadTickets = (offset, limit, order, orderBy) => {
+        setIsLoadingTicketContext(true);
+        let _query = "SELECT TICKET_TYPE, TICKET_USER_ID, TICKET_STRING, TICKET_OBJECT_TYPE"
+
+        _query = queryGenerator(_query, order, orderBy);
+        return axios({
+            method: 'GET',
+            url: `${restApiLocation}/query`,
+            headers: {
+                'Authorization': localStorage.getItem('zmt-token')
+            },
+            params: {
+                query: _query,
+                limit: limit,
+                offset: offset,
+                type: 'general',
+                'case-sensitive': 0
+            }
+        }).then((res) => {
+            setTicketTotal(res.data.total)
+            setTicketContext(res.data);
+            setIsLoadingTicketContext(false);
+        }).catch(() => {
+            setTicketContext(undefined);
+            setIsLoadingTicketContext(false);
+        });
+
+
     }
 
     // iterate through group results and load user counts
@@ -435,9 +468,10 @@ export const ServerProvider = ({ children }) => {
         <ServerContext.Provider value={{
             zoneContext, localZoneName, zones, loadZones, loadZoneReport, filteredServers, loadCurrServers,
             userTotal, userContext, loadUsers,
+            ticketTotal, ticketContext, loadTickets,
             groupTotal, groupContext, loadGroups,
             rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResources,
-            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext, isLoadingZones,
+            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext, isLoadingZones, isLoadingTicketContext,
             serverVersions, validServerHosts, irodsVersionComparator,
             specificQueryContext, isLoadingSpecificQueryContext, specificQueryTotal, loadSpecificQueries,
             loadData
