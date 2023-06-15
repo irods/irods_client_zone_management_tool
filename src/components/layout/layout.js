@@ -72,7 +72,7 @@ export const Layout = ({ children }) => {
     const { localZoneName, zones } = useServer();
     const AppBarLogo = require(`../../img/${environment.appbarLogo}`).default;
     const [mobileOpen, setMobileOpen] = useState(false);
-    const { userTotal, groupTotal, rescTotal, zoneContext, specificQueryTotal } = useServer();
+    const { userTotal, groupTotal, rescTotal, zoneContext, specificQueryTotal, ticketTotal } = useServer();
 
     const logoutHandler = () => {
         localStorage.removeItem('zmt-token');
@@ -108,6 +108,11 @@ export const Layout = ({ children }) => {
                 <MenuItem button selected={pathname === 'specific-query'} component={Link} to="/specific-query" key='specific-query'>
                     <ListItemText>Specific Queries ({specificQueryTotal})</ListItemText>
                 </MenuItem>
+                <MenuItem button selected={pathname === 'tickets'} component={Link} to="/tickets" key='ticket'>
+                    <ListItemText>Tickets ({ticketTotal})</ListItemText>
+                </MenuItem>
+
+
             </List>
             <Divider />
             <List>

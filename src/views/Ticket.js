@@ -104,7 +104,7 @@ export const Ticket = () => {
                         <TableRow>
                             <TableCell className={classes.table_cell} style={{ width: '40%' }}>Created By</TableCell>
                             <TableCell className={classes.table_cell} style={{ width: '40%' }}>Type</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Ticket String</TableCell>
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Ticket ID</TableCell>
                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>Create Time</TableCell>
                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>Modify Time</TableCell>
                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>Expire Time</TableCell>
