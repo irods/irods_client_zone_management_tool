@@ -108,7 +108,7 @@ export const Ticket = () => {
                 ticket[4].includes(filterTicket.toLowerCase()) ||
                 ticket[5].includes(filterTicket.toLowerCase()) ||
                 ticket[6].includes(filterTicket.toLowerCase())
-                
+
     })
 
     return (
@@ -226,7 +226,7 @@ export const Ticket = () => {
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[2]}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{new Date(parseInt(ticket[4])).toLocaleDateString()}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{new Date(parseInt(ticket[5])).toLocaleDateString()}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[6] ? new Date(parseInt(ticket[6])).toLocaleDateString(): ""}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[6] ? new Date(parseInt(ticket[6])).toLocaleDateString(): "N/A"}</TableCell>
                                 </TableRow>
                             )
                         })
