@@ -1,11 +1,11 @@
 /*eslint no-unused-vars: "error"*/
 
-import React, { Fragment, useEffect } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { navigate } from '@reach/router';
 // import axios from 'axios';
 import { useServer } from '../contexts';
 // import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
-import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody } from '@material-ui/core';
+import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TableSortLabel } from '@material-ui/core';
 // import SaveIcon from '@material-ui/icons/Save';
 // import CloseIcon from '@material-ui/icons/Close';
 // import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
@@ -63,22 +63,31 @@ export const Ticket = () => {
     const { isLoadingUserContext, loadTickets, ticketContext } = useServer();
     const classes = useStyles();
     // const [filterTicket, setFilterTicket] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
-    // const [order, setOrder] = useState("asc");
-    // const [orderBy, setOrderBy] = useState("USER_NAME");
-
+    const [order, setOrder] = useState("asc");
+    const [orderBy, setOrderBy] = useState("TICKET_OWNER_NAME");
+ // TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY
   
     const perPage = 10;
     const currPage = 1;
-    const order = "asc";
-    const orderBy = "USER_NAME";
-    useEffect(() => {
-      
 
+    useEffect(() => {
         loadTickets(perPage * (currPage - 1), perPage, order, orderBy)
         console.log("ticketContext: ", ticketContext)
-        
     }, [currPage, perPage, order, orderBy])
-    console.log("ticketContext: ", ticketContext)
+
+    const handleSort = (props) => {
+        const isAsc = orderBy === props && order === 'desc';
+        setOrder(isAsc ? 'asc' : 'desc');
+        setOrderBy(props);
+    }
+
+    const handleFilterChange = (e) => {
+        setFilterName(e.target.value)
+        // update the path without reload, filter is also encoded 
+        if (e.target.value === '') window.history.replaceState('', '', '/users')
+        else window.history.replaceState('', '', `/users?filter=${encodeURIComponent(e.target.value)}`)
+    }
+
     return (
       <Fragment>
         {isLoadingUserContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
@@ -102,12 +111,77 @@ export const Ticket = () => {
                 <TableHead>
                     <StylesProvider injectFirst>
                         <TableRow>
-                            <TableCell className={classes.table_cell} style={{ width: '40%' }}>Created By</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '40%' }}>Type</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Ticket ID</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Create Time</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Modify Time</TableCell>
-                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>Expire Time</TableCell>
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_OWNER_NAME"}
+                                    direction={orderBy === "TICKET_OWNER_NAME" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_OWNER_NAME");
+                                    }}
+                                >Created By
+                                </TableSortLabel>
+                            </TableCell>
+
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_TYPE"}
+                                    direction={orderBy === "TICKET_TYPE" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_TYPE");
+                                    }}
+                                >Type
+                                </TableSortLabel>
+                            </TableCell>
+
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_STRING"}
+                                    direction={orderBy === "TICKET_STRING" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_STRING");
+                                    }}
+                                >
+                                Ticket ID
+                                </TableSortLabel>
+                            </TableCell>
+
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_CREATE_TIME"}
+                                    direction={orderBy === "TICKET_CREATE_TIME" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_CREATE_TIME");
+                                    }}
+                                >
+                                Create Time
+                                </TableSortLabel>
+                            </TableCell>
+
+
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_MODIFY_TIME"}
+                                    direction={orderBy === "TICKET_MODIFY_TIME" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_MODIFY_TIME");
+                                    }}
+                                >
+                                Modify Time
+                                </TableSortLabel>
+                            </TableCell>
+
+
+                            <TableCell className={classes.table_cell} style={{ width: '20%' }}>
+                                <TableSortLabel
+                                    active={orderBy === "TICKET_EXPIRY"}
+                                    direction={orderBy === "TICKET_EXPIRY" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_EXPIRY");
+                                    }}
+                                >
+                                Expire Time
+                                </TableSortLabel>
+                            </TableCell>
                         </TableRow>
                     </StylesProvider>
                 </TableHead>
