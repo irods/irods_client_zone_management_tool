@@ -1,11 +1,11 @@
 /*eslint no-unused-vars: "error"*/
 
 import React, { useState, Fragment, useEffect } from 'react';
-import { navigate } from '@reach/router';
+import { navigate, useLocation } from '@reach/router';
 // import axios from 'axios';
 import { useServer } from '../contexts';
 // import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
-import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TableSortLabel } from '@material-ui/core';
+import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TextField, TableSortLabel } from '@material-ui/core';
 // import SaveIcon from '@material-ui/icons/Save';
 // import CloseIcon from '@material-ui/icons/Close';
 // import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
@@ -52,19 +52,21 @@ const useStyles = makeStyles((theme) => ({
 
 export const Ticket = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-    // const location = useLocation()
-    // const params = new URLSearchParams(location.search)
+    const location = useLocation()
+    const params = new URLSearchParams(location.search)
     // const { restApiLocation } = useEnvironment();
     // const auth = localStorage.getItem('zmt-token');
     // const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     // const [currPage, setCurrPage] = useState(1);
     // const [perPage, setPerPage] = useState(10);
-    // const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
+
     const { isLoadingUserContext, loadTickets, ticketContext } = useServer();
     const classes = useStyles();
-    // const [filterTicket, setFilterTicket] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
+    const [filterTicket, setFilterTicket] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("TICKET_OWNER_NAME");
+    const [ticketsData, setTicketsData] = useState([]); // array of ticket information
+
  // TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY
   
     const perPage = 10;
@@ -75,6 +77,13 @@ export const Ticket = () => {
         console.log("ticketContext: ", ticketContext)
     }, [currPage, perPage, order, orderBy])
 
+    useEffect(() => {
+        if (ticketContext !== undefined) {
+            setTicketsData(ticketContext._embedded)
+        }
+    }, [ticketContext])
+
+
     const handleSort = (props) => {
         const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
@@ -82,14 +91,36 @@ export const Ticket = () => {
     }
 
     const handleFilterChange = (e) => {
-        setFilterName(e.target.value)
+        setFilterTicket(e.target.value)
+        console.log("filter: ", e.target.value)
         // update the path without reload, filter is also encoded 
-        if (e.target.value === '') window.history.replaceState('', '', '/users')
-        else window.history.replaceState('', '', `/users?filter=${encodeURIComponent(e.target.value)}`)
+        if (e.target.value === '') window.history.replaceState('', '', '/tickets')
+        else window.history.replaceState('', '', `/tickets?filter=${encodeURIComponent(e.target.value)}`)
+
+
     }
+
+    let filteredTickets = ticketsData.filter((ticket) => {
+        return ticket[0].includes(filterTicket.toLowerCase()) || 
+                ticket[1].includes(filterTicket.toLowerCase()) ||
+                ticket[2].includes(filterTicket.toLowerCase()) ||
+                ticket[3].includes(filterTicket.toLowerCase()) ||
+                ticket[4].includes(filterTicket.toLowerCase()) ||
+                ticket[5].includes(filterTicket.toLowerCase()) ||
+                ticket[6].includes(filterTicket.toLowerCase())
+                
+    })
 
     return (
       <Fragment>
+        <TextField
+            className={classes.filter}
+            id="filter-term"
+            label="Filter"
+            placeholder="Filter by User Name"
+            onChange={handleFilterChange}
+        />
+
         {isLoadingUserContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
 
         {ticketContext === undefined ? <div>Cannot load ticket data. Please check your iRODS Client REST API endpoint connection.</div> :
@@ -187,8 +218,7 @@ export const Ticket = () => {
                 </TableHead>
                 <TableBody>
                     {
-                        ticketContext._embedded.map((ticket, index) => {
-
+                        filteredTickets.map((ticket, index) => {
                             return (
                                 <TableRow key={index}>
                                     <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[0]}</TableCell>
