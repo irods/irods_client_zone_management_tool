@@ -223,9 +223,9 @@ export const Ticket = () => {
                 <TableBody>
                     {
                         filteredTickets.map((ticket, index) => {
-                            let d1 = new Date(parseInt(ticket[4] * 1000))
-                            let d2 = new Date(parseInt(ticket[5] * 1000))
-                            let temp = new Date(parseInt(ticket[6] * 1000)) 
+                            let d1 = new Date(parseInt(ticket[4] * 1000, 10))
+                            let d2 = new Date(parseInt(ticket[5] * 1000, 10))
+                            let temp = new Date(parseInt(ticket[6] * 1000, 10)) 
                             let d3 = ticket[6] ? temp.toLocaleDateString() + ", " + temp.toLocaleTimeString() : "N/A"
                             return (
                                 <TableRow key={index}>
