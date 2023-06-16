@@ -70,7 +70,7 @@ export const Ticket = () => {
     const [orderBy, setOrderBy] = useState("TICKET_OWNER_NAME");
     const [ticketsData, setTicketsData] = useState([]); // array of ticket information
 
- // TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY
+    // SELECT TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY
   
 
     useEffect(() => {
@@ -103,13 +103,13 @@ export const Ticket = () => {
     }
 
     let filteredTickets = ticketsData.filter((ticket) => {
-        return ticket[0].includes(filterTicket.toLowerCase()) || 
-                ticket[1].includes(filterTicket.toLowerCase()) ||
-                ticket[2].includes(filterTicket.toLowerCase()) ||
-                ticket[3].includes(filterTicket.toLowerCase()) ||
-                ticket[4].includes(filterTicket.toLowerCase()) ||
-                ticket[5].includes(filterTicket.toLowerCase()) ||
-                ticket[6].includes(filterTicket.toLowerCase())
+        return ticket[0].includes(filterTicket) || 
+                ticket[1].includes(filterTicket) ||
+                ticket[2].includes(filterTicket) ||
+                ticket[3].includes(filterTicket) ||
+                ticket[4].includes(filterTicket) ||
+                ticket[5].includes(filterTicket) ||
+                ticket[6].includes(filterTicket)
 
     })
     console.log("ticketContext: ", ticketContext)
@@ -123,6 +123,7 @@ export const Ticket = () => {
                 label="Filter"
                 placeholder="Filter by User Name"
                 onChange={handleFilterChange}
+                value={filterTicket}
             />
         </div>
 
@@ -215,10 +216,18 @@ export const Ticket = () => {
                     </StylesProvider>
                 </TableHead>
                 <TableBody>
+                    
                     {
                         filteredTickets.map((ticket, index) => {
                             let d1 = new Date(parseInt(ticket[4] * 1000, 10))
                             let d2 = new Date(parseInt(ticket[5] * 1000, 10))
+                            let show1 = d1.toLocaleDateString() + ",  " + d1.toLocaleTimeString()
+                            let show2 = d2.toLocaleDateString() + ", " + d2.toLocaleTimeString()
+                            
+                            if (ticket[4] == ticket[5]) {
+                                show2 = "N/A"
+                            }   
+
                             let temp = new Date(parseInt(ticket[6] * 1000, 10)) 
                             let d3 = ticket[6] ? temp.toLocaleDateString() + ", " + temp.toLocaleTimeString() : "N/A"
                             return (
@@ -226,8 +235,8 @@ export const Ticket = () => {
                                     <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[0]}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[1]}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[2]}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d1.toLocaleDateString()}, {d1.toLocaleTimeString()}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d2.toLocaleDateString()}, {d2.toLocaleTimeString()}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{show1}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{show2}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d3}</TableCell>
                                 </TableRow>
                             )
