@@ -223,14 +223,18 @@ export const Ticket = () => {
                 <TableBody>
                     {
                         filteredTickets.map((ticket, index) => {
+                            let d1 = new Date(parseInt(ticket[4] * 1000))
+                            let d2 = new Date(parseInt(ticket[5] * 1000))
+                            let temp = new Date(parseInt(ticket[6] * 1000)) 
+                            let d3 = ticket[6] ? temp.toLocaleDateString() + ", " + temp.toLocaleTimeString() : "N/A"
                             return (
                                 <TableRow key={index}>
                                     <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[0]}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[1]}</TableCell>
                                     <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[2]}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{new Date(parseInt(ticket[4])).toLocaleDateString()}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{new Date(parseInt(ticket[5])).toLocaleDateString()}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[6] ? new Date(parseInt(ticket[6])).toLocaleDateString(): "N/A"}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d1.toLocaleDateString()}, {d1.toLocaleTimeString()}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d2.toLocaleDateString()}, {d2.toLocaleTimeString()}</TableCell>
+                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d3}</TableCell>
                                 </TableRow>
                             )
                         })
