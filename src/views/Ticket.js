@@ -131,13 +131,7 @@ export const Ticket = () => {
         {ticketContext === undefined ?? <div>Cannot load ticket data. Please check your iRODS Client REST API endpoint connection.</div>
         }
 
-        {/* <TextField
-            className={classes.filter}
-            id="filter-term"
-            label="Filter"
-            placeholder="Filter by User Name"
-            onChange={handleFilterChange}
-        /> */}
+  
         <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(ticketContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
 
 
