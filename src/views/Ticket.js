@@ -224,7 +224,7 @@ export const Ticket = () => {
                 <TableBody>
                     
                     {
-                       filteredTickets.map((ticket, index) => {
+                       filteredTickets.map((ticket) => {
                           
                             return (
                                 <TicketRows key={ticket[0]} row={ticket} />

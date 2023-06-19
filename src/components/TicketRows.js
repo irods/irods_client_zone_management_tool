@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
 import Collapse from '@material-ui/core/Collapse';
-import Typography from '@material-ui/core/Typography';
-import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import CancelIcon from '@material-ui/icons/Cancel';
-import EditIcon from '@material-ui/icons/Edit';
-import WarningIcon from '@material-ui/icons/Warning';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { useEnvironment, useServer } from '../contexts';
-import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
-import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, Icon, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField, Box} from "@material-ui/core";
+import { makeStyles, IconButton, Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -64,7 +54,8 @@ const useStyles = makeStyles((theme) => ({
 
 function TicketRows({ row }) {
   const classes = useStyles(); 
-  const [ticket, setTicket] = useState(row);
+  // const [ticket, setTicket] = useState(row);
+  const ticket = row; // the above line is there in case we need to change the state of the ticket (through ticket editing)
   const [open, setOpen] = useState(false);
 
 //   useEffect(() => {
@@ -152,3 +143,7 @@ function TicketRows({ row }) {
 }
 
 export default TicketRows;
+
+TicketRows.propTypes = {
+  row: PropTypes.array,
+}
