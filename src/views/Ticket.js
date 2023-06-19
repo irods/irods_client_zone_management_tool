@@ -9,6 +9,7 @@ import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, St
 // import SaveIcon from '@material-ui/icons/Save';
 // import CloseIcon from '@material-ui/icons/Close';
 // import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import TicketRows from '../components/TicketRows';
 
 const useStyles = makeStyles((theme) => ({
     tableContainer: {
@@ -63,7 +64,7 @@ export const Ticket = () => {
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
 
-    const { isLoadingUserContext, loadTickets, ticketContext } = useServer();
+    const { isLoadingTicketContext, loadTickets, ticketContext } = useServer();
     const classes = useStyles();
     const [filterTicket, setFilterTicket] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const [order, setOrder] = useState("asc");
@@ -75,13 +76,15 @@ export const Ticket = () => {
 
     useEffect(() => {
         loadTickets(perPage * (currPage - 1), perPage, order, orderBy)
-        
+        console.log('loading tickets')
     }, [currPage, perPage, order, orderBy])
 
     useEffect(() => {
         if (ticketContext !== undefined) {
+            console.log("ticketContext", ticketContext);
             setTicketsData(ticketContext._embedded)
         }
+
     }, [ticketContext])
 
 
@@ -103,16 +106,14 @@ export const Ticket = () => {
     }
 
     let filteredTickets = ticketsData.filter((ticket) => {
-        return ticket[0].includes(filterTicket) || 
-                ticket[1].includes(filterTicket) ||
-                ticket[2].includes(filterTicket) ||
-                ticket[3].includes(filterTicket) ||
-                ticket[4].includes(filterTicket) ||
-                ticket[5].includes(filterTicket) ||
-                ticket[6].includes(filterTicket)
+        if (filterTicket === '') return true;
+
+        return ticket[17].includes(filterTicket) || 
+        ticket[2].includes(filterTicket) ||
+        ticket[0].includes(filterTicket)
 
     })
-    console.log("ticketContext: ", ticketContext)
+    
     return (
       <Fragment>
 
@@ -121,13 +122,13 @@ export const Ticket = () => {
                 className={classes.filter}
                 id="filter-term"
                 label="Filter"
-                placeholder="Filter by User Name"
+                placeholder="Filter by owner, type, or ID"
                 onChange={handleFilterChange}
                 value={filterTicket}
             />
         </div>
 
-        {isLoadingUserContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
+        {isLoadingTicketContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
 
         {ticketContext === undefined ?? <div>Cannot load ticket data. Please check your iRODS Client REST API endpoint connection.</div>
         }
@@ -148,7 +149,7 @@ export const Ticket = () => {
                                     onClick={() => {
                                         handleSort("TICKET_OWNER_NAME");
                                     }}
-                                >Created By
+                                >Owner
                                 </TableSortLabel>
                             </TableCell>
 
@@ -212,33 +213,21 @@ export const Ticket = () => {
                                 Expire Time
                                 </TableSortLabel>
                             </TableCell>
+
+                            <TableCell
+                      style={{ width: "5%" }}
+                      align="right"
+                    ></TableCell>
                         </TableRow>
                     </StylesProvider>
                 </TableHead>
                 <TableBody>
                     
                     {
-                        filteredTickets.map((ticket, index) => {
-                            let d1 = new Date(parseInt(ticket[4] * 1000, 10))
-                            let d2 = new Date(parseInt(ticket[5] * 1000, 10))
-                            let show1 = d1.toLocaleDateString() + ",  " + d1.toLocaleTimeString()
-                            let show2 = d2.toLocaleDateString() + ", " + d2.toLocaleTimeString()
-                            
-                            if (ticket[4] == ticket[5]) {
-                                show2 = "N/A"
-                            }   
-
-                            let temp = new Date(parseInt(ticket[6] * 1000, 10)) 
-                            let d3 = ticket[6] ? temp.toLocaleDateString() + ", " + temp.toLocaleTimeString() : "N/A"
+                       filteredTickets.map((ticket, index) => {
+                          
                             return (
-                                <TableRow key={index}>
-                                    <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[0]}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[1]}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[2]}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{show1}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{show2}</TableCell>
-                                    <TableCell className={classes.table_cell} style={{ width: '20%' }}>{d3}</TableCell>
-                                </TableRow>
+                                <TicketRows key={ticket[0]} row={ticket} />
                             )
                         })
                     }
