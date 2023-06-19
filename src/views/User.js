@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { Link, navigate, useLocation } from '@reach/router';
 import axios from 'axios';
 import { useEnvironment, useServer } from '../contexts';
@@ -62,10 +62,24 @@ export const User = () => {
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
-    const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
+    const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : "");
     const { isLoadingUserContext, userContext, localZoneName, loadUsers, zones } = useServer();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
+    const [userData, setUserData] = useState([]);
+    const [time, setTime] = useState(0);
+    const [isRunning, setIsRunning] = useState(false);
+    const firstUpdate = useRef(true); // used to prevent filtering useEffect from running on initial render
+    const delayTimeUse = environment.filterTimeInMilliseconds / 100; // convert into tenths of a second
+
+    useEffect(() => {
+        // timer for keystroke delay
+        let intervalId;
+        if (isRunning) {
+          intervalId = setInterval(() => setTime(time + 1), 100); // run every 100 milliseconds
+        }
+        return () => clearInterval(intervalId);
+    }, [isRunning, time]);
 
     async function addUser() {
         try {
@@ -153,17 +167,66 @@ export const User = () => {
     }
 
     const handleFilterChange = (e) => {
+        if (filterUsername == '') setIsRunning(!isRunning);
         setFilterName(e.target.value)
+        setUserData([]);
         // update the path without reload, filter is also encoded 
         if (e.target.value === '') window.history.replaceState('', '', '/users')
         else window.history.replaceState('', '', `/users?filter=${encodeURIComponent(e.target.value)}`)
     }
 
     useEffect(() => {
-        loadUsers(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
+        loadUsers(perPage * (currPage - 1), perPage, order, orderBy, filterUsername);
         environment.pageTitle = environment.usersTitle;
         document.title = `${environment.titleFormat()}`
-    }, [currPage, perPage, filterUsername, order, orderBy])
+    }, [currPage, perPage, order, orderBy]);
+
+    useEffect(() => {
+        if (firstUpdate.current) {
+            // don't run on initial render
+            firstUpdate.current = false;
+            return;
+        }
+        if (filterUsername === '') {
+            // when the user clears out the filter, immediately load all users back
+            loadUsers(perPage * (currPage - 1), perPage, order, orderBy, filterUsername);
+            setTime(0);
+            setIsRunning(false);
+            return;
+        } 
+        if (!isRunning) {
+            // start timer because the user typed again
+            setTime(0);
+            setIsRunning(true);
+        } else {
+            // timer is already running, reset the timer b/c we're starting delay from last keystroke
+            setTime(0);
+            setIsRunning(true);
+        }
+    }, [filterUsername])
+
+
+    useEffect(() => {
+        if (userContext == undefined) return; // safety check
+        
+        if (time < delayTimeUse) {
+            // filter on frontend since timer has not reached delay limit yet
+            let filteredUsers = userContext._embedded.filter(user => user[0].toLowerCase().includes(filterUsername.toLowerCase()) || user[2].toLowerCase().includes(filterUsername.toLowerCase()) || user[1].toLowerCase().includes(filterUsername.toLowerCase()));
+            setUserData(filteredUsers);
+        } else {
+            // call the API and stop the timer
+            loadUsers(perPage * (currPage - 1), perPage, order, orderBy, filterUsername);
+            setTime(0);
+            setIsRunning(false);
+        }
+
+    }, [time]);
+
+    useEffect(() => {
+        if (userContext !== undefined) {
+            setUserData(userContext._embedded); 
+        }
+    }, [userContext]);
 
     return (
         <Fragment>
@@ -176,8 +239,9 @@ export const User = () => {
                             className={classes.filter}
                             id="filter-term"
                             label="Filter"
-                            placeholder="Filter by User Name"
+                            placeholder="Filter by User Name, Zone, or Type"
                             onChange={handleFilterChange}
+                            value={filterUsername}
                         />
                         <Button className={classes.add_button} variant="outlined" color="primary" onClick={handleAddRowOpen}>
                             Add New User
@@ -215,9 +279,9 @@ export const User = () => {
                                     </Select></TableCell>
                                     <TableCell align="right"><ToggleButtonGroup size="small"><ToggleButton value="save" onClick={addUser}><SaveIcon /></ToggleButton><ToggleButton value="close" onClick={handleAddRowClose}><CloseIcon /></ToggleButton></ToggleButtonGroup></TableCell>
                                 </TableRow>
-                                {!isLoadingUserContext && (userContext._embedded.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterUsername}].</div></TableCell></TableRow> :
-                                    userContext._embedded.map((this_user) =>
-                                        <TableRow key={this_user[0]}>
+                                {(userData.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterUsername}].</div></TableCell></TableRow> :
+                                    userData.map((this_user, index) =>
+                                        <TableRow key={index}>
                                             <TableCell className={classes.table_cell} style={{ width: '40%' }} component="th" scope="row">{this_user[0]}</TableCell>
                                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[2]}</TableCell>
                                             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{this_user[1]}</TableCell>

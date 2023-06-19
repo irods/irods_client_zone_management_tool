@@ -43,34 +43,136 @@ export const ServerProvider = ({ children }) => {
     const [specificQueryContext, setSpecificQueryContext] = useState(initialState)
     const [specificQueryTotal, setSpecificQueryTotal] = useState(0)
 
-    const loadUsers = (offset, limit, name, order, orderBy) => {
+    const loadUsers = async (offset, limit, order, orderBy, name) => {
         setIsLoadingUserContext(true);
-        let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
-        if (name !== '') {
-            _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
-        }
-        _query = queryGenerator(_query, order, orderBy);
-        return axios({
-            method: 'GET',
-            url: `${restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: _query,
-                limit: limit,
-                offset: offset,
-                type: 'general',
-                'case-sensitive': 0
+
+    
+        if (name == "" || name == "USER_NAME") {
+            let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
+
+            _query = queryGenerator(_query, order, orderBy);
+
+            return axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query: _query,
+                    limit: limit,
+                    offset: offset,
+                    type: 'general',
+                    'case-sensitive': 0
+                }
+            }).then((res) => {
+                if (name === '') setUserTotal(res.data.total)
+                setUserTotal(res.data.total)
+                setUserContext(res.data);
+                setIsLoadingUserContext(false);
+            }).catch(() => {
+                setUserContext(undefined);
+                setIsLoadingUserContext(false);
+            });
+        } else {
+            let totalData = [];
+
+            let queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`
+            let q1 = queryGenerator(queryTry1, order, orderBy);
+
+            let queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`
+            let q2 = queryGenerator(queryTry2, order, orderBy);
+
+            let queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`
+            let q3 = queryGenerator(queryTry3, order, orderBy);
+
+            const resp1 = await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query: q1,
+                    limit: limit,
+                    offset: offset,
+                    type: 'general',
+                    'case-sensitive': 0
+                }
+            })
+
+            const resp2 = await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query: q2,
+                    limit: limit,
+                    offset: offset,
+                    type: 'general',
+                    'case-sensitive': 0
+                }
+            })
+            
+            const resp3 = await axios({
+                method: 'GET',
+                url: `${restApiLocation}/query`,
+                headers: {
+                    'Authorization': localStorage.getItem('zmt-token')
+                },
+                params: {
+                    query: q3,
+                    limit: limit,
+                    offset: offset,
+                    type: 'general',
+                    'case-sensitive': 0
+                }
+            })
+
+            const pushOnlyNewData = (totalData, newArr) => {
+                // if totalData already has anything in resp2.data._embedded, don't push it again
+                // this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
+                // there will at most be 100 items in each array, so it won't take too long
+                newArr.forEach((item) => {
+                    let found = false;
+                    totalData.forEach((item2) => {
+                        if (item[0] === item2[0]) {
+                            found = true;
+                            return;
+                        }
+                    });
+                    if (!found) {
+                        totalData.push(item);
+                    }
+                });
+
+                return totalData;
             }
-        }).then((res) => {
-            if (name === '') setUserTotal(res.data.total)
-            setUserContext(res.data);
+
+            let useTotal = 0;
+            if (resp1 && resp1.data._embedded.length > 0) {
+                totalData.push(...resp1.data._embedded)
+                useTotal = parseInt(resp1.data.total)
+            }
+             if (resp2 && resp2.data._embedded.length > 0) {
+                totalData = pushOnlyNewData(totalData, resp2.data._embedded)
+                useTotal = parseInt(resp2.data.total)
+            } 
+             if (resp3 && resp3.data._embedded.length > 0) {
+                totalData = pushOnlyNewData(totalData, resp3.data._embedded)
+                useTotal = parseInt(resp3.data.total)
+            }
+
+            setUserTotal(useTotal)
+            setUserContext({
+                _embedded: totalData,
+                total: useTotal
+            })
             setIsLoadingUserContext(false);
-        }).catch(() => {
-            setUserContext(undefined);
-            setIsLoadingUserContext(false);
-        });
+            return
+        }
     }
 
     // iterate through group results and load user counts
