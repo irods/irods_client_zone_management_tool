@@ -28,6 +28,7 @@ export const EnvironmentProvider = ({ children }) => {
             appbarLogo: process.env.REACT_APP_APPBAR_LOGO,
             loginLogo: process.env.REACT_APP_LOGIN_LOGO,
             brandingName: process.env.REACT_APP_BRANDING_NAME,
+            filterTimeInMilliseconds: process.env.REACT_APP_FILTER_TIME_IN_MILLISECONDS,
 
             groupsTitle: "Groups",
             homeTitle: "Home",
