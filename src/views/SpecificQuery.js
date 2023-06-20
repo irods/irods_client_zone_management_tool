@@ -43,7 +43,7 @@ export const SpecificQuery = () => {
     const [order, setOrder] = useState('asc')
     const [orderBy, setOrderBy] = useState('alias')
     const [sortedSpecificQueryContext, setSortedSpecificQueryContext] = useState()
-    const { restApiLocation } = useEnvironment()
+    const environment = useEnvironment();
     const { specificQueryContext, isLoadingSpecificQueryContext, loadSpecificQueries } = useServer()
 
     const addButtonEventHandler = () => {
@@ -54,7 +54,7 @@ export const SpecificQuery = () => {
 
     const addSpecificQueryHandler = async () => {
         setConfirmationVisibility(false)
-        await AddSpecificQueryController(newAlias, newSqlStr, restApiLocation)
+        await AddSpecificQueryController(newAlias, newSqlStr, environment.restApiLocation)
             .then(res => {
                 if (res.status === 200) {
                     loadSpecificQueries('')
@@ -75,7 +75,7 @@ export const SpecificQuery = () => {
 
     const deleteSpecificQueryHandler = async () => {
         setConfirmationVisibility(false)
-        await DeleteSpecificQueryController(aliasToDelete, restApiLocation)
+        await DeleteSpecificQueryController(aliasToDelete, environment.restApiLocation)
             .then(res => {
                 if (res.status === 200) {
                     loadSpecificQueries('')
@@ -109,6 +109,8 @@ export const SpecificQuery = () => {
             // filter by input
             setSortedSpecificQueryContext(newSortedSpecificQueryContext.filter(query => query[0].toLowerCase().includes(filterInput.toLowerCase()) || query[1].toLowerCase().includes(filterInput.toLowerCase())))
         }
+        environment.pageTitle = environment.specificQueriesTitle;
+        document.title = `${environment.titleFormat()}`
     }, [filterInput, specificQueryContext, order, orderBy])
 
     return (

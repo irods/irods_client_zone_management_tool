@@ -61,13 +61,15 @@ export const ResourceListView = () => {
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
-    const { restApiLocation } = useEnvironment();
+    const environment = useEnvironment();
     const { isLoadingRescContext, localZoneName, validServerHosts, rescContext, rescTypes, loadResources, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
     useEffect(() => {
         if (localZoneName) {
             loadResources((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
         }
+        environment.pageTitle = environment.resourcesTitle;
+        document.title = `${environment.titleFormat()}`
     }, [currPage, perPage, filterRescName, order, orderBy])
 
     useEffect(() => {
@@ -90,7 +92,7 @@ export const ResourceListView = () => {
         setLoading(true);
         await axios({
             method: 'POST',
-            url: `${restApiLocation}/admin`,
+            url: `${environment.restApiLocation}/admin`,
             headers: {
                 'Authorization': auth
             },
