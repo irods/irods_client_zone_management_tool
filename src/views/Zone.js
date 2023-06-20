@@ -32,7 +32,6 @@ export const Zone = () => {
     const { zones, loadZones, isLoadingZones } = useServer()
     const [sortedZones, setSortedZones] = useState([])
     const [status, setStatus] = useState('none')
-    const { restApiLocation } = useEnvironment();
     const [currZone, setCurrZone] = useState(initialZoneState)
     const [modifiedCurrZone, setModifiedCurrZone] = useState()
     const [confirmationDialog, setConfirmationDialog] = useState({ state: '', visibility: false })
@@ -40,11 +39,14 @@ export const Zone = () => {
     const [order, setOrder] = useState('')
     const [orderBy, setOrderBy] = useState('asc')
     const classes = useStyles()
+    const environment = useEnvironment()
 
     useEffect(() => {
         if (zones && zones.length > 0) {
             setSortedZones(zones)
         }
+        environment.pageTitle = environment.zonesTitle;
+        document.title = `${environment.titleFormat()}`
     }, [zones])
 
     // sort rows if user clicks on the column arrows
@@ -80,7 +82,7 @@ export const Zone = () => {
 
     const addZoneHandler = async () => {
         try {
-            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, restApiLocation)
+            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, environment.restApiLocation)
             if (res.status === 200) {
                 setStatus('add-success')
                 loadZones()
@@ -97,7 +99,7 @@ export const Zone = () => {
         setConfirmationDialog({ state: 'remove', visibility: true })
     }
     const deleteZoneHandler = async () => {
-        const res = await DeleteZoneController(currZone.name, restApiLocation)
+        const res = await DeleteZoneController(currZone.name, environment.restApiLocation)
         setConfirmationDialog({ state: 'remove', visibility: false })
         if (res.status === 200) {
             setStatus('remove-success')
@@ -120,15 +122,15 @@ export const Zone = () => {
         try {
             let updated = true
             if (newZoneName !== currZone.name) {
-                let nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, restApiLocation)
+                let nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, environment.restApiLocation)
                 if (nameModificationRes.status !== 200) updated = false
             }
             if (newConnString !== (currZone.hostname + ":" + currZone.port)) {
-                let hostModificationRes = await ModifyZoneController(newZoneName, 'conn', newConnString, restApiLocation)
+                let hostModificationRes = await ModifyZoneController(newZoneName, 'conn', newConnString, environment.restApiLocation)
                 if (hostModificationRes.status !== 200) updated = false
             }
             if (newComment !== currZone.comment) {
-                let commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, restApiLocation)
+                let commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, environment.restApiLocation)
                 if (commentModificationRes.status !== 200) updated = false
             }
             if (updated) {

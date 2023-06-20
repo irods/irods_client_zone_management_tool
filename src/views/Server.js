@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { TabPanel } from '../components'
-import { useServer } from '../contexts';
+import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@material-ui/core';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@material-ui/core';
 import { navigate } from '@reach/router';
@@ -45,6 +45,7 @@ export const Server = () => {
 
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
+    const environment = useEnvironment();
     const [currPage, setCurrPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [tabValue, setTabValue] = useState(0);
@@ -55,6 +56,8 @@ export const Server = () => {
 
     useEffect(() => {
         loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
+        environment.pageTitle = environment.serversTitle;
+        document.title = `${environment.titleFormat()}`
     }, [perPage, currPage, order, orderBy])
 
     const handleSort = props => {

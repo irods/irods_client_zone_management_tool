@@ -50,7 +50,7 @@ export const User = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
     const location = useLocation()
     const params = new URLSearchParams(location.search)
-    const { restApiLocation } = useEnvironment();
+    const environment = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const loggedUserName = localStorage.getItem('zmt-username');
     const classes = useStyles();
@@ -71,7 +71,7 @@ export const User = () => {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/admin`,
+                url: `${environment.restApiLocation}/admin`,
                 headers: {
                     'Authorization': auth
                 },
@@ -95,7 +95,7 @@ export const User = () => {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/admin`,
+                url: `${environment.restApiLocation}/admin`,
                 headers: {
                     'Authorization': auth
                 },
@@ -161,6 +161,8 @@ export const User = () => {
 
     useEffect(() => {
         loadUsers(perPage * (currPage - 1), perPage, filterUsername, order, orderBy)
+        environment.pageTitle = environment.usersTitle;
+        document.title = `${environment.titleFormat()}`
     }, [currPage, perPage, filterUsername, order, orderBy])
 
     return (

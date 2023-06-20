@@ -45,7 +45,7 @@ export const Group = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
     const location = useLocation()
     const params = new URLSearchParams(location.search)
-    const { restApiLocation } = useEnvironment();
+    const environment = useEnvironment();
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
     const { isLoadingGroupContext, localZoneName, groupContext, loadGroups } = useServer();
@@ -66,13 +66,15 @@ export const Group = () => {
 
     useEffect(() => {
         if(localZoneName && !isLoadingGroupContext) loadGroups((currPage - 1) * perPage, perPage, filterGroupName, order, orderBy);
+        environment.pageTitle = environment.groupsTitle;
+        document.title = `${environment.titleFormat()}`
     }, [currPage, perPage, filterGroupName, order, orderBy])
 
     async function addGroup() {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/admin`,
+                url: `${environment.restApiLocation}/admin`,
                 params: {
                     action: 'add',
                     target: 'user',
@@ -99,7 +101,7 @@ export const Group = () => {
         try {
             await axios({
                 method: 'POST',
-                url: `${restApiLocation}/admin`,
+                url: `${environment.restApiLocation}/admin`,
                 params: {
                     action: 'rm',
                     target: 'user',

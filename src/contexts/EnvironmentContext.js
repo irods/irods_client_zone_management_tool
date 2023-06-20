@@ -28,6 +28,20 @@ export const EnvironmentProvider = ({ children }) => {
             appbarLogo: process.env.REACT_APP_APPBAR_LOGO,
             loginLogo: process.env.REACT_APP_LOGIN_LOGO,
             brandingName: process.env.REACT_APP_BRANDING_NAME,
+
+            groupsTitle: "Groups",
+            homeTitle: "Home",
+            resourcesTitle: "Resources",
+            serversTitle: "Servers",
+            specificQueriesTitle: "Specific Queries",
+            usersTitle: "Users",
+            zonesTitle: "Zones",
+
+            pageTitle: "", // placeholder that gets filled on each page
+            titleFormat: function () {
+                return `${this.pageTitle} - ${this.brandingName}`
+            }
+
         }}>
             {children}
         </EnvironmentContext.Provider>

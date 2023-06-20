@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useCheck, useServer } from '../contexts';
+import { useCheck, useServer, useEnvironment } from '../contexts';
 import { navigate } from '@reach/router';
 import { Check } from '../components/checks/check';
 import { makeStyles, CircularProgress, Fade, Paper } from '@material-ui/core';
@@ -51,10 +51,13 @@ export const Home = () => {
     const { statusResult } = useCheck()
     const { loadData } = useServer()
     const [open, setOpen] = useState('none')
+    const environment = useEnvironment()
 
     useEffect(() => {
         // load data every time user visit /home, so all checks can get access to the latest server data
         loadData()
+        environment.pageTitle = environment.homeTitle;
+        document.title = environment.titleFormat();
     }, [])
 
     useEffect(() => {
