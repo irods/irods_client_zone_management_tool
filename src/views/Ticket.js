@@ -2,10 +2,20 @@
 
 import React, { useState, Fragment, useEffect } from 'react';
 import { navigate, useLocation } from '@reach/router';
-// import axios from 'axios';
-import { useServer } from '../contexts';
+import axios from 'axios';
+import { useServer, useEnvironment } from '../contexts';
 // import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
-import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TextField, TablePagination, TableSortLabel } from '@material-ui/core';
+import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TextField, TablePagination, TableSortLabel, InputLabel } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
+
+
 // import SaveIcon from '@material-ui/icons/Save';
 // import CloseIcon from '@material-ui/icons/Close';
 // import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
@@ -50,7 +60,12 @@ const useStyles = makeStyles((theme) => ({
     },
     header_row: {
         fontWeight: 'bold'
-    }
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 240,
+      },
+    
 }));
 
 
@@ -58,7 +73,8 @@ export const Ticket = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
     const location = useLocation()
     const params = new URLSearchParams(location.search)
-    // const { restApiLocation } = useEnvironment();
+    const { restApiLocation } = useEnvironment();
+    console.log("restApiLocation", restApiLocation)
     // const auth = localStorage.getItem('zmt-token');
     // const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     const [currPage, setCurrPage] = useState(1);
@@ -70,6 +86,7 @@ export const Ticket = () => {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("TICKET_OWNER_NAME");
     const [ticketsData, setTicketsData] = useState([]); // array of ticket information
+    const [createOpen, setCreateOpen] = useState(false);
 
     // SELECT TICKET_OWNER_NAME, TICKET_TYPE, TICKET_STRING, TICKET_OBJECT_TYPE, TICKET_CREATE_TIME, TICKET_MODIFY_TIME, TICKET_EXPIRY
   
@@ -113,6 +130,53 @@ export const Ticket = () => {
         ticket[0].includes(filterTicket)
 
     })
+
+    const handleClickOpen = () => {
+        setCreateOpen(true);
+      };
+    
+      const handleClose = () => {
+        setCreateOpen(false);
+      };
+    
+    const handleCreateTicket = async () => {
+        let dataObj = {
+            logical_path: document.getElementById('logical-path').value,
+            type: document.getElementById('ticket-type').value,
+            use_count: document.getElementById('use-count').value,
+            write_file_count: document.getElementById('write-file-count').value,
+            write_byte_count: document.getElementById('write-byte-count').value,
+            seconds_until_expiration: document.getElementById('seconds-until-expiration').value,
+            users: document.getElementById('users').value,
+            groups: document.getElementById('groups').value,
+            hosts: document.getElementById('hosts').value
+        }
+
+
+        const response = await axios({
+            method: 'GET',
+            url: `${restApiLocation}/ticket`,
+            params: {
+                logical_path: dataObj.logical_path,
+                type: dataObj.type,
+                use_count: dataObj.use_count,
+                write_file_count: dataObj.write_file_count,
+                write_byte_count: dataObj.write_byte_count,
+
+                seconds_until_expiration: dataObj.seconds_until_expiration,
+                users: dataObj.users,
+                groups: dataObj.groups,
+                hosts: dataObj.hosts
+            },
+            headers: {
+                'Authorization': localStorage.getItem('zmt-token')
+            },
+        })
+
+        console.log(response);
+
+
+    }
     
     return (
       <Fragment>
@@ -126,6 +190,128 @@ export const Ticket = () => {
                 onChange={handleFilterChange}
                 value={filterTicket}
             />
+
+        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+            Open form dialog
+        </Button>
+
+        {/* 
+            logical-path: The url encoded logical path to a collection or data object for which access is desired
+            type: The type of ticket to create. The value must be either read or write. Defaults to read
+            use-count: The maximum number of times the ticket can be used. Defaults to 0 (unlimited use)
+            write-file-count: The maximum number of writes allowed to a data object. Defaults to 0 (unlimited writes)
+            write-byte-count: The maximum number of bytes allowed to be written to data object. Defaults to 0 (unlimited bytes)
+            seconds-until-expiration: The number of seconds before the ticket will expire. Defaults to 0 (no expiration)
+            users: A comma-separated list of iRODS users who are allowed to use the generated ticket
+            groups: A comma-separated list of iRODS groups that are allowed to use the generated ticket
+            hosts: A comma-separated list of hosts that are allowed to use the ticket
+        
+        */}
+        <Dialog open={createOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">New Ticket</DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+            Create a new ticket
+            </DialogContentText>
+            
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="logical-path"
+                label="Logical Path"
+                type="text"
+                fullWidth
+            />
+            </FormControl>
+            
+            <FormControl className={classes.formControl}>
+            <InputLabel htmlFor="age-native-simple">Ticket Type</InputLabel>
+            <Select
+                native
+                id="ticket-type"
+            >
+                <option value='read'>Read</option>
+                <option value='write'>Write</option>
+            </Select>
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="use-count"
+                label="Use Count"
+                type="number"
+                fullWidth
+            />
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="write-file-count"
+                label="Write File Count"
+                type="number"
+                fullWidth
+            />
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="write-byte-count"
+                label="Write Byte Count"
+                type="number"
+                fullWidth
+            />
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="seconds-until-expiration"
+                label="Seconds Until Expiration"
+                type="number"
+                fullWidth
+            />
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+                id="users"
+                label="Users"
+                type="text"
+                fullWidth
+            />
+            </FormControl>
+
+            <FormControl className={classes.formControl}>
+            <TextField
+
+                id="groups"
+                label="Groups"
+                type="text"
+                fullWidth
+            />
+            </FormControl>
+
+
+            <FormControl className={classes.formControl}>
+            <TextField
+
+                id="hosts"
+                label="Hosts"
+                type="text"
+                fullWidth
+            />
+            </FormControl>  
+
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose} color="primary">
+            Cancel
+            </Button>
+            <Button onClick={handleCreateTicket} color="primary" >
+            Create Ticket
+            </Button>
+        </DialogActions>
+        </Dialog>;
+
+
         </div>
 
         {isLoadingTicketContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
