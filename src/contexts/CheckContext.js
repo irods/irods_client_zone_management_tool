@@ -6,19 +6,43 @@ import { customChecks } from '../data/checkfiles/custom_checkfiles'
 import { irodsVersionComparator } from '../utils'
 
 // prior to running any check, zmt will validate all health checks following these rules:
-// 1. check's name is non-empty, 
-// 2. description is non-empty, 
+// 1. check's name is a non-empty string
+// 2. description is a non-empty string
 // 3. interval_in_seconds is a positive value
 // 4. checker function is defined
 // 5. minimum_server_version is smaller than maximum_server_version (if minimum_server_version and maximum_server_version are specified)
+// 6. active is a boolean
 
 const validateChecks = (checks) => {
     return checks.reduce((acc, curr) => {
-        if (!curr.name || !curr.description || !curr.interval_in_seconds || curr.interval_in_seconds < 0 || !curr.checker || (curr.minimum_server_version && curr.maximum_server_version && irodsVersionComparator(curr.maximum_server_version,curr.minimum_server_version) < 0)) {
-            curr.isValid = false
-            curr.active = false
+        let state = {
+            isValid: true,
         }
-        else curr.isValid = true
+ 
+        let assert_checkfile_precondition = (state, precondition) => {
+            if (!precondition) {
+               state.isValid = false
+            }
+        }
+
+        // `name` exists and is a string
+        assert_checkfile_precondition(state, curr.name && typeof curr.name === 'string');
+        // `description` exists and is a string
+        assert_checkfile_precondition(state, curr.description && typeof curr.description === 'string');
+        // `interval_in_seconds` exists and is a positive number
+        assert_checkfile_precondition(state, curr.interval_in_seconds && typeof curr.interval_in_seconds === 'number' && curr.interval_in_seconds > 0);
+        // `checker` function exists and is a function
+        assert_checkfile_precondition(state, curr.checker && typeof curr.checker === 'function');
+        // either `minimum_server_version` doesn't exist, or it is a string
+        assert_checkfile_precondition(state, !(curr.minimum_server_version) || typeof curr.minimum_server_version === 'string'); 
+        // either `maximum_server_version` doesn't exist, or it is a string
+        assert_checkfile_precondition(state, !(curr.maximum_server_version) || typeof curr.maximum_server_version === 'string');
+        // if both min and max version are in the file, then max version must be greater than or equal to min version
+        assert_checkfile_precondition(state, !(curr.minimum_server_version) || !(curr.maximum_server_version) || irodsVersionComparator(curr.maximum_server_version,curr.minimum_server_version) >= 0);
+        // `active` exists and is a boolean
+        assert_checkfile_precondition(state, !('active' in curr) || typeof curr.active === 'boolean');
+
+        curr.isValid = state.isValid;
         acc.push(curr)
         return acc
     }, [])
