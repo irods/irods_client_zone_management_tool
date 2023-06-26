@@ -162,7 +162,7 @@ export const CheckProvider = ({ children }) => {
                     newCheckResults[check['id']] = [check, { status: 'invalid', message: `Checkfile is invalid.`, timestamp: new Date() }]
                 }
                 // if active, run the check
-                else if (!inactiveChecks.has(`zmt-${index}`)) {
+                else if (!inactiveChecks.has(`zmt-${index}`) && check.active) {
                     try {
                         // enforce minimum/maximum server version
                         if (checkServerVersion(check) === true) {
