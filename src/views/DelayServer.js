@@ -26,6 +26,8 @@ export const DelayServer = () => {
 
     useEffect(() => {
         loadCurrServers(0, 999999, "asc", "role");
+        environment.pageTitle = environment.delayServerTitle;
+        document.title = environment.titleFormat();
     }, []);
 
     const saveServerHostname = async () => {

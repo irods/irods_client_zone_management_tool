@@ -29,6 +29,7 @@ export const EnvironmentProvider = ({ children }) => {
             loginLogo: process.env.REACT_APP_LOGIN_LOGO,
             brandingName: process.env.REACT_APP_BRANDING_NAME,
 
+            delayServerTitle: "Delay Server",
             groupsTitle: "Groups",
             homeTitle: "Home",
             resourcesTitle: "Resources",
