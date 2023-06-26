@@ -108,6 +108,9 @@ export const Layout = ({ children }) => {
                 <MenuItem button selected={pathname === 'specific-query'} component={Link} to="/specific-query" key='specific-query'>
                     <ListItemText>Specific Queries ({specificQueryTotal})</ListItemText>
                 </MenuItem>
+                <MenuItem button selected={pathname === 'delay-server'} component={Link} to="/delay-server" key='delay-server'>
+                    <ListItemText>Delay Server</ListItemText>
+                </MenuItem>
             </List>
             <Divider />
             <List>
