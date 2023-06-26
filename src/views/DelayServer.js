@@ -21,11 +21,11 @@ export const DelayServer = () => {
     const environment = useEnvironment();
     const auth = localStorage.getItem('zmt-token')
     const classes = useStyles()
-    const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
+    const { isLoadingZoneContext, filteredServers, loadCurrServers } = useServer();
     
 
     useEffect(() => {
-        loadCurrServers(0, 999999, "asc", "role");
+        loadCurrServers(0, 9999999, "asc", "role");
         environment.pageTitle = environment.delayServerTitle;
         document.title = environment.titleFormat();
     }, []);
@@ -95,21 +95,6 @@ export const DelayServer = () => {
                 </Box>
 
                 <Box display='flex' alignItems="center">
-                    {/* <FormControl>
-                        <TextField
-                        className={classes.inputBox}
-                        id="delay_server"
-                        label="example.org"
-                        variant="outlined"
-                        margin="dense"
-                        required
-                        autoFocus
-                        size='medium'
-                        value={hostname}
-                        onChange={(e) => setHostname(e.target.value)}
-                        />  
-                    </FormControl> */}
-
                     <FormControl>
                         <Select
                             native
