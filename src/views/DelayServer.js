@@ -66,7 +66,7 @@ export const DelayServer = () => {
                         />  
                     </FormControl>
 
-                    <Button variant="contained" color="primary" onClick={saveServerHostname}>
+                    <Button variant="outlined" color="primary" onClick={saveServerHostname}>
                         Save
                     </Button>
                 </Box>
