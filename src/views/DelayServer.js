@@ -75,6 +75,8 @@ export const DelayServer = () => {
         console.log('setting hostname as: ' + event.target.value)
         if (event.target.value === "custom_hostname") {
             setCustomFieldOpen(true)
+        } else {
+            setCustomFieldOpen(false)
         }
         setHostname(event.target.value);
     };
