@@ -87,7 +87,7 @@ export const DelayServer = () => {
           
             <Box >
                 <Box variant="h4" fontWeight="fontWeightBold" fontSize='h6.fontSize'>
-                    Change the delay server hostname (equivalent to <Chip label="iadmin set_delay_server" />):
+                    Change where the delay server runs (equivalent to <Chip label="iadmin set_delay_server" />):
                 </Box>
 
                 <Box marginY={'16px'}>
