@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { navigate } from '@reach/router';
+import { navigate, useLocation } from '@reach/router';
 import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody, TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -33,24 +33,44 @@ const useStyles = makeStyles((theme) => ({
 
 export const SpecificQuery = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-    const classes = useStyles()
-    const [status, setStatus] = useState('none')
-    const [newAlias, setNewAlias] = useState()
-    const [newSqlStr, setNewSqlStr] = useState()
-    const [aliasToDelete, setAliasToDelete] = useState()
-    const [filterInput, setFilterInput] = useState('')
-    const [confirmationVisibility, setConfirmationVisibility] = useState(false)
-    const [order, setOrder] = useState('asc')
-    const [orderBy, setOrderBy] = useState('alias')
-    const [sortedSpecificQueryContext, setSortedSpecificQueryContext] = useState()
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const classes = useStyles();
+    const [status, setStatus] = useState('none');
+    const [newAlias, setNewAlias] = useState(params.get('alias') ? decodeURIComponent(params.get('alias')) : "");
+    const [newSqlStr, setNewSqlStr] = useState(params.get('sqlStr') ? decodeURIComponent(params.get('sqlStr')) : "");
+    const [aliasToDelete, setAliasToDelete] = useState();
+    const [filterInput, setFilterInput] = useState('');
+    const [confirmationVisibility, setConfirmationVisibility] = useState(false);
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('alias');
+    const [sortedSpecificQueryContext, setSortedSpecificQueryContext] = useState();
     const environment = useEnvironment();
-    const { specificQueryContext, isLoadingSpecificQueryContext, loadSpecificQueries } = useServer()
+    const { specificQueryContext, isLoadingSpecificQueryContext, loadSpecificQueries } = useServer();
 
     const addButtonEventHandler = () => {
         setStatus('Adding')
-        setNewAlias()
-        setNewSqlStr()
+        setNewAlias("")
+        setNewSqlStr("")
     }
+
+    // Format: http://localhost:9000/specific-query?add=SELECT%20*%20FROM%20R_USER_MAIN&alias=selectAll
+    // everything after ? needs to be URL encoded
+
+    useEffect(() => {
+        if (newAlias === "" && newSqlStr === "") {
+            window.history.replaceState('', '', '/specific-query')
+        } else {
+            window.history.replaceState('', '', `/specific-query?sqlStr=${encodeURIComponent(newSqlStr)}&alias=${encodeURIComponent(newAlias)}`)
+        }
+
+    }, [newAlias, newSqlStr])
+
+    useEffect(() => {
+        if (newAlias || newSqlStr) {
+            setStatus('Adding');
+        }
+    }, [])
 
     const addSpecificQueryHandler = async () => {
         setConfirmationVisibility(false)
@@ -58,7 +78,7 @@ export const SpecificQuery = () => {
             .then(res => {
                 if (res.status === 200) {
                     loadSpecificQueries('')
-                    setNewSqlStr()
+                    setNewSqlStr("")
                     setStatus('add-success')
                 } else setStatus('add-failed')
             })
@@ -136,9 +156,9 @@ export const SpecificQuery = () => {
                     <TableBody>
                         {status === 'Adding' &&
                             <TableRow>
-                                <TableCell><Input className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setNewAlias(e.target.value)} /></TableCell>
-                                <TableCell><Input fullWidth className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setNewSqlStr(e.target.value)} /></TableCell>
-                                <TableCell align="center"><IconButton size="small" disabled={!newAlias || !newSqlStr} onClick={() => setConfirmationVisibility(true)}><SaveIcon /></IconButton><IconButton size="small" onClick={() => setStatus('none')}><CloseIcon /></IconButton></TableCell>
+                                <TableCell><Input className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setNewAlias(e.target.value)} value={newAlias} /></TableCell>
+                                <TableCell><Input fullWidth className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setNewSqlStr(e.target.value)} value={newSqlStr} /></TableCell>
+                                <TableCell align="center"><IconButton size="small" disabled={!newAlias || !newSqlStr} onClick={() => setConfirmationVisibility(true)}><SaveIcon /></IconButton><IconButton size="small" onClick={() => {setStatus('none'); setNewAlias(""); setNewSqlStr("");}}><CloseIcon /></IconButton></TableCell>
                             </TableRow>}
                         {!isLoadingSpecificQueryContext && (sortedSpecificQueryContext && sortedSpecificQueryContext.length > 0 ? sortedSpecificQueryContext.map(specificQuery =>
                             <TableRow key={`specific-query-${specificQuery[0]}`}>
@@ -153,17 +173,29 @@ export const SpecificQuery = () => {
             <Dialog open={confirmationVisibility}>
                 <DialogTitle>Confirmation</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>{status} specific query {status === 'Adding' ? newAlias : aliasToDelete}?</DialogContentText>
+                    <DialogContentText>{status} specific query &apos;{status === 'Adding' ? newAlias : aliasToDelete}&apos;?</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button color="secondary" onClick={status === 'Adding' ? addSpecificQueryHandler : deleteSpecificQueryHandler}>Confirm</Button>
-                    <Button color="primary" onClick={() => setConfirmationVisibility(false)}>Cancel</Button>
+                    {
+                        status === 'Adding' ? (
+                            <Fragment>
+                                <Button color="secondary" onClick={() => setConfirmationVisibility(false)}>Cancel</Button>
+                                <Button color="primary" onClick={addSpecificQueryHandler}>Confirm</Button>
+                            </Fragment>
+                        ) : (
+                            <Fragment>
+                                <Button color="secondary" onClick={deleteSpecificQueryHandler}>Confirm</Button>
+                                <Button color="primary" onClick={() => setConfirmationVisibility(false)}>Cancel</Button>
+                                
+                            </Fragment>
+                        )
+                    }
                 </DialogActions>
             </Dialog>
-            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query {newAlias} is added.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to add specific query {newAlias}.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'delete-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query {aliasToDelete} is deleted.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'delete-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to delete specific query {aliasToDelete}.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); setNewAlias("") }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{newAlias}&apos; is added.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to add specific query &apos;{newAlias}&apos;.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'delete-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{aliasToDelete}&apos; is deleted.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'delete-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to delete specific query &apos;{aliasToDelete}&apos;.</MuiAlert></Snackbar>
         </Fragment>
     )
 }
