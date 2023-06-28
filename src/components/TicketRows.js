@@ -84,6 +84,7 @@ function TicketRows({ row }) {
     <React.Fragment>
         <TableRow hover={true} onClick={() => setOpen(!open)}>
             <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[17]}</TableCell>
+            <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[1]}</TableCell>
             <TableCell className={classes.table_cell} style={{ width: '40%' }}>{ticket[2]}</TableCell>
             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{ticket[0]}</TableCell>
             <TableCell className={classes.table_cell} style={{ width: '20%' }}>{show1}</TableCell>
@@ -106,7 +107,7 @@ function TicketRows({ row }) {
               >
                 <TableBody>
                     <TableRow>
-                        <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_STRING: {ticket[1]}</TableCell>
+                        <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_OWNER_ZONE: {ticket[18]}</TableCell>
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_USER_ID: {ticket[3]}</TableCell>
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_OBJECT_ID: {ticket[4]}</TableCell>
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_OBJECT_TYPE: {ticket[5]}</TableCell>
@@ -124,10 +125,6 @@ function TicketRows({ row }) {
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_WRITE_BYTE_LIMIT: {ticket[11]}</TableCell>
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_DATA_NAME: {ticket[15]}</TableCell>
                         <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_DATA_COLL_NAME: {ticket[16]}</TableCell>
-                    </TableRow>
-
-                    <TableRow>
-                        <TableCell className={classes.table_cell} style={{ width: '40%' }}>TICKET_OWNER_ZONE: {ticket[18]}</TableCell>
                     </TableRow>
 
                 </TableBody>

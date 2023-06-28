@@ -345,6 +345,18 @@ export const Ticket = () => {
 
                             <TableCell className={classes.table_cell, classes.header_row} style={{ width: '20%' }}>
                                 <TableSortLabel
+                                    active={orderBy === "TICKET_STRING"}
+                                    direction={orderBy === "TICKET_STRING" ? order : "asc"}
+                                    onClick={() => {
+                                        handleSort("TICKET_STRING");
+                                    }}
+                                >
+                                String
+                                </TableSortLabel>
+                            </TableCell>
+
+                            <TableCell className={classes.table_cell, classes.header_row} style={{ width: '20%' }}>
+                                <TableSortLabel
                                     active={orderBy === "TICKET_TYPE"}
                                     direction={orderBy === "TICKET_TYPE" ? order : "asc"}
                                     onClick={() => {
