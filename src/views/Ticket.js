@@ -4,7 +4,6 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { navigate, useLocation } from '@reach/router';
 import axios from 'axios';
 import { useServer, useEnvironment } from '../contexts';
-// import { makeStyles, StylesProvider, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, LinearProgress, TextField, Typography, Input, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel, Select, Paper } from '@material-ui/core';
 import { makeStyles, LinearProgress, TableContainer, Paper, Table, TableHead, StylesProvider, TableRow, TableCell, TableBody, TextField, TablePagination, TableSortLabel, InputLabel } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -14,11 +13,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
-
-
-// import SaveIcon from '@material-ui/icons/Save';
-// import CloseIcon from '@material-ui/icons/Close';
-// import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 import TicketRows from '../components/TicketRows';
 
 const useStyles = makeStyles((theme) => ({
@@ -171,10 +165,20 @@ export const Ticket = () => {
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
-        })
+        }).catch(e => {})
+
+        const exampleResponse = {
+            "headers": {
+              "irods-ticket": ["CS11B8C4KZX2BIl"]
+            },
+            "url": "/irods-rest/0.9.3/stream?logical-path=%2FtempZone%2Fhome%2Frods%2Ffile0&offset=0&count=33064"
+        }
+
+        if (exampleResponse && exampleResponse.url) {
+            window.location.reload();
+        }
 
         console.log(response);
-
 
     }
     
@@ -192,7 +196,7 @@ export const Ticket = () => {
             />
 
         <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-            Open form dialog
+            New Ticket
         </Button>
 
         {/* 
@@ -309,7 +313,7 @@ export const Ticket = () => {
             Create Ticket
             </Button>
         </DialogActions>
-        </Dialog>;
+        </Dialog>
 
 
         </div>
