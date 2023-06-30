@@ -11,7 +11,7 @@ export const AddSpecificQueryController = (alias, sqlStr, restApiLocation) => {
         params: {
             action: 'add',
             target: 'specificQuery',
-            arg2: sqlStr,
+            arg2: encodeURIComponent(sqlStr),
             arg3: alias 
         }
     })
