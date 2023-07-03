@@ -427,11 +427,21 @@ export const ServerProvider = ({ children }) => {
     // load all servers at each render, and iterate through server list to fetch resources which have the same hostname
     const loadServers = async () => {
         setIsLoadingZoneContext(true);
+        const servers_limit = 10; // max number of servers to store, so we're not overwhelming the frontend
         let zone_report = await loadZoneReport();
+
         if (zone_report !== undefined) {
             let resc_types = new Set();
-            let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
-            let fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
+            let version_4_3_1_or_after = zone_report.data.zones[0].icat_server ? false : true;
+            let fullServersArray;
+
+            if (version_4_3_1_or_after) {
+                fullServersArray = zone_report.data.zones[0]['servers'];
+            } else {
+                 // before 4.3.1, icat_server was separately defined in the zonereport
+                let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
+                fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
+            }
             let newValidHostSet = new Set(['EMPTY_RESC_HOST'])
             for (let curr_server of fullServersArray) {
                 // check and load resource plugins from zone report
@@ -447,6 +457,7 @@ export const ServerProvider = ({ children }) => {
                 if (resource_counts === undefined) curr_server["resources"] = 0;
                 else curr_server["resources"] = resource_counts.data.total;
             }
+
             setValidServerHosts(newValidHostSet)
             setServerVersions(fullServersArray.reduce((prev, curr) => {
                 prev.push(curr['version']['irods_version'])
@@ -454,7 +465,7 @@ export const ServerProvider = ({ children }) => {
             }, []).sort(irodsVersionComparator))
             setRescTypes([...resc_types].sort())
             setZoneContext(fullServersArray)
-            setFilteredServers(fullServersArray.slice(0, 10));
+            setFilteredServers(fullServersArray.slice(0, servers_limit));
             setIsLoadingZoneContext(false);
         }
     }
@@ -464,7 +475,6 @@ export const ServerProvider = ({ children }) => {
         if (zoneContext !== undefined && zoneContext.length !== 0) {
             let tem_servers = zoneContext;
             let orderSyntax = order === 'asc' ? 1 : -1;
-
             const server_sort_comparator = (a, b) => {
                 switch (orderBy) {
                     case 'hostname':
