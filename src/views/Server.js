@@ -122,7 +122,7 @@ export const Server = () => {
                         <Dialog open={openDetails} className={classes.dialog} onClose={() => setOpenDetails(false)}>
                             <DialogTitle>Server Details</DialogTitle>
                             <DialogContent className={classes.server_details}>
-                                <Tabs orientation="vertical" variant="scrollable" value={tabValue} className={classes.tabs} onChange={(event, newValue) => setTabValue(newValue)} aria-label="vertical tabs example">
+                                <Tabs orientation="vertical" variant="scrollable" value={tabValue} className={classes.tabs} onChange={(event, newValue) => setTabValue(newValue)} aria-label="vertical tabs example" indicatorColor="primary" textColor="primary">
                                     <Tab className={classes.tab} label="General" {...a11yProps(0)} />
                                     <Tab className={classes.tab} label="Service Configuration" {...a11yProps(1)} />
                                     <Tab className={classes.tab} label="Service Account Environment" {...a11yProps(2)} />
@@ -134,8 +134,8 @@ export const Server = () => {
                                     <p className={classes.info}>OS Distribution Version: {currServer['host_system_information']['os_distribution_version']}</p>
                                     <p className={classes.info}>Service Account Group Name: {currServer['host_system_information']['service_account_group_name']}</p>
                                     <p className={classes.info}>Service Account User Name: {currServer['host_system_information']['service_account_user_name']}</p>
-                                    <p className={classes.info}>Schema Name: {currServer['host_access_control_config']['schema_name']}</p>
-                                    <p className={classes.info}>Schema Version: {currServer['host_access_control_config']['schema_version']}</p>
+                                    <p className={classes.info}>Schema Name: {currServer['server_config']['schema_name']}</p>
+                                    <p className={classes.info}>Schema Version: {currServer['server_config']['schema_version']}</p>
                                     <p className={classes.info}>Catalog Schema Version: {currServer['version']['catalog_schema_version']}</p>
                                     <p className={classes.info}>Configuration Schema Version: {currServer['version']['configuration_schema_version']}</p>
                                     <p className={classes.info}>iRODS Version: {currServer['version']['irods_version']}</p>
