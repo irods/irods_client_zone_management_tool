@@ -18,7 +18,7 @@ const queryGenerator = (_query, order, orderBy) => {
 }
 
 export const ServerProvider = ({ children }) => {
-    const { restApiLocation } = useEnvironment();
+    const { restApiLocation, displayMaxNumberOfServers } = useEnvironment();
     const [zoneContext, setZoneContext] = useState([]);
     const [localZoneName, setLocalZoneName] = useState()
     const [zones, setZones] = useState()
@@ -454,7 +454,7 @@ export const ServerProvider = ({ children }) => {
             }, []).sort(irodsVersionComparator))
             setRescTypes([...resc_types].sort())
             setZoneContext(fullServersArray)
-            setFilteredServers(fullServersArray.slice(0, 10));
+            setFilteredServers(fullServersArray.slice(0, displayMaxNumberOfServers));
             setIsLoadingZoneContext(false);
         }
     }

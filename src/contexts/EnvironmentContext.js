@@ -29,6 +29,7 @@ export const EnvironmentProvider = ({ children }) => {
             loginLogo: process.env.REACT_APP_LOGIN_LOGO,
             brandingName: process.env.REACT_APP_BRANDING_NAME,
             filterTimeInMilliseconds: process.env.REACT_APP_FILTER_TIME_IN_MILLISECONDS,
+            displayMaxNumberOfServers: process.env.REACT_APP_DISPLAY_MAXIMUM_NUMBER_OF_SERVERS,
 
             groupsTitle: "Groups",
             homeTitle: "Home",
