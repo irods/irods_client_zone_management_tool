@@ -48,9 +48,11 @@ const useStyles = makeStyles((theme) => ({
 
 export const User = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const location = useLocation()
     const params = new URLSearchParams(location.search)
     const environment = useEnvironment();
+    const usersPageKey = environment.usersPageKey;
     const auth = localStorage.getItem('zmt-token');
     const loggedUserName = localStorage.getItem('zmt-username');
     const classes = useStyles();
@@ -61,7 +63,7 @@ export const User = () => {
     const userTypes = ["rodsuser", "rodsadmin", "groupadmin"];
     const [removeConfirmation, setRemoveConfirmation] = useState(false);
     const [currPage, setCurrPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(parseInt(localStorage.getItem(usersPageKey), 10));
     const [filterUsername, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : "");
     const { isLoadingUserContext, userContext, localZoneName, loadUsers, zones } = useServer();
     const [order, setOrder] = useState("asc");
@@ -71,6 +73,15 @@ export const User = () => {
     const [isRunning, setIsRunning] = useState(false);
     const firstUpdate = useRef(true); // used to prevent filtering useEffect from running on initial render
     const delayTimeUse = environment.filterTimeInMilliseconds / 100; // convert into tenths of a second
+
+    useEffect(() => {
+        // runs on initial render
+        const usersPerPage = localStorage.getItem(usersPageKey);
+        if (!usersPerPage) {
+            localStorage.setItem(usersPageKey, environment.defaultItemsPerPage);
+            setPerPage(environment.defaultItemsPerPage);
+        }
+    }, [])
 
     useEffect(() => {
         // timer for keystroke delay
@@ -247,7 +258,7 @@ export const User = () => {
                             Add New User
                         </Button>
                     </div>
-                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(userContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(userContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(usersPageKey, e.target.value) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
                         <Table style={{ width: '100%', tableLayout: 'fixed' }} aria-label="User table">
                             <TableHead>

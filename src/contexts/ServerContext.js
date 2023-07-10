@@ -18,7 +18,7 @@ const queryGenerator = (_query, order, orderBy) => {
 }
 
 export const ServerProvider = ({ children }) => {
-    const { restApiLocation } = useEnvironment();
+    const environment = useEnvironment();
     const [zoneContext, setZoneContext] = useState([]);
     const [localZoneName, setLocalZoneName] = useState()
     const [zones, setZones] = useState()
@@ -54,7 +54,7 @@ export const ServerProvider = ({ children }) => {
 
             return axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -88,7 +88,7 @@ export const ServerProvider = ({ children }) => {
 
             const resp1 = await axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -103,7 +103,7 @@ export const ServerProvider = ({ children }) => {
 
             const resp2 = await axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -118,7 +118,7 @@ export const ServerProvider = ({ children }) => {
             
             const resp3 = await axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -179,7 +179,7 @@ export const ServerProvider = ({ children }) => {
     const loadGroupUserCounts = async (inputArray, offset, limit, order, orderBy) => {
         let groupUserCountPromises = inputArray._embedded.map(group => axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${environment.restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
@@ -217,7 +217,7 @@ export const ServerProvider = ({ children }) => {
         _query = queryGenerator(_query, order, orderBy);
         await axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${environment.restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
@@ -279,7 +279,7 @@ export const ServerProvider = ({ children }) => {
             let _query = queryGenerator(base_query, order, orderBy);
             return axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -303,7 +303,7 @@ export const ServerProvider = ({ children }) => {
             let filteredResults = {};
             await axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -322,7 +322,7 @@ export const ServerProvider = ({ children }) => {
             });
             await axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -340,7 +340,7 @@ export const ServerProvider = ({ children }) => {
                 setIsLoadingRescContext(false);
             });
         }
-    }, [restApiLocation])
+    }, [environment.restApiLocation])
 
     const updatingRescPanelStatus = (text) => {
         setRescPanelStatus(text);
@@ -351,7 +351,7 @@ export const ServerProvider = ({ children }) => {
         let zonesRes = []
         const zoneData = await axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${environment.restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
@@ -375,7 +375,7 @@ export const ServerProvider = ({ children }) => {
         const zoneUserDataPromises = zoneData.data._embedded.map(zone => {
             return axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${environment.restApiLocation}/query`,
                 headers: {
                     'Authorization': localStorage.getItem('zmt-token')
                 },
@@ -396,7 +396,7 @@ export const ServerProvider = ({ children }) => {
     const loadZoneReport = () => {
         return axios({
             method: 'GET',
-            url: `${restApiLocation}/zonereport`,
+            url: `${environment.restApiLocation}/zonereport`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': localStorage.getItem('zmt-token')
@@ -411,7 +411,7 @@ export const ServerProvider = ({ children }) => {
     const fetchServerResources = (server_hostname) => {
         return axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${environment.restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
@@ -427,7 +427,6 @@ export const ServerProvider = ({ children }) => {
     // load all servers at each render, and iterate through server list to fetch resources which have the same hostname
     const loadServers = async () => {
         setIsLoadingZoneContext(true);
-        const servers_limit = 10; // max number of servers to store, so we're not overwhelming the frontend
         let zone_report = await loadZoneReport();
 
         if (zone_report !== undefined) {
@@ -465,7 +464,10 @@ export const ServerProvider = ({ children }) => {
             }, []).sort(irodsVersionComparator))
             setRescTypes([...resc_types].sort())
             setZoneContext(fullServersArray)
-            setFilteredServers(fullServersArray.slice(0, servers_limit));
+            if (!localStorage.getItem(environment.serversPageKey)) {
+                localStorage.setItem(environment.serversPageKey, environment.defaultItemsPerPage);
+            }
+            setFilteredServers(fullServersArray.slice(0, parseInt(localStorage.getItem(environment.serversPageKey), 10)));
             setIsLoadingZoneContext(false);
         }
     }
@@ -505,7 +507,7 @@ export const ServerProvider = ({ children }) => {
         setIsLoadingSpecificQueryContext(true)
         axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${environment.restApiLocation}/query`,
             headers: {
                 'Authorization': localStorage.getItem('zmt-token')
             },
@@ -528,11 +530,25 @@ export const ServerProvider = ({ children }) => {
 
 
     const loadData = () => {
+        // not including servers key because we don't need to set default load amount here for it
+        const pageKeys = ["groupsPerPageKey", "resourcesPageKey", "usersPageKey"];
+
+        for (let key of pageKeys) {
+            if (!localStorage.getItem(environment[key])) {
+                localStorage.setItem(environment[key], environment.defaultItemsPerPage);
+            }
+        }
+
+        const groupsPerPage = parseInt(localStorage.getItem(environment[pageKeys[0]]), 10);
+        const rescPerPage = parseInt(localStorage.getItem(environment[pageKeys[1]]), 10);
+        const usersPerPage = parseInt(localStorage.getItem(environment[pageKeys[2]]), 10);
+        
+
         !isLoadingZones && loadZones();
         !isLoadingZoneContext && loadServers();
-        !isLoadingUserContext && loadUsers(0, 10, '', 'asc', 'USER_NAME');
-        !isLoadingGroupContext && loadGroups(0, 10, '', 'asc', 'USER_NAME');
-        !isLoadingRescContext && loadResources(0, 0, '', 'asc', 'RESC_NAME');
+        !isLoadingGroupContext && loadGroups(0, groupsPerPage, '', 'asc', 'USER_NAME');
+        !isLoadingRescContext && loadResources(0, rescPerPage, '', 'asc', 'RESC_NAME');
+        !isLoadingUserContext && loadUsers(0, usersPerPage, '', 'asc', 'USER_NAME');
         !isLoadingSpecificQueryContext && loadSpecificQueries('')
     }
 

@@ -46,13 +46,24 @@ export const Server = () => {
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
     const environment = useEnvironment();
+    const serversPageKey = environment.serversPageKey;
     const [currPage, setCurrPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(parseInt(localStorage.getItem(serversPageKey), 10));
     const [tabValue, setTabValue] = useState(0);
     const [openDetails, setOpenDetails] = useState(false);
     const [currServer, setCurrServer] = useState();
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("role");
+
+    useEffect(() => {
+        // runs on initial render
+        const serversPerPage = localStorage.getItem(serversPageKey);
+        
+        if (!serversPerPage) {
+            localStorage.setItem(serversPageKey, environment.defaultItemsPerPage);
+            setPerPage(environment.defaultItemsPerPage);
+        } 
+    }, [])
 
     useEffect(() => {
         loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
@@ -79,7 +90,7 @@ export const Server = () => {
             <br />
             {zoneContext === undefined ? <div>Cannot load server data. Please check your iRODS Client REST API endpoint connection.</div> :
                 <Fragment>
-                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(zoneContext.length)} rowsPerPage={perPage} onChangePage={(event, value) => { setCurrPage(value + 1) }} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(zoneContext.length)} rowsPerPage={perPage} onChangePage={(event, value) => { setCurrPage(value + 1) }} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(serversPageKey, e.target.value) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
