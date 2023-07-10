@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const ResourceListView = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const location = useLocation()
     const params = new URLSearchParams(location.search)
     const auth = localStorage.getItem('zmt-token');
@@ -59,11 +60,21 @@ export const ResourceListView = () => {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("RESC_NAME");
     const [currPage, setCurrPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
-    const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const environment = useEnvironment();
+    const resourcesPageKey = environment.resourcesPageKey;
+    const [perPage, setPerPage] = useState(parseInt(localStorage.getItem(resourcesPageKey), 10));
+    const [filterRescName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const { isLoadingRescContext, localZoneName, validServerHosts, rescContext, rescTypes, loadResources, rescPanelStatus, updatingRescPanelStatus } = useServer();
 
+    useEffect(() => {
+        // runs on initial render
+        const resourcesPerPage = localStorage.getItem(resourcesPageKey);
+        if (!resourcesPerPage) {
+            localStorage.setItem(resourcesPageKey, environment.defaultItemsPerPage);
+            setPerPage(environment.defaultItemsPerPage);
+        }
+    }, [])
+    
     useEffect(() => {
         if (localZoneName) {
             loadResources((currPage - 1) * perPage, perPage, filterRescName, order, orderBy)
@@ -190,7 +201,7 @@ export const ResourceListView = () => {
                         Add New Resource
                     </Button>
                 </div>
-                <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(rescContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(rescContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(resourcesPageKey, e.target.value) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
                         <Table style={{ width: '100%', tableLayout: 'fixed'}} aria-label="simple table">
                             <TableHead>

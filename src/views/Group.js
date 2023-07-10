@@ -43,9 +43,11 @@ const useStyles = makeStyles((theme) => ({
 
 export const Group = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
+
     const location = useLocation()
     const params = new URLSearchParams(location.search)
     const environment = useEnvironment();
+    const groupsPerPageKey = environment.groupsPerPageKey;
     const auth = localStorage.getItem('zmt-token');
     const classes = useStyles();
     const { isLoadingGroupContext, localZoneName, groupContext, loadGroups } = useServer();
@@ -56,10 +58,19 @@ export const Group = () => {
     const [currGroup, setCurrGroup] = useState([]);
     const [filterGroupName, setFilterName] = useState(params.get('filter') ? decodeURIComponent(params.get('filter')) : '');
     const [currPage, setCurrPage] = useState(1);
-    const [perPage, setPerPage] = useState(10);
+    const [perPage, setPerPage] = useState(parseInt(localStorage.getItem(groupsPerPageKey), 10));
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState("USER_NAME");
     let group_id = 0;
+
+    useEffect(() => {
+        // runs on initial render
+        const groupsPerPage = localStorage.getItem(groupsPerPageKey);
+        if (!groupsPerPage) {
+            localStorage.setItem(groupsPerPageKey, environment.defaultItemsPerPage);
+            setPerPage(environment.defaultItemsPerPage);
+        }
+    }, [])
 
     // load group from context provider,
     // pass in perPage, currentPage, filtername('' by default), order, orderBy
@@ -184,7 +195,7 @@ export const Group = () => {
                             Add New Group
                         </Button>
                     </div>
-                    <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1) }} />
+                    <Fragment><TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(groupContext.total)} rowsPerPage={perPage} onChangePage={handlePageChange} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(groupsPerPageKey, e.target.value) }} />
                         <TableContainer className={classes.tableContainer} component={Paper}>
                             <Table aria-label="simple table">
                                 <TableHead>

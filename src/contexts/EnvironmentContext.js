@@ -38,6 +38,12 @@ export const EnvironmentProvider = ({ children }) => {
             usersTitle: "Users",
             zonesTitle: "Zones",
 
+            groupsPerPageKey: "zmt-perpage-groups",
+            resourcesPageKey: "zmt-perpage-resources",
+            serversPageKey: "zmt-perpage-servers",
+            usersPageKey: "zmt-perpage-users",
+            defaultItemsPerPage: 25,
+
             pageTitle: "", // placeholder that gets filled on each page
             titleFormat: function () {
                 return `${this.pageTitle} - ${this.brandingName}`
