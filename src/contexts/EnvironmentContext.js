@@ -30,6 +30,7 @@ export const EnvironmentProvider = ({ children }) => {
             brandingName: process.env.REACT_APP_BRANDING_NAME,
             filterTimeInMilliseconds: process.env.REACT_APP_FILTER_TIME_IN_MILLISECONDS,
 
+            delayServerTitle: "Delay Server",
             groupsTitle: "Groups",
             homeTitle: "Home",
             resourcesTitle: "Resources",
