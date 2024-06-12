@@ -39,11 +39,12 @@ export default {
 				name: specificQuery,
 				count: 0, // 0 = return all results
 				offset: 0,
-				"case-sensitive": 1,
 			},
 		}).catch(() => {
 			specificWarning = true;
 		});
+
+		// console.log(specificResp);
 
 		if (specificResp && specificResp.data) {
 			// specific query succeeded, so we can use the result
@@ -59,8 +60,8 @@ export default {
 					Authorization: `Bearer ${authToken}`,
 				},
 				params: {
+					op: "execute_genquery",
 					query: totalMetaQuery,
-					type: "general",
 					count: 0, // 0 = return all results
 					offset: 0,
 					"case-sensitive": 0,
@@ -106,8 +107,8 @@ export default {
 						Authorization: `Bearer ${authToken}`,
 					},
 					params: {
+						op: "execute_genquery",
 						query: query,
-						type: "general",
 						count: 0, // 0 = return all results
 						offset: 0,
 						"case-sensitive": 0,
