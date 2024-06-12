@@ -21,8 +21,8 @@ export default {
 			params: {
 				op: "report",
 			},
-		}).catch((e) => {
-			if (!e.response || e.response.status >= 500) {
+		}).then((res) => {
+			if (!res.data || !res.data.zone_report || res.status >= 500) {
 				result.status = "error";
 				result.message = "/zones endpoint is down.";
 			} else {
@@ -30,6 +30,7 @@ export default {
 				result.message = "/zones endpoint is running normally.";
 			}
 		});
+		// console.log(result);
 		return result;
 	},
 };

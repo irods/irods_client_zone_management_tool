@@ -12,7 +12,6 @@ export default {
 			success: 0,
 			failed: [],
 		};
-		console.log(this.rescAll);
 		let compoundRescObj = this.rescAll.rows.reduce((prev, curr) => {
 			if (curr[1] === "compound")
 				prev[curr[11]] = {
