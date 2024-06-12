@@ -1,134 +1,155 @@
 import React from "react";
 import { Link } from "@reach/router";
-import axios from 'axios'
-import Chip from '@material-ui/core/Chip';
+import axios from "axios";
+import Chip from "@material-ui/core/Chip";
 
 export default {
-  name: "Each user is in a valid zone.",
-  description: `Checks if any users belong to invalid zones.`,
-  minimum_server_version: "4.2.0",
-  maximum_server_version: "",
-  interval_in_seconds: 86400,
-  active: true,
-  checker: async function () {
-    let result = {
-      status: "",
-      message: [],
-      success: 0,
-      failed: [],
-    };
+	name: "Each user is in a valid zone.",
+	description: `Checks if any users belong to invalid zones.`,
+	minimum_server_version: "4.2.0",
+	maximum_server_version: "",
+	interval_in_seconds: 86400,
+	active: true,
+	checker: async function () {
+		let result = {
+			status: "",
+			message: [],
+			success: 0,
+			failed: [],
+		};
 
-    const authToken = localStorage.getItem("zmt-token");
-    let warningAboutSpecificQuery = false
-    const specificQuery = "SELECT user_name, zone_name FROM R_USER_MAIN WHERE zone_name NOT IN (SELECT zone_name FROM R_ZONE_MAIN)"
-    let resultsArr = []
+		const authToken = localStorage.getItem("zmt-token");
+		let warningAboutSpecificQuery = false;
+		const specificQuery =
+			"SELECT user_name, zone_name FROM R_USER_MAIN WHERE zone_name NOT IN (SELECT zone_name FROM R_ZONE_MAIN)";
+		let resultsArr = [];
 
-    const resp = await axios({
-        url: `${this.restApiLocation}/query`,
-        method: 'GET',
-        headers: {
-            'Authorization': authToken
-        },
-        params: {
-            query: specificQuery,
-            type: "specific",
-            limit: 0, // 0 = return all results
-            offset: 0,
-            "case-sensitive": 1
-        }
-    }).catch(e => {
-            if (!e.response || e.response.status == 400) {
-                warningAboutSpecificQuery = true
-            }
-        })
+		const resp = await axios({
+			url: `${this.restApiLocation}/query`,
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${authToken}`,
+			},
+			params: {
+				op: "execute_specific_query",
+				name: specificQuery,
+				limit: 0, // 0 = return all results
+				offset: 0,
+				"case-sensitive": 1,
+			},
+		}).catch((e) => {
+			if (!e.response || e.response.status == 400) {
+				warningAboutSpecificQuery = true;
+			}
+		});
 
-    if (resp && resp.data) {
-        resultsArr = resp.data._embedded
-        if (resultsArr.length > 0)  {
-            resultsArr.map((user) => {
-                result.failed.push([user[0], user[1]]);
-                
-            })
-        }
-    } else {
-        const generalQuery1 = "SELECT USER_NAME, USER_ZONE WHERE USER_TYPE != 'rodsgroup'"
+		if (resp && resp.data) {
+			resultsArr = resp.data._embedded;
+			if (resultsArr.length > 0) {
+				resultsArr.map((user) => {
+					result.failed.push([user[0], user[1]]);
+				});
+			}
+		} else {
+			const generalQuery1 =
+				"SELECT USER_NAME, USER_ZONE WHERE USER_TYPE != 'rodsgroup'";
 
-        const resp1 = await axios({
-            url: `${this.restApiLocation}/query`,
-            method: 'GET',
-            headers: {
-                'Authorization': authToken
-            },
-            params: {
-                query: generalQuery1,
-                type: "general",
-                limit: 0, // 0 = return all results
-                offset: 0
-        }});
+			const resp1 = await axios({
+				url: `${this.restApiLocation}/query`,
+				method: "GET",
+				headers: {
+					Authorization: authToken,
+				},
+				params: {
+					query: generalQuery1,
+					type: "general",
+					limit: 0, // 0 = return all results
+					offset: 0,
+				},
+			});
 
-        const generalQuery2 = "SELECT ZONE_NAME"
+			const generalQuery2 = "SELECT ZONE_NAME";
 
-        const resp2 = await axios({
-            url: `${this.restApiLocation}/query`,
-            method: 'GET',
-            headers: {
-                'Authorization': authToken
-            },
-            params: {
-                query: generalQuery2,
-                type: "general",
-                limit: 0, // 0 = return all results
-                offset: 0
-        }});
+			const resp2 = await axios({
+				url: `${this.restApiLocation}/query`,
+				method: "GET",
+				headers: {
+					Authorization: authToken,
+				},
+				params: {
+					query: generalQuery2,
+					type: "general",
+					limit: 0, // 0 = return all results
+					offset: 0,
+				},
+			});
 
-        if (resp1 && resp1.data && resp2 && resp2.data) {
-            resp1.data._embedded.map((user) => {
-                    for (let i = 0; i < resp2.data._embedded.length; i++) {
-                        if (user[1] == resp2.data._embedded[i][0]) {
-                            return
-                        }
-                    }
-                    result.failed.push([user[0], user[1]]);
-                }
-            )
-        }
-    }
+			if (resp1 && resp1.data && resp2 && resp2.data) {
+				resp1.data._embedded.map((user) => {
+					for (let i = 0; i < resp2.data._embedded.length; i++) {
+						if (user[1] == resp2.data._embedded[i][0]) {
+							return;
+						}
+					}
+					result.failed.push([user[0], user[1]]);
+				});
+			}
+		}
 
-    result.status = result.failed.length > 0 ? "error" : "healthy";
+		result.status = result.failed.length > 0 ? "error" : "healthy";
 
-    if (result.failed.length > 0) {
-        let pushed = (
-            <span key='push1'>
-              <span>Failed on: </span>
-              {result.failed.map((failedUser, index) => (
-                <span key={`userNameCheckFailed-${index}`}>
-                  {index !== 0 && ", "}
-                  <Link
-                    className="check_result_link"
-                    key={`userNameCheckFailed-${index}`}
-                    to={`/users?filter=${encodeURIComponent(failedUser[0])}`}
-                  >
-                    {failedUser[0]}
-                  </Link>{" "}
-                  ({failedUser[1]})
-                </span>
-              ))}
-            </span>
-          );
-          
-        result.message.push(pushed) 
-    } else {
-        result.message.push(<span key='push0'>All users are in valid zones</span>)
-    }
+		if (result.failed.length > 0) {
+			let pushed = (
+				<span key="push1">
+					<span>Failed on: </span>
+					{result.failed.map((failedUser, index) => (
+						<span key={`userNameCheckFailed-${index}`}>
+							{index !== 0 && ", "}
+							<Link
+								className="check_result_link"
+								key={`userNameCheckFailed-${index}`}
+								to={`/users?filter=${encodeURIComponent(
+									failedUser[0]
+								)}`}
+							>
+								{failedUser[0]}
+							</Link>{" "}
+							({failedUser[1]})
+						</span>
+					))}
+				</span>
+			);
 
-    if (warningAboutSpecificQuery) {
-        result.message.push(<span key='push2'>. Additionally, please define the specific query: <Chip label={specificQuery} /> manually, or by using this <a rel="noreferrer" target="_blank" href={`/specific-query?sqlStr=${encodeURIComponent(specificQuery)}&alias=usersInvalidZone`}>dynamically generated link</a> to get faster results.</span>)
+			result.message.push(pushed);
+		} else {
+			result.message.push(
+				<span key="push0">All users are in valid zones</span>
+			);
+		}
 
-        if (result.status == "healthy") {
-            result.status = "warning"
-        }
-    }
+		if (warningAboutSpecificQuery) {
+			result.message.push(
+				<span key="push2">
+					. Additionally, please define the specific query:{" "}
+					<Chip label={specificQuery} /> manually, or by using this{" "}
+					<a
+						rel="noreferrer"
+						target="_blank"
+						href={`/specific-query?sqlStr=${encodeURIComponent(
+							specificQuery
+						)}&alias=usersInvalidZone`}
+					>
+						dynamically generated link
+					</a>{" "}
+					to get faster results.
+				</span>
+			);
 
-    return result;
-  },
+			if (result.status == "healthy") {
+				result.status = "warning";
+			}
+		}
+
+		return result;
+	},
 };
