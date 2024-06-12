@@ -73,7 +73,6 @@ export default {
 			) {
 				totalMeta = parseInt(totalMetaResp.data.rows[0][0]);
 			}
-			console.log(totalMeta);
 
 			if (totalMeta > AVUThresholdBeforeWarningForNoSpecificQuery) {
 				// if there are more than `AVUThresholdBeforeWarningForNoSpecificQuery` metadata entries, the genqueries below will take too long to run
