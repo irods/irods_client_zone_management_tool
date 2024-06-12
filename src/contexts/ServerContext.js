@@ -1,582 +1,792 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import { useEnvironment } from './';
-import { irodsVersionComparator } from '../utils';
+import React, {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
+import PropTypes from "prop-types";
+import axios from "axios";
+import { useEnvironment } from "./";
+import { irodsVersionComparator } from "../utils";
 
 export const ServerContext = createContext();
 
 const initialState = {
-    _embedded: [],
-    count: 0,
-    total: 0
-}
+	_embedded: [],
+	count: 0,
+	total: 0,
+};
 
 const queryGenerator = (_query, order, orderBy) => {
-    const orderSyntax = order === 'desc' ? 'order_desc' : 'order';
-    return _query.replace(orderBy, orderSyntax + '(' + orderBy + ')');
-}
+	const orderSyntax = order === "desc" ? "order_desc" : "order";
+	return _query.replace(orderBy, orderSyntax + "(" + orderBy + ")");
+};
 
 export const ServerProvider = ({ children }) => {
-    const environment = useEnvironment();
-    const [zoneContext, setZoneContext] = useState([]);
-    const [localZoneName, setLocalZoneName] = useState()
-    const [zones, setZones] = useState()
-    const [isLoadingZones, setIsLoadingZones] = useState(false)
-    const [isLoadingZoneContext, setIsLoadingZoneContext] = useState(false);
-    const [userContext, setUserContext] = useState(initialState);
-    const [userTotal, setUserTotal] = useState(0);
-    const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
-    const [groupContext, setGroupContext] = useState(initialState);
-    const [groupTotal, setGroupTotal] = useState(0);
-    const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
-    const [rescContext, setRescContext] = useState(initialState);
-    const [rescTypes, setRescTypes] = useState([]);
-    const [rescAll, setRescAll] = useState([])
-    const [rescTotal, setRescTotal] = useState(0);
-    const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
-    const [rescPanelStatus, setRescPanelStatus] = useState('idle');
-    const [filteredServers, setFilteredServers] = useState();
-    const [serverVersions, setServerVersions] = useState([])
-    const [validServerHosts, setValidServerHosts] = useState(new Set(['EMPTY_RESC_HOST']))
-    const [isLoadingSpecificQueryContext, setIsLoadingSpecificQueryContext] = useState(false)
-    const [specificQueryContext, setSpecificQueryContext] = useState(initialState)
-    const [specificQueryTotal, setSpecificQueryTotal] = useState(0)
+	const environment = useEnvironment();
+	const [zoneContext, setZoneContext] = useState([]);
+	const [localZoneName, setLocalZoneName] = useState();
+	const [zones, setZones] = useState();
+	const [isLoadingZones, setIsLoadingZones] = useState(false);
+	const [isLoadingZoneContext, setIsLoadingZoneContext] = useState(false);
+	const [userContext, setUserContext] = useState(initialState);
+	const [userTotal, setUserTotal] = useState(0);
+	const [isLoadingUserContext, setIsLoadingUserContext] = useState(false);
+	const [groupContext, setGroupContext] = useState(initialState);
+	const [groupTotal, setGroupTotal] = useState(0);
+	const [isLoadingGroupContext, setIsLoadingGroupContext] = useState(false);
+	const [rescContext, setRescContext] = useState(initialState);
+	const [rescTypes, setRescTypes] = useState([]);
+	const [rescAll, setRescAll] = useState([]);
+	const [rescTotal, setRescTotal] = useState(0);
+	const [isLoadingRescContext, setIsLoadingRescContext] = useState(false);
+	const [rescPanelStatus, setRescPanelStatus] = useState("idle");
+	const [filteredServers, setFilteredServers] = useState();
+	const [serverVersions, setServerVersions] = useState([]);
+	const [validServerHosts, setValidServerHosts] = useState(
+		new Set(["EMPTY_RESC_HOST"])
+	);
+	const [isLoadingSpecificQueryContext, setIsLoadingSpecificQueryContext] =
+		useState(false);
+	const [specificQueryContext, setSpecificQueryContext] =
+		useState(initialState);
+	const [specificQueryTotal, setSpecificQueryTotal] = useState(0);
 
-    const loadUsers = async (offset, limit, order, orderBy, name) => {
-        setIsLoadingUserContext(true);
+	const loadUsers = async (offset, limit, order, orderBy, name) => {
+		setIsLoadingUserContext(true);
 
-    
-        if (name == "" || name == "USER_NAME") {
-            let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
+		if (name == "" || name == "USER_NAME") {
+			let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
 
-            _query = queryGenerator(_query, order, orderBy);
+			_query = queryGenerator(_query, order, orderBy);
 
-            return axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: _query,
-                    limit: limit,
-                    offset: offset,
-                    type: 'general',
-                    'case-sensitive': 0
-                }
-            }).then((res) => {
-                if (name === '') setUserTotal(res.data.total)
-                setUserTotal(res.data.total)
-                setUserContext(res.data);
-                setIsLoadingUserContext(false);
-            }).catch(() => {
-                setUserContext(undefined);
-                setIsLoadingUserContext(false);
-            });
-        } else {
-            let totalData = [];
+			return axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: _query,
+					count: limit,
+					offset: offset,
+					"case-sensitive": 0,
+				},
+			})
+				.then((res) => {
+					if (name === "") setUserTotal(res.data.total);
+					setUserTotal(res.data.total);
+					setUserContext(res.data);
+					setIsLoadingUserContext(false);
+				})
+				.catch(() => {
+					setUserContext(undefined);
+					setIsLoadingUserContext(false);
+				});
+		} else {
+			let totalData = [];
 
-            let queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`
-            let q1 = queryGenerator(queryTry1, order, orderBy);
+			let queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`;
+			let q1 = queryGenerator(queryTry1, order, orderBy);
 
-            let queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`
-            let q2 = queryGenerator(queryTry2, order, orderBy);
+			let queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`;
+			let q2 = queryGenerator(queryTry2, order, orderBy);
 
-            let queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`
-            let q3 = queryGenerator(queryTry3, order, orderBy);
+			let queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`;
+			let q3 = queryGenerator(queryTry3, order, orderBy);
 
-            const resp1 = await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: q1,
-                    limit: limit,
-                    offset: offset,
-                    type: 'general',
-                    'case-sensitive': 0
-                }
-            })
+			const resp1 = await axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: q1,
+					count: limit,
+					offset: offset,
+					"case-sensitive": 0,
+				},
+			});
 
-            const resp2 = await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: q2,
-                    limit: limit,
-                    offset: offset,
-                    type: 'general',
-                    'case-sensitive': 0
-                }
-            })
-            
-            const resp3 = await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: q3,
-                    limit: limit,
-                    offset: offset,
-                    type: 'general',
-                    'case-sensitive': 0
-                }
-            })
+			const resp2 = await axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: q2,
+					count: limit,
+					offset: offset,
+					"case-sensitive": 0,
+				},
+			});
 
-            const pushOnlyNewData = (totalData, newArr) => {
-                // if totalData already has anything in resp2.data._embedded, don't push it again
-                // this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
-                // there will at most be 100 items in each array, so it won't take too long
-                newArr.forEach((item) => {
-                    let found = false;
-                    totalData.forEach((item2) => {
-                        if (item[0] === item2[0]) {
-                            found = true;
-                            return;
-                        }
-                    });
-                    if (!found) {
-                        totalData.push(item);
-                    }
-                });
+			const resp3 = await axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: q3,
+					count: limit,
+					offset: offset,
+					"case-sensitive": 0,
+				},
+			});
 
-                return totalData;
-            }
+			const pushOnlyNewData = (totalData, newArr) => {
+				// if totalData already has anything in resp2.data._embedded, don't push it again
+				// this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
+				// there will at most be 100 items in each array, so it won't take too long
+				newArr.forEach((item) => {
+					let found = false;
+					totalData.forEach((item2) => {
+						if (item[0] === item2[0]) {
+							found = true;
+							return;
+						}
+					});
+					if (!found) {
+						totalData.push(item);
+					}
+				});
 
-            let useTotal = 0;
-            if (resp1 && resp1.data._embedded.length > 0) {
-                totalData.push(...resp1.data._embedded)
-                useTotal = parseInt(resp1.data.total)
-            }
-             if (resp2 && resp2.data._embedded.length > 0) {
-                totalData = pushOnlyNewData(totalData, resp2.data._embedded)
-                useTotal = parseInt(resp2.data.total)
-            } 
-             if (resp3 && resp3.data._embedded.length > 0) {
-                totalData = pushOnlyNewData(totalData, resp3.data._embedded)
-                useTotal = parseInt(resp3.data.total)
-            }
+				return totalData;
+			};
 
-            setUserTotal(useTotal)
-            setUserContext({
-                _embedded: totalData,
-                total: useTotal
-            })
-            setIsLoadingUserContext(false);
-            return
-        }
-    }
+			let useTotal = 0;
+			if (resp1 && resp1.data._embedded.length > 0) {
+				totalData.push(...resp1.data._embedded);
+				useTotal = parseInt(resp1.data.total);
+			}
+			if (resp2 && resp2.data._embedded.length > 0) {
+				totalData = pushOnlyNewData(totalData, resp2.data._embedded);
+				useTotal = parseInt(resp2.data.total);
+			}
+			if (resp3 && resp3.data._embedded.length > 0) {
+				totalData = pushOnlyNewData(totalData, resp3.data._embedded);
+				useTotal = parseInt(resp3.data.total);
+			}
 
-    // iterate through group results and load user counts
-    const loadGroupUserCounts = async (inputArray, offset, limit, order, orderBy) => {
-        let groupUserCountPromises = inputArray._embedded.map(group => axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
-                limit: 100,
-                offset: 0,
-                type: 'general'
-            }
-        }))
+			setUserTotal(useTotal);
+			setUserContext({
+				_embedded: totalData,
+				total: useTotal,
+			});
+			setIsLoadingUserContext(false);
+			return;
+		}
+	};
 
-        // wait until all promises are resolved so we can get all user counts
-        await Promise.all(groupUserCountPromises).then(resolvedPromises => {
-            resolvedPromises.forEach((resolvedPromise, index) => {
-                inputArray._embedded[index].push(resolvedPromise.data.total);
-            })
-        }).catch(() => {
-            setGroupContext(undefined)
-            setIsLoadingGroupContext(false)
-        })
+	// iterate through group results and load user counts
+	const loadGroupUserCounts = async (
+		inputArray,
+		offset,
+		limit,
+		order,
+		orderBy
+	) => {
+		let groupUserCountPromises = inputArray.rows.map((group) =>
+			axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
+					count: 100,
+					offset: 0,
+				},
+			})
+		);
 
-        if (orderBy === 'USER_COUNT') {
-            inputArray._embedded = inputArray._embedded.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[1] - b[1])).slice(offset, offset + limit)
-        }
-        setGroupContext(inputArray)
-        setIsLoadingGroupContext(false)
-    }
+		// wait until all promises are resolved so we can get all user counts
+		await Promise.all(groupUserCountPromises)
+			.then((resolvedPromises) => {
+				resolvedPromises.forEach((resolvedPromise, index) => {
+					inputArray._embedded[index].push(
+						resolvedPromise.data.total
+					);
+				});
+			})
+			.catch(() => {
+				setGroupContext(undefined);
+				setIsLoadingGroupContext(false);
+			});
 
-    const loadGroups = async (offset, limit, name, order, orderBy) => {
-        setIsLoadingGroupContext(true);
-        let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
-        if (name !== '') {
-            _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`
-        }
-        _query = queryGenerator(_query, order, orderBy);
-        await axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: _query,
-                limit: orderBy === 'USER_COUNT' ? 0 : limit,
-                offset: orderBy === 'USER_COUNT' ? 0 : offset,
-                type: 'general',
-                'case-sensitive': 0
-            }
-        }).then((res) => {
-            if (name === '') setGroupTotal(res.data.total)
-            loadGroupUserCounts(res.data, offset, limit, order, orderBy);
-        }).catch(() => {
-            setGroupContext(undefined)
-            setIsLoadingGroupContext(false);
-        });
+		if (orderBy === "USER_COUNT") {
+			inputArray._embedded = inputArray._embedded
+				.sort((a, b) => (order === "asc" ? 1 : -1) * (a[1] - b[1]))
+				.slice(offset, offset + limit);
+		}
+		setGroupContext(inputArray);
+		setIsLoadingGroupContext(false);
+	};
 
-    }
+	const loadGroups = async (offset, limit, name, order, orderBy) => {
+		setIsLoadingGroupContext(true);
+		let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
+		if (name !== "") {
+			_query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`;
+		}
+		_query = queryGenerator(_query, order, orderBy);
+		await axios({
+			method: "GET",
+			url: `${environment.restApiLocation}/query`,
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+			},
+			params: {
+				op: "execute_genquery",
+				query: _query,
+				count: orderBy === "USER_COUNT" ? 0 : limit,
+				offset: orderBy === "USER_COUNT" ? 0 : offset,
+				"case-sensitive": 0,
+			},
+		})
+			.then((res) => {
+				if (name === "") setGroupTotal(res.data.total);
+				loadGroupUserCounts(res.data, offset, limit, order, orderBy);
+			})
+			.catch(() => {
+				setGroupContext(undefined);
+				setIsLoadingGroupContext(false);
+			});
+	};
 
-    // sort and remove duplicate resources
-    const resourceSortRemoveDuplicatesHelper = (rescArray, offset, limit, order, orderBy) => {
-        let filteredRescContext = {
-            _embedded: rescArray,
-            total: 0
-        };
-        let uniqueResc = new Set();
-        let filteredResc = [];
-        for (let i = 0; i < rescArray.length; i++) {
-            if (!uniqueResc.has(rescArray[i][11])) {
-                uniqueResc.add(rescArray[i][11]);
-                filteredResc.push(rescArray[i]);
-            }
-        }
-        let orderSyntax = order === 'asc' ? 1 : -1;
-        const resourceComparator = (a, b) => {
-            switch (orderBy) {
-                case 'RESC_TYPE_NAME':
-                    return orderSyntax * (a[1].localeCompare(b[1]))
-                case 'RESC_LOC':
-                    return orderSyntax * (a[4].localeCompare(b[4]))
-                case 'RESC_VAULT_PATH':
-                    return orderSyntax * (a[3].localeCompare(b[3]))
-                default:
-                    return orderSyntax * (a[0].localeCompare(b[0]))
-            }
-        }
-        filteredResc.sort(resourceComparator);
-        // slice the array to get pagination working
-        filteredRescContext._embedded = filteredResc.slice(offset, offset + limit);
-        filteredRescContext.total = filteredResc.length;
-        setRescContext(filteredRescContext);
-    }
+	// sort and remove duplicate resources
+	const resourceSortRemoveDuplicatesHelper = (
+		rescArray,
+		offset,
+		limit,
+		order,
+		orderBy
+	) => {
+		let filteredRescContext = {
+			_embedded: rescArray,
+			total: 0,
+		};
+		let uniqueResc = new Set();
+		let filteredResc = [];
+		for (let i = 0; i < rescArray.length; i++) {
+			if (!uniqueResc.has(rescArray[i][11])) {
+				uniqueResc.add(rescArray[i][11]);
+				filteredResc.push(rescArray[i]);
+			}
+		}
+		let orderSyntax = order === "asc" ? 1 : -1;
+		const resourceComparator = (a, b) => {
+			switch (orderBy) {
+				case "RESC_TYPE_NAME":
+					return orderSyntax * a[1].localeCompare(b[1]);
+				case "RESC_LOC":
+					return orderSyntax * a[4].localeCompare(b[4]);
+				case "RESC_VAULT_PATH":
+					return orderSyntax * a[3].localeCompare(b[3]);
+				default:
+					return orderSyntax * a[0].localeCompare(b[0]);
+			}
+		};
+		filteredResc.sort(resourceComparator);
+		// slice the array to get pagination working
+		filteredRescContext._embedded = filteredResc.slice(
+			offset,
+			offset + limit
+		);
+		filteredRescContext.total = filteredResc.length;
+		setRescContext(filteredRescContext);
+	};
 
-    const loadResources = useCallback(async (offset, limit, name, order, orderBy) => {
-        setIsLoadingRescContext(true);
-        let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`
-        if (name === '') {
-            let _query = queryGenerator(base_query, order, orderBy);
-            return axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: _query,
-                    limit: limit,
-                    offset: offset,
-                    type: 'general'
-                }
-            }).then((res) => {
-                setRescContext(res.data);
-                setRescTotal(res.data.total)
-                if (res.data.count === res.data.total) setRescAll(res.data)
-                setIsLoadingRescContext(false);
-            }).catch(() => {
-                setRescContext(undefined)
-                setIsLoadingRescContext(false);
-            });
-        }
-        else {
-            let filteredResults = {};
-            await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: base_query + ` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
-                    limit: 500,
-                    offset: 0,
-                    type: 'general',
-                    'case-sensitive': 0
-                }
-            }).then((res) => {
-                filteredResults = res.data;
-            }).catch(() => {
-                setRescContext(undefined)
-                setIsLoadingRescContext(false);
-            });
-            await axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
-                    limit: 500,
-                    offset: 0,
-                    type: 'general'
-                }
-            }).then((res) => {
-                resourceSortRemoveDuplicatesHelper([...filteredResults._embedded, ...res.data._embedded], offset, limit, order, orderBy);
-                setIsLoadingRescContext(false);
-            }).catch(() => {
-                setRescContext(undefined)
-                setIsLoadingRescContext(false);
-            });
-        }
-    }, [environment.restApiLocation])
+	const loadResources = useCallback(
+		async (offset, limit, name, order, orderBy) => {
+			setIsLoadingRescContext(true);
+			let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`;
+			if (name === "") {
+				let _query = queryGenerator(base_query, order, orderBy);
+				return axios({
+					method: "GET",
+					url: `${environment.restApiLocation}/query`,
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem(
+							"zmt-token"
+						)}`,
+					},
+					params: {
+						op: "execute_genquery",
+						query: _query,
+						count: limit,
+						offset: offset,
+					},
+				})
+					.then((res) => {
+						setRescContext(res.data);
+						setRescTotal(res.data.total);
+						if (res.data.count === res.data.total)
+							setRescAll(res.data);
+						setIsLoadingRescContext(false);
+					})
+					.catch(() => {
+						setRescContext(undefined);
+						setIsLoadingRescContext(false);
+					});
+			} else {
+				let filteredResults = {};
+				await axios({
+					method: "GET",
+					url: `${environment.restApiLocation}/query`,
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem(
+							"zmt-token"
+						)}`,
+					},
+					params: {
+						op: "execute_genquery",
+						query:
+							base_query +
+							` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
+						count: 500,
+						offset: 0,
+						"case-sensitive": 0,
+					},
+				})
+					.then((res) => {
+						filteredResults = res.data;
+					})
+					.catch(() => {
+						setRescContext(undefined);
+						setIsLoadingRescContext(false);
+					});
+				await axios({
+					method: "GET",
+					url: `${environment.restApiLocation}/query`,
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem(
+							"zmt-token"
+						)}`,
+					},
+					params: {
+						op: "execute_genquery",
+						query: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
+						count: 500,
+						offset: 0,
+					},
+				})
+					.then((res) => {
+						resourceSortRemoveDuplicatesHelper(
+							[
+								...filteredResults._embedded,
+								...res.data._embedded,
+							],
+							offset,
+							limit,
+							order,
+							orderBy
+						);
+						setIsLoadingRescContext(false);
+					})
+					.catch(() => {
+						setRescContext(undefined);
+						setIsLoadingRescContext(false);
+					});
+			}
+		},
+		[environment.restApiLocation]
+	);
 
-    const updatingRescPanelStatus = (text) => {
-        setRescPanelStatus(text);
-    }
+	const updatingRescPanelStatus = (text) => {
+		setRescPanelStatus(text);
+	};
 
-    const loadZones = async () => {
-        setIsLoadingZones(true)
-        let zonesRes = []
-        const zoneData = await axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
-                limit: 0,
-                offset: 0,
-                type: 'general'
-            }
-        })
-        if (zoneData.status === 200) {
-            setLocalZoneName(zoneData.data._embedded.filter(a => a[1] === 'local')[0][0])
-            zonesRes = zoneData.data._embedded.map(zone => { return { name: zone[0], type: zone[1], hostname: zone[2] && zone[2].split(':')[0], port: zone[2] && zone[2].split(':')[1], comment: zone[3] } })
-        } else {
-            // handle error if the request failed
-            setZones([])
-            setIsLoadingZones(false)
-            return
-        }
-        // make each request for the number of users in each zone
-        const zoneUserDataPromises = zoneData.data._embedded.map(zone => {
-            return axios({
-                method: 'GET',
-                url: `${environment.restApiLocation}/query`,
-                headers: {
-                    'Authorization': localStorage.getItem('zmt-token')
-                },
-                params: {
-                    query: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
-                    limit: 0,
-                    offset: 0,
-                    type: 'general'
-                }
-            })
-        })
-        const zoneUserData = await Promise.all(zoneUserDataPromises)
-        zonesRes.forEach((zone, index) => zone.users = zoneUserData[index].data.total)
-        setZones(zonesRes)
-        setIsLoadingZones(false)
-    }
+	const loadZones = async () => {
+		setIsLoadingZones(true);
+		let zonesRes = [];
+		const zoneData = await axios({
+			method: "GET",
+			url: `${environment.restApiLocation}/query`,
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+			},
+			params: {
+				op: "execute_genquery",
+				query: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
+				count: 0,
+				offset: 0,
+			},
+		});
+		if (zoneData.status === 200) {
+			setLocalZoneName(
+				zoneData.data.rows.filter((a) => a[1] === "local")[0][0]
+			);
+			zonesRes = zoneData.data.rows.map((zone) => {
+				return {
+					name: zone[0],
+					type: zone[1],
+					hostname: zone[2] && zone[2].split(":")[0],
+					port: zone[2] && zone[2].split(":")[1],
+					comment: zone[3],
+				};
+			});
+		} else {
+			// handle error if the request failed
+			setZones([]);
+			setIsLoadingZones(false);
+			return;
+		}
+		// make each request for the number of users in each zone
+		const zoneUserDataPromises = zoneData.data.rows.map((zone) => {
+			return axios({
+				method: "GET",
+				url: `${environment.restApiLocation}/query`,
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem(
+						"zmt-token"
+					)}`,
+				},
+				params: {
+					op: "execute_genquery",
+					query: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
+					count: 0,
+					offset: 0,
+				},
+			});
+		});
+		const zoneUserData = await Promise.all(zoneUserDataPromises);
+		zonesRes.forEach(
+			(zone, index) => (zone.users = zoneUserData[index].data.total)
+		);
+		setZones(zonesRes);
+		setIsLoadingZones(false);
+	};
 
-    const loadZoneReport = () => {
-        return axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/zonereport`,
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-        }).catch(() => {
-            setZoneContext(undefined)
-            setIsLoadingZoneContext(false)
-        })
-    }
+	const loadZoneReport = () => {
+		return axios({
+			method: "GET",
+			url: `${environment.restApiLocation}/zones`,
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+			},
+			params: {
+				op: "report",
+			},
+		}).catch(() => {
+			setZoneContext(undefined);
+			setIsLoadingZoneContext(false);
+		});
+	};
 
-    // to query all resources that live on a specific hostname
-    const fetchServerResources = (server_hostname) => {
-        return axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
-                limit: 100,
-                offset: 0,
-                type: 'general'
-            }
-        })
-    }
+	// to query all resources that live on a specific hostname
+	const fetchServerResources = (server_hostname) => {
+		return axios({
+			method: "GET",
+			url: `${environment.restApiLocation}/query`,
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+			},
+			params: {
+				op: "execute_genquery",
+				query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
+				count: 100,
+				offset: 0,
+			},
+		});
+	};
 
-    // load all servers at each render, and iterate through server list to fetch resources which have the same hostname
-    const loadServers = async () => {
-        setIsLoadingZoneContext(true);
-        let zone_report = await loadZoneReport();
+	// load all servers at each render, and iterate through server list to fetch resources which have the same hostname
+	const loadServers = async () => {
+		setIsLoadingZoneContext(true);
+		let zone_report = await loadZoneReport();
 
-        if (zone_report !== undefined) {
-            let resc_types = new Set();
-            let version_4_3_1_or_after = zone_report.data.zones[0].icat_server ? false : true;
-            let fullServersArray;
+		if (zone_report !== undefined) {
+			let resc_types = new Set();
+			let version_4_3_1_or_after = zone_report.data.zone_report.zones[0]
+				.icat_server
+				? false
+				: true;
+			let fullServersArray;
 
-            if (version_4_3_1_or_after) {
-                fullServersArray = zone_report.data.zones[0]['servers'];
-            } else {
-                 // before 4.3.1, icat_server was separately defined in the zonereport
-                let catalog_service_provider = [zone_report.data.zones[0]['icat_server']];
-                fullServersArray = catalog_service_provider.concat(zone_report.data.zones[0]['servers']);
-            }
-            let newValidHostSet = new Set(['EMPTY_RESC_HOST'])
-            for (let curr_server of fullServersArray) {
-                // check and load resource plugins from zone report
-                if (curr_server.plugins) {
-                    for (let i = 0; i < curr_server.plugins.length; i++) {
-                        if (curr_server.plugins[i].type === 'resource' && !resc_types.has(curr_server.plugins[i].name)) {
-                            resc_types.add(curr_server.plugins[i].name)
-                        }
-                    }
-                }
-                newValidHostSet.add(curr_server['host_system_information']['hostname'])
-                let resource_counts = await fetchServerResources(curr_server['host_system_information']['hostname'])
-                if (resource_counts === undefined) curr_server["resources"] = 0;
-                else curr_server["resources"] = resource_counts.data.total;
-            }
+			if (version_4_3_1_or_after) {
+				fullServersArray =
+					zone_report.data.zone_report.zones[0]["servers"];
+			} else {
+				// before 4.3.1, icat_server was separately defined in the zonereport
+				let catalog_service_provider = [
+					zone_report.data.zone_report.zones[0]["icat_server"],
+				];
+				fullServersArray = catalog_service_provider.concat(
+					zone_report.data.zone_report.zones[0]["servers"]
+				);
+			}
+			let newValidHostSet = new Set(["EMPTY_RESC_HOST"]);
+			for (let curr_server of fullServersArray) {
+				// check and load resource plugins from zone report
+				if (curr_server.plugins) {
+					for (let i = 0; i < curr_server.plugins.length; i++) {
+						if (
+							curr_server.plugins[i].type === "resource" &&
+							!resc_types.has(curr_server.plugins[i].name)
+						) {
+							resc_types.add(curr_server.plugins[i].name);
+						}
+					}
+				}
+				newValidHostSet.add(
+					curr_server["host_system_information"]["hostname"]
+				);
+				let resource_counts = await fetchServerResources(
+					curr_server["host_system_information"]["hostname"]
+				);
+				if (resource_counts === undefined) curr_server["resources"] = 0;
+				else curr_server["resources"] = resource_counts.data.total;
+			}
 
-            setValidServerHosts(newValidHostSet)
-            setServerVersions(fullServersArray.reduce((prev, curr) => {
-                prev.push(curr['version']['irods_version'])
-                return prev
-            }, []).sort(irodsVersionComparator))
-            setRescTypes([...resc_types].sort())
-            setZoneContext(fullServersArray)
-            if (!localStorage.getItem(environment.serversPageKey)) {
-                localStorage.setItem(environment.serversPageKey, environment.defaultItemsPerPage);
-            }
-            setFilteredServers(fullServersArray.slice(0, parseInt(localStorage.getItem(environment.serversPageKey), 10)));
-            setIsLoadingZoneContext(false);
-        }
-    }
+			setValidServerHosts(newValidHostSet);
+			setServerVersions(
+				fullServersArray
+					.reduce((prev, curr) => {
+						prev.push(curr["version"]["irods_version"]);
+						return prev;
+					}, [])
+					.sort(irodsVersionComparator)
+			);
+			setRescTypes([...resc_types].sort());
+			setZoneContext(fullServersArray);
+			if (!localStorage.getItem(environment.serversPageKey)) {
+				localStorage.setItem(
+					environment.serversPageKey,
+					environment.defaultItemsPerPage
+				);
+			}
+			setFilteredServers(
+				fullServersArray.slice(
+					0,
+					parseInt(
+						localStorage.getItem(environment.serversPageKey),
+						10
+					)
+				)
+			);
+			setIsLoadingZoneContext(false);
+		}
+	};
 
-    // handle servers page pagination and sorting
-    const loadCurrServers = async (offset, perPage, order, orderBy) => {
-        if (zoneContext !== undefined && zoneContext.length !== 0) {
-            let tem_servers = zoneContext;
-            let orderSyntax = order === 'asc' ? 1 : -1;
-            const server_sort_comparator = (a, b) => {
-                switch (orderBy) {
-                    case 'hostname':
-                        return orderSyntax * (a['host_system_information']['hostname']).localeCompare(b['host_system_information']['hostname']);
-                    case 'role':
-                        return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']))
-                    case 'os':
-                        return orderSyntax * ((a['host_system_information']['os_distribution_name'] + a['host_system_information']['os_distribution_version']).localeCompare((b['host_system_information']['os_distribution_name'] + b['host_system_information']['os_distribution_version'])))
-                    case 'resources':
-                        return orderSyntax * (a['resources'] - b['resources'])
-                    case 'irods-version':
-                        return orderSyntax * irodsVersionComparator(a['version']['irods_version'], b['version']['irods_version'])
-                    default:
-                        return orderSyntax * (a['server_config']['catalog_service_role'].localeCompare(b['server_config']['catalog_service_role']));
-                }
-            }
-            tem_servers.sort(server_sort_comparator);
-            tem_servers = tem_servers.slice(offset, offset + perPage);
-            setFilteredServers(tem_servers);
-        }
-    }
+	// handle servers page pagination and sorting
+	const loadCurrServers = async (offset, perPage, order, orderBy) => {
+		if (zoneContext !== undefined && zoneContext.length !== 0) {
+			let tem_servers = zoneContext;
+			let orderSyntax = order === "asc" ? 1 : -1;
+			const server_sort_comparator = (a, b) => {
+				switch (orderBy) {
+					case "hostname":
+						return (
+							orderSyntax *
+							a["host_system_information"][
+								"hostname"
+							].localeCompare(
+								b["host_system_information"]["hostname"]
+							)
+						);
+					case "role":
+						return (
+							orderSyntax *
+							a["server_config"][
+								"catalog_service_role"
+							].localeCompare(
+								b["server_config"]["catalog_service_role"]
+							)
+						);
+					case "os":
+						return (
+							orderSyntax *
+							(
+								a["host_system_information"][
+									"os_distribution_name"
+								] +
+								a["host_system_information"][
+									"os_distribution_version"
+								]
+							).localeCompare(
+								b["host_system_information"][
+									"os_distribution_name"
+								] +
+									b["host_system_information"][
+										"os_distribution_version"
+									]
+							)
+						);
+					case "resources":
+						return orderSyntax * (a["resources"] - b["resources"]);
+					case "irods-version":
+						return (
+							orderSyntax *
+							irodsVersionComparator(
+								a["version"]["irods_version"],
+								b["version"]["irods_version"]
+							)
+						);
+					default:
+						return (
+							orderSyntax *
+							a["server_config"][
+								"catalog_service_role"
+							].localeCompare(
+								b["server_config"]["catalog_service_role"]
+							)
+						);
+				}
+			};
+			tem_servers.sort(server_sort_comparator);
+			tem_servers = tem_servers.slice(offset, offset + perPage);
+			setFilteredServers(tem_servers);
+		}
+	};
 
-    const loadSpecificQueries = (term) => {
-        let _query = 'select alias, sqlStr from R_SPECIFIC_QUERY'
-        if (term !== '') {
-            _query += ` where alias like '${term}'`
-        }
-        setIsLoadingSpecificQueryContext(true)
-        axios({
-            method: 'GET',
-            url: `${environment.restApiLocation}/query`,
-            headers: {
-                'Authorization': localStorage.getItem('zmt-token')
-            },
-            params: {
-                query: _query,
-                limit: 100,
-                offset: 0,
-                type: 'specific',
-            }
-        }).then(res => {
-            setSpecificQueryTotal(res.data.total)
-            setSpecificQueryContext(res.data)
-            setIsLoadingSpecificQueryContext(false)
-        }).catch(() => {
-            setSpecificQueryTotal(0)
-            setSpecificQueryContext(undefined)
-            setIsLoadingSpecificQueryContext(false)
-        })
-    }
+	const loadSpecificQueries = (term) => {
+		let _query = "select alias, sqlStr from R_SPECIFIC_QUERY";
+		if (term !== "") {
+			_query += ` where alias like '${term}'`;
+		}
+		setIsLoadingSpecificQueryContext(true);
+		axios({
+			method: "GET",
+			url: `${environment.restApiLocation}/query`,
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+			},
+			params: {
+				op: "execute_specific_query",
+				name: _query,
+				count: 100,
+				offset: 0,
+			},
+		})
+			.then((res) => {
+				setSpecificQueryTotal(res.data.total);
+				setSpecificQueryContext(res.data);
+				setIsLoadingSpecificQueryContext(false);
+			})
+			.catch(() => {
+				setSpecificQueryTotal(0);
+				setSpecificQueryContext(undefined);
+				setIsLoadingSpecificQueryContext(false);
+			});
+	};
 
+	const loadData = () => {
+		// not including servers key because we don't need to set default load amount here for it
+		const pageKeys = [
+			"groupsPerPageKey",
+			"resourcesPageKey",
+			"usersPageKey",
+		];
 
-    const loadData = () => {
-        // not including servers key because we don't need to set default load amount here for it
-        const pageKeys = ["groupsPerPageKey", "resourcesPageKey", "usersPageKey"];
+		for (let key of pageKeys) {
+			if (!localStorage.getItem(environment[key])) {
+				localStorage.setItem(
+					environment[key],
+					environment.defaultItemsPerPage
+				);
+			}
+		}
 
-        for (let key of pageKeys) {
-            if (!localStorage.getItem(environment[key])) {
-                localStorage.setItem(environment[key], environment.defaultItemsPerPage);
-            }
-        }
+		const groupsPerPage = parseInt(
+			localStorage.getItem(environment[pageKeys[0]]),
+			10
+		);
+		const rescPerPage = parseInt(
+			localStorage.getItem(environment[pageKeys[1]]),
+			10
+		);
+		const usersPerPage = parseInt(
+			localStorage.getItem(environment[pageKeys[2]]),
+			10
+		);
 
-        const groupsPerPage = parseInt(localStorage.getItem(environment[pageKeys[0]]), 10);
-        const rescPerPage = parseInt(localStorage.getItem(environment[pageKeys[1]]), 10);
-        const usersPerPage = parseInt(localStorage.getItem(environment[pageKeys[2]]), 10);
-        
+		!isLoadingZones && loadZones();
+		!isLoadingZoneContext && loadServers();
+		!isLoadingGroupContext &&
+			loadGroups(0, groupsPerPage, "", "asc", "USER_NAME");
+		!isLoadingRescContext &&
+			loadResources(0, rescPerPage, "", "asc", "RESC_NAME");
+		!isLoadingUserContext &&
+			loadUsers(0, usersPerPage, "", "asc", "USER_NAME");
+		!isLoadingSpecificQueryContext && loadSpecificQueries("");
+	};
 
-        !isLoadingZones && loadZones();
-        !isLoadingZoneContext && loadServers();
-        !isLoadingGroupContext && loadGroups(0, groupsPerPage, '', 'asc', 'USER_NAME');
-        !isLoadingRescContext && loadResources(0, rescPerPage, '', 'asc', 'RESC_NAME');
-        !isLoadingUserContext && loadUsers(0, usersPerPage, '', 'asc', 'USER_NAME');
-        !isLoadingSpecificQueryContext && loadSpecificQueries('')
-    }
+	// load all zone data at each render if user is logged in
+	useEffect(() => {
+		if (
+			localZoneName === undefined &&
+			localStorage.getItem("zmt-token") !== null
+		) {
+			loadData();
+		}
+	}, []);
 
-    // load all zone data at each render if user is logged in
-    useEffect(() => {
-        if (localZoneName === undefined && localStorage.getItem('zmt-token') !== null) {
-            loadData()
-        }
-    }, [])
-
-    return (
-        <ServerContext.Provider value={{
-            zoneContext, localZoneName, zones, loadZones, loadZoneReport, filteredServers, loadCurrServers,
-            userTotal, userContext, loadUsers,
-            groupTotal, groupContext, loadGroups,
-            rescTotal, rescAll, rescContext, rescTypes, rescPanelStatus, updatingRescPanelStatus, loadResources,
-            isLoadingGroupContext, isLoadingRescContext, isLoadingUserContext, isLoadingZoneContext, isLoadingZones,
-            serverVersions, validServerHosts, irodsVersionComparator,
-            specificQueryContext, isLoadingSpecificQueryContext, specificQueryTotal, loadSpecificQueries,
-            loadData
-        }}>
-            {children}
-        </ServerContext.Provider>
-    )
-}
+	return (
+		<ServerContext.Provider
+			value={{
+				zoneContext,
+				localZoneName,
+				zones,
+				loadZones,
+				loadZoneReport,
+				filteredServers,
+				loadCurrServers,
+				userTotal,
+				userContext,
+				loadUsers,
+				groupTotal,
+				groupContext,
+				loadGroups,
+				rescTotal,
+				rescAll,
+				rescContext,
+				rescTypes,
+				rescPanelStatus,
+				updatingRescPanelStatus,
+				loadResources,
+				isLoadingGroupContext,
+				isLoadingRescContext,
+				isLoadingUserContext,
+				isLoadingZoneContext,
+				isLoadingZones,
+				serverVersions,
+				validServerHosts,
+				irodsVersionComparator,
+				specificQueryContext,
+				isLoadingSpecificQueryContext,
+				specificQueryTotal,
+				loadSpecificQueries,
+				loadData,
+			}}
+		>
+			{children}
+		</ServerContext.Provider>
+	);
+};
 
 ServerProvider.propTypes = {
-    children: PropTypes.node.isRequired
-}
+	children: PropTypes.node.isRequired,
+};
 
 export const useServer = () => useContext(ServerContext);
