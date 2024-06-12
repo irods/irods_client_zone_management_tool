@@ -33,9 +33,8 @@ export default {
 			params: {
 				op: "execute_specific_query",
 				name: specificQuery,
-				limit: 0, // 0 = return all results
+				count: 0, // 0 = return all results
 				offset: 0,
-				"case-sensitive": 1,
 			},
 		}).catch((e) => {
 			if (!e.response || e.response.status == 400) {
@@ -43,8 +42,8 @@ export default {
 			}
 		});
 
-		if (resp && resp.data) {
-			resultsArr = resp.data._embedded;
+		if (resp && resp.data && resp.data.rows) {
+			resultsArr = resp.data.rows;
 			if (resultsArr.length > 0) {
 				resultsArr.map((user) => {
 					result.failed.push([user[0], user[1]]);
@@ -58,12 +57,12 @@ export default {
 				url: `${this.restApiLocation}/query`,
 				method: "GET",
 				headers: {
-					Authorization: authToken,
+					Authorization: `Bearer ${authToken}`,
 				},
 				params: {
+					op: "execute_genquery",
 					query: generalQuery1,
-					type: "general",
-					limit: 0, // 0 = return all results
+					count: 0, // 0 = return all results
 					offset: 0,
 				},
 			});
@@ -74,20 +73,20 @@ export default {
 				url: `${this.restApiLocation}/query`,
 				method: "GET",
 				headers: {
-					Authorization: authToken,
+					Authorization: `Bearer ${authToken}`,
 				},
 				params: {
+					op: "execute_genquery",
 					query: generalQuery2,
-					type: "general",
-					limit: 0, // 0 = return all results
+					count: 0, // 0 = return all results
 					offset: 0,
 				},
 			});
 
 			if (resp1 && resp1.data && resp2 && resp2.data) {
-				resp1.data._embedded.map((user) => {
-					for (let i = 0; i < resp2.data._embedded.length; i++) {
-						if (user[1] == resp2.data._embedded[i][0]) {
+				resp1.data.rows.map((user) => {
+					for (let i = 0; i < resp2.data.rows.length; i++) {
+						if (user[1] == resp2.data.rows[i][0]) {
 							return;
 						}
 					}

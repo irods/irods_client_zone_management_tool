@@ -44,11 +44,9 @@ export default {
 			specificWarning = true;
 		});
 
-		// console.log(specificResp);
-
-		if (specificResp && specificResp.data) {
+		if (specificResp && specificResp.data && specificResp.data.rows) {
 			// specific query succeeded, so we can use the result
-			numUnusedMeta = specificResp.data._embedded[0][0];
+			numUnusedMeta = specificResp.data.rows[0][0];
 		} else {
 			// specific query failed; first perform a check to see how many total metadata entries there are
 			let totalMetaQuery = "SELECT COUNT(META_DATA_ATTR_ID)";
@@ -68,9 +66,14 @@ export default {
 				},
 			}).catch(() => {});
 
-			if (totalMetaResp && totalMetaResp.data) {
-				totalMeta = totalMetaResp.data._embedded[0][0];
+			if (
+				totalMetaResp &&
+				totalMetaResp.data &&
+				totalMetaResp.data.rows
+			) {
+				totalMeta = parseInt(totalMetaResp.data.rows[0][0]);
 			}
+			console.log(totalMeta);
 
 			if (totalMeta > AVUThresholdBeforeWarningForNoSpecificQuery) {
 				// if there are more than `AVUThresholdBeforeWarningForNoSpecificQuery` metadata entries, the genqueries below will take too long to run
@@ -116,13 +119,14 @@ export default {
 				}).catch(() => {});
 
 				let useSet = new Set();
-				if (resp && resp.data) {
-					// turn the returned metadata into a set
-					resp.data._embedded.forEach((row) => {
+				if (resp && resp.data && resp.data.rows) {
+					// console.log(resp.data.rows);
+					// turn the ids of the metadata into a set
+					resp.data.rows.forEach((row) => {
 						useSet.add(row[0]);
 					});
 				}
-
+				// console.log(useSet);
 				return useSet;
 			};
 
