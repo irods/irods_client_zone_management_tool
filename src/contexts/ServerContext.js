@@ -13,7 +13,7 @@ import { irodsVersionComparator } from "../utils";
 export const ServerContext = createContext();
 
 const initialState = {
-	_embedded: [],
+	rows: [],
 	count: 0,
 	total: 0,
 };
@@ -56,7 +56,7 @@ export const ServerProvider = ({ children }) => {
 	const loadUsers = async (offset, limit, order, orderBy, name) => {
 		setIsLoadingUserContext(true);
 
-		if (name == "" || name == "USER_NAME") {
+		if (!name || name == "USER_NAME") {
 			let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
 
 			_query = queryGenerator(_query, order, orderBy);
@@ -78,9 +78,14 @@ export const ServerProvider = ({ children }) => {
 				},
 			})
 				.then((res) => {
-					if (name === "") setUserTotal(res.data.total);
-					setUserTotal(res.data.total);
-					setUserContext(res.data);
+					if (name === "") setUserTotal(res.data.rows.length);
+					setUserTotal(res.data.rows.length);
+					let newUserContext = {
+						rows: res.data.rows,
+						count: Math.min(25, res.data.rows.length),
+						total: res.data.rows.length,
+					};
+					setUserContext(newUserContext);
 					setIsLoadingUserContext(false);
 				})
 				.catch(() => {
@@ -151,7 +156,7 @@ export const ServerProvider = ({ children }) => {
 			});
 
 			const pushOnlyNewData = (totalData, newArr) => {
-				// if totalData already has anything in resp2.data._embedded, don't push it again
+				// if totalData already has anything in resp2.data.rows, don't push it again
 				// this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
 				// there will at most be 100 items in each array, so it won't take too long
 				newArr.forEach((item) => {
@@ -171,22 +176,23 @@ export const ServerProvider = ({ children }) => {
 			};
 
 			let useTotal = 0;
-			if (resp1 && resp1.data._embedded.length > 0) {
-				totalData.push(...resp1.data._embedded);
-				useTotal = parseInt(resp1.data.total);
+			if (resp1 && resp1.data.rows.length > 0) {
+				totalData.push(...resp1.data.rows);
+				useTotal = parseInt(resp1.data.rows.length);
 			}
-			if (resp2 && resp2.data._embedded.length > 0) {
-				totalData = pushOnlyNewData(totalData, resp2.data._embedded);
-				useTotal = parseInt(resp2.data.total);
+			if (resp2 && resp2.data.rows.length > 0) {
+				totalData = pushOnlyNewData(totalData, resp2.data.rows);
+				useTotal = parseInt(resp2.data.rows.length);
 			}
-			if (resp3 && resp3.data._embedded.length > 0) {
-				totalData = pushOnlyNewData(totalData, resp3.data._embedded);
-				useTotal = parseInt(resp3.data.total);
+			if (resp3 && resp3.data.rows.length > 0) {
+				totalData = pushOnlyNewData(totalData, resp3.data.rows);
+				useTotal = parseInt(resp3.data.rows.length);
 			}
 
 			setUserTotal(useTotal);
 			setUserContext({
-				_embedded: totalData,
+				rows: totalData,
+				count: useTotal,
 				total: useTotal,
 			});
 			setIsLoadingUserContext(false);
@@ -224,9 +230,7 @@ export const ServerProvider = ({ children }) => {
 		await Promise.all(groupUserCountPromises)
 			.then((resolvedPromises) => {
 				resolvedPromises.forEach((resolvedPromise, index) => {
-					inputArray._embedded[index].push(
-						resolvedPromise.data.total
-					);
+					inputArray.rows[index].push(resolvedPromise.data.total);
 				});
 			})
 			.catch(() => {
@@ -235,11 +239,16 @@ export const ServerProvider = ({ children }) => {
 			});
 
 		if (orderBy === "USER_COUNT") {
-			inputArray._embedded = inputArray._embedded
+			inputArray.rows = inputArray.rows
 				.sort((a, b) => (order === "asc" ? 1 : -1) * (a[1] - b[1]))
 				.slice(offset, offset + limit);
 		}
-		setGroupContext(inputArray);
+		let newGroupContext = {
+			rows: inputArray.rows,
+			count: inputArray.rows.length,
+			total: inputArray.rows.length,
+		};
+		setGroupContext(newGroupContext);
 		setIsLoadingGroupContext(false);
 	};
 
@@ -265,7 +274,7 @@ export const ServerProvider = ({ children }) => {
 			},
 		})
 			.then((res) => {
-				if (name === "") setGroupTotal(res.data.total);
+				if (name === "") setGroupTotal(res.data.rows.length);
 				loadGroupUserCounts(res.data, offset, limit, order, orderBy);
 			})
 			.catch(() => {
@@ -283,7 +292,7 @@ export const ServerProvider = ({ children }) => {
 		orderBy
 	) => {
 		let filteredRescContext = {
-			_embedded: rescArray,
+			rows: rescArray,
 			total: 0,
 		};
 		let uniqueResc = new Set();
@@ -309,10 +318,7 @@ export const ServerProvider = ({ children }) => {
 		};
 		filteredResc.sort(resourceComparator);
 		// slice the array to get pagination working
-		filteredRescContext._embedded = filteredResc.slice(
-			offset,
-			offset + limit
-		);
+		filteredRescContext.rows = filteredResc.slice(offset, offset + limit);
 		filteredRescContext.total = filteredResc.length;
 		setRescContext(filteredRescContext);
 	};
@@ -339,10 +345,14 @@ export const ServerProvider = ({ children }) => {
 					},
 				})
 					.then((res) => {
-						setRescContext(res.data);
-						setRescTotal(res.data.total);
-						if (res.data.count === res.data.total)
-							setRescAll(res.data);
+						setRescContext({
+							rows: res.data.rows,
+							count: res.data.rows.length,
+							total: res.data.rows.length,
+						});
+						setRescTotal(res.data.rows.length);
+						// if (res.data.count === res.data.total)
+						setRescAll(res.data);
 						setIsLoadingRescContext(false);
 					})
 					.catch(() => {
@@ -393,10 +403,7 @@ export const ServerProvider = ({ children }) => {
 				})
 					.then((res) => {
 						resourceSortRemoveDuplicatesHelper(
-							[
-								...filteredResults._embedded,
-								...res.data._embedded,
-							],
+							[...filteredResults.rows, ...res.data.rows],
 							offset,
 							limit,
 							order,

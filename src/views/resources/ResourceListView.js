@@ -247,7 +247,7 @@ export const ResourceListView = () => {
 				<div className="table_view_spinner_holder" />
 			)}
 			<br />
-			{rescContext === undefined ? (
+			{!rescContext ? (
 				<div>
 					Cannot load resource data. Please check iRODS Client Rest
 					API.
@@ -446,7 +446,8 @@ export const ResourceListView = () => {
 													aria-label="None"
 													value=""
 												/>
-												{rescTypes.length &&
+												{rescTypes &&
+													rescTypes.length &&
 													rescTypes.map((type) => (
 														<option
 															key={`resource-type-${type}`}
@@ -518,7 +519,8 @@ export const ResourceListView = () => {
 										</TableCell>
 									</TableRow>
 									{!isLoadingRescContext &&
-										(rescContext.rows.length === 0 ? (
+										(rescContext.rows &&
+										rescContext.rows.length === 0 ? (
 											<TableRow>
 												<TableCell colSpan={4}>
 													<div className="table_view_no_results_container">
@@ -528,6 +530,7 @@ export const ResourceListView = () => {
 												</TableCell>
 											</TableRow>
 										) : (
+											rescContext.rows &&
 											rescContext.rows.map(
 												(this_resc) => (
 													<ResourceRows
