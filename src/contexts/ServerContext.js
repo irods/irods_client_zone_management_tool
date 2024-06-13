@@ -479,9 +479,10 @@ export const ServerProvider = ({ children }) => {
 		});
 		const zoneUserData = await Promise.all(zoneUserDataPromises);
 		zonesRes.forEach(
-			(zone, index) => (zone.users = zoneUserData[index].data.total)
+			(zone, index) => (zone.users = zoneUserData[index].data.rows.length)
 		);
 		setZones(zonesRes);
+		console.log(zonesRes)
 		setIsLoadingZones(false);
 	};
 
@@ -563,7 +564,7 @@ export const ServerProvider = ({ children }) => {
 					curr_server["host_system_information"]["hostname"]
 				);
 				if (resource_counts === undefined) curr_server["resources"] = 0;
-				else curr_server["resources"] = resource_counts.data.total;
+				else curr_server["resources"] = resource_counts.data.rows.length;
 			}
 
 			setValidServerHosts(newValidHostSet);
