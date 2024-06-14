@@ -36,10 +36,10 @@ export default {
 
 			const parsedFreeSpaceInBytes = parseInt(freeSpaceInBytes, 10);
 
-			console.log(
-				`freeSpaceInBytes: ${freeSpaceInBytes}`,
-				`parsedFreeSpaceInBytes: ${parsedFreeSpaceInBytes}`
-			);
+			// console.log(
+			// 	`freeSpaceInBytes: ${freeSpaceInBytes}`,
+			// 	`parsedFreeSpaceInBytes: ${parsedFreeSpaceInBytes}`
+			// );
 			if (
 				!digitRegex.test(freeSpaceInBytes) ||
 				isNaN(parsedFreeSpaceInBytes)

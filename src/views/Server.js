@@ -142,42 +142,60 @@ export const Server = () => {
                                     <p className={classes.info}>Installation Time: {currServer['version']['installation_time']}</p>
                                 </TabPanel>
                                 <TabPanel className={classes.tab_panel} value={tabValue} index={1}>
-                                    <div className={classes.info}>Catalog Provider Hosts: {currServer['server_config']['catalog_provider_hosts']}</div>
-                                    <div className={classes.info}>Catalog Service Role: {currServer['server_config']['catalog_service_role']}</div>
-                                    <div className={classes.info}>Client Api Whitelist Policy: {currServer['server_config']['client_api_whitelist_policy']}</div>
-                                    <div className={classes.info}>Default Dir Mode: {currServer['server_config']['default_dir_mode']}</div>
-                                    <div className={classes.info}>Default File Mode: {currServer['server_config']['default_file_mode']}</div>
-                                    <div className={classes.info}>Default Hash Scheme: {currServer['server_config']['default_hash_scheme']}</div>
-                                    <div className={classes.info}>Default Resource Name: {currServer['server_config']['default_resource_name']}</div>
-                                    <div className={classes.info}>Match Hash Policy: {currServer['server_config']['match_hash_policy']}</div>
-                                    <div className={classes.info}>Server Control Plane Encryption Algorithm: {currServer['server_config']['server_control_plane_encryption_algorithm']}</div>
-                                    <div className={classes.info}>Server Control Plane Encryption Num Hash Rounds: {currServer['server_config']['server_control_plane_encryption_num_hash_rounds']}</div>
-                                    <div className={classes.info}>Server Control Plane Port: {currServer['server_config']['server_control_plane_port']}</div>
-                                    <div className={classes.info}>Server Port Range: {currServer['server_config']['server_port_range_start']} - {currServer['server_config']['server_port_range_end']}</div>
-                                    <div className={classes.info}>XMSG Port: {currServer['server_config']['xmsg_port']}</div>
-                                    <div className={classes.info}>Zone Auth Scheme: {currServer['server_config']['zone_auth_scheme']}</div>
-                                    <div className={classes.info}>Zone Port: {currServer['server_config']['zone_port']}</div>
-                                    <div className={classes.info}>Zone User: {currServer['server_config']['zone_user']}</div>
+                                    <p className={classes.info}>Catalog Provider Hosts: {currServer['server_config']['catalog_provider_hosts']}</p>
+                                    <p className={classes.info}>Catalog Service Role: {currServer['server_config']['catalog_service_role']}</p>
+                                    <p className={classes.info}>Client Api Whitelist Policy: {currServer['server_config']['client_api_whitelist_policy']}</p>
+                                    <p className={classes.info}>Default Dir Mode: {currServer['server_config']['default_dir_mode']}</p>
+                                    <p className={classes.info}>Default File Mode: {currServer['server_config']['default_file_mode']}</p>
+                                    <p className={classes.info}>Default Hash Scheme: {currServer['server_config']['default_hash_scheme']}</p>
+                                    <p className={classes.info}>Default Resource Name: {currServer['server_config']['default_resource_name']}</p>
+                                    <p className={classes.info}>Match Hash Policy: {currServer['server_config']['match_hash_policy']}</p>
+                                    <p className={classes.info}>Server Control Plane Encryption Algorithm: {currServer['server_config']['server_control_plane_encryption_algorithm']}</p>
+                                    <p className={classes.info}>Server Control Plane Encryption Num Hash Rounds: {currServer['server_config']['server_control_plane_encryption_num_hash_rounds']}</p>
+                                    <p className={classes.info}>Server Control Plane Port: {currServer['server_config']['server_control_plane_port']}</p>
+                                    <p className={classes.info}>Server Port Range: {currServer['server_config']['server_port_range_start']} - {currServer['server_config']['server_port_range_end']}</p>
+                                    <p className={classes.info}>XMSG Port: {currServer['server_config']['xmsg_port']}</p>
+                                    <p className={classes.info}>Zone Auth Scheme: {currServer['server_config']['zone_auth_scheme']}</p>
+                                    <p className={classes.info}>Zone Port: {currServer['server_config']['zone_port']}</p>
+                                    <p className={classes.info}>Zone User: {currServer['server_config']['zone_user']}</p>
                                 </TabPanel>
                                 <TabPanel className={classes.tab_panel} value={tabValue} index={2}>
-                                    <div className={classes.info}>iRODS Client Server Negotiation: {currServer['service_account_environment']['irods_client_server_negotiation']}</div>
-                                    <div className={classes.info}>iRODS Client Server Policy: {currServer['service_account_environment']['irods_client_server_policy']}</div>
-                                    <div className={classes.info}>iRODS Connection Refresh Time: {currServer['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</div>
-                                    <div className={classes.info}>iRODS CWD: {currServer['service_account_environment']['irods_cwd']}</div>
-                                    <div className={classes.info}>iRODS Default Hash Scheme: {currServer['service_account_environment']['irods_default_hash_scheme']}</div>
-                                    <div className={classes.info}>iRODS Default Resource: {currServer['service_account_environment']['irods_default_resource']}</div>
-                                    <div className={classes.info}>iRODS Encryption Algorithm: {currServer['service_account_environment']['irods_encryption_algorithm']}</div>
-                                    <div className={classes.info}>iRODS Encryption Key Size: {currServer['service_account_environment']['irods_encryption_key_size']}</div>
-                                    <div className={classes.info}>iRODS Encryption Hash Rounds: {currServer['service_account_environment']['irods_encryption_num_hash_rounds']}</div>
-                                    <div className={classes.info}>iRODS Encryption Salt Size: {currServer['service_account_environment']['irods_encryption_salt_size']}</div>
-                                    <div className={classes.info}>iRODS Home: {currServer['service_account_environment']['irods_home']}</div>
-                                    <div className={classes.info}>iRODS Maximum Size for Single Buffer In Megabytes: {currServer['service_account_environment']['irods_maximum_size_for_single_buffer_in_megabytes']}</div>
+                                    <p className={classes.info}>iRODS Client Server Negotiation: {currServer['service_account_environment']['irods_client_server_negotiation']}</p>
+                                    <p className={classes.info}>iRODS Client Server Policy: {currServer['service_account_environment']['irods_client_server_policy']}</p>
+                                    <p className={classes.info}>iRODS Connection Refresh Time: {currServer['service_account_environment']['irods_connection_pool_refresh_time_in_seconds']}</p>
+                                    <p className={classes.info}>iRODS CWD: {currServer['service_account_environment']['irods_cwd']}</p>
+                                    <p className={classes.info}>iRODS Default Hash Scheme: {currServer['service_account_environment']['irods_default_hash_scheme']}</p>
+                                    <p className={classes.info}>iRODS Default Resource: {currServer['service_account_environment']['irods_default_resource']}</p>
+                                    <p className={classes.info}>iRODS Encryption Algorithm: {currServer['service_account_environment']['irods_encryption_algorithm']}</p>
+                                    <p className={classes.info}>iRODS Encryption Key Size: {currServer['service_account_environment']['irods_encryption_key_size']}</p>
+                                    <p className={classes.info}>iRODS Encryption Hash Rounds: {currServer['service_account_environment']['irods_encryption_num_hash_rounds']}</p>
+                                    <p className={classes.info}>iRODS Encryption Salt Size: {currServer['service_account_environment']['irods_encryption_salt_size']}</p>
+                                    <p className={classes.info}>iRODS Home: {currServer['service_account_environment']['irods_home']}</p>
+                                    <p className={classes.info}>iRODS Maximum Size for Single Buffer In Megabytes: {currServer['service_account_environment']['irods_maximum_size_for_single_buffer_in_megabytes']}</p>
                                 </TabPanel>
                                 <TabPanel className={classes.tab_panel} value={tabValue} index={3}>
-                                    <div>
-                                        <tr><td><b>Name</b></td><td><b>Type</b></td></tr>
-                                        {currServer['plugins'].map(plugin => <tr key={plugin.name}><td><div className={classes.plugin_info}>{plugin.name}</div></td><td><div className={classes.info}>{plugin.type}</div></td></tr>)}
-                                    </div>
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <b>Name</b>
+                                                </td>
+                                                <td>
+                                                    <b>Type</b>
+                                                </td>
+                                            </tr>
+                                            {currServer['plugins'].map(plugin => (
+                                                <tr key={plugin.name}>
+                                                    <td>
+                                                        <div className={classes.plugin_info}>{plugin.name}</div>
+                                                    </td>
+                                                    <td>
+                                                        <p className={classes.info}>{plugin.type}</p>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </TabPanel>
                             </DialogContent>
                         </Dialog>
