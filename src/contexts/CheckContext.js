@@ -71,7 +71,8 @@ export const CheckProvider = ({ children }) => {
     const callBackFn = useRef(null)
 
     useEffect(() => {
-        if (localStorage.getItem('zmt-token') && Object.keys(statusResult).length === 0 && zoneContext.length > 0 && !isChecking && !isLoadingZoneContext) {
+        let keys = Object.keys(statusResult)
+        if (localStorage.getItem('zmt-token') && keys.length === 0 && zoneContext && zoneContext.length > 0 && !isChecking && !isLoadingZoneContext) {
             // run checks only when data loading is complete
             runAllCheck()
         }

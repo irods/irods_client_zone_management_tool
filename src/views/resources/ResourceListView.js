@@ -37,6 +37,12 @@ import ListIcon from "@material-ui/icons/List";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import { navigate, useLocation } from "@reach/router";
 
+import { 
+	AddResourceController,
+	ModifyResourceController,
+	RemoveResourceController
+ } from "../../controllers/ResourceController"
+
 const useStyles = makeStyles((theme) => ({
 	dialog_action: {
 		margin: theme.spacing(1),
@@ -145,39 +151,29 @@ export const ResourceListView = () => {
 		return !((rescLocation === "") ^ (rescVaultPath === ""));
 	};
 
-	async function addResource() {
-		setAddFormOpen(true);
+	const addResource = async () => {
+        setAddFormOpen(true);
 		setLoading(true);
-		await axios({
-			method: "POST",
-			url: `${environment.restApiLocation}/admin`,
-			headers: {
-				Authorization: auth,
-			},
-			params: {
-				action: "add",
-				target: "resource",
-				arg2: rescName,
-				arg3: rescType,
-				arg4:
-					rescLocation === "" && rescVaultPath === ""
-						? ""
-						: rescLocation + ":" + rescVaultPath,
-				arg5: "",
-				arg6: localZoneName,
-			},
-		})
-			.then(() => {
+        await AddResourceController(
+			rescName, 
+			rescType, 
+			rescLocation, 
+			rescVaultPath, 
+			environment.restApiLocation
+		)
+        .then(res => {
+			if (res.status === 200) {
 				window.location.reload();
 				setAddResult("Resource created.");
 				setLoading(false);
-			})
-			.catch((e) => {
-				setAddResult(
-					`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`
-				);
-				setLoading(false);
-			});
+			}
+		})
+		.catch((e) => {
+			setAddResult(
+				`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`
+			);
+			setLoading(false);
+		})
 	}
 
 	const handleKeyDown = (e) => {
