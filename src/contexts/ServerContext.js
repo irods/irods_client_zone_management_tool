@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useEnvironment } from "./";
 import { irodsVersionComparator } from "../utils";
+import { navigate } from "@reach/router";
 
 export const ServerContext = createContext();
 
@@ -175,25 +176,25 @@ export const ServerProvider = ({ children }) => {
 				return totalData;
 			};
 
-			let useTotal = 0;
+			let userTotal = 0;
 			if (resp1 && resp1.data.rows.length > 0) {
 				totalData.push(...resp1.data.rows);
-				useTotal = parseInt(resp1.data.rows.length);
+				userTotal = parseInt(resp1.data.rows.length);
 			}
 			if (resp2 && resp2.data.rows.length > 0) {
 				totalData = pushOnlyNewData(totalData, resp2.data.rows);
-				useTotal = parseInt(resp2.data.rows.length);
+				userTotal = parseInt(resp2.data.rows.length);
 			}
 			if (resp3 && resp3.data.rows.length > 0) {
 				totalData = pushOnlyNewData(totalData, resp3.data.rows);
-				useTotal = parseInt(resp3.data.rows.length);
+				userTotal = parseInt(resp3.data.rows.length);
 			}
 
-			setUserTotal(useTotal);
+			setUserTotal(userTotal);
 			setUserContext({
 				rows: totalData,
-				count: useTotal,
-				total: useTotal,
+				count: userTotal,
+				total: userTotal,
 			});
 			setIsLoadingUserContext(false);
 			return;
@@ -221,7 +222,6 @@ export const ServerProvider = ({ children }) => {
 					op: "execute_genquery",
 					query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
 					count: 100,
-					offset: 0,
 				},
 			})
 		);
@@ -230,7 +230,7 @@ export const ServerProvider = ({ children }) => {
 		await Promise.all(groupUserCountPromises)
 			.then((resolvedPromises) => {
 				resolvedPromises.forEach((resolvedPromise, index) => {
-					inputArray.rows[index].push(resolvedPromise.data.total);
+					inputArray.rows[index].push(resolvedPromise.data.rows.length);
 				});
 			})
 			.catch(() => {
@@ -375,7 +375,6 @@ export const ServerProvider = ({ children }) => {
 							base_query +
 							` AND RESC_NAME LIKE '%${name.toUpperCase()}%'`,
 						count: 500,
-						offset: 0,
 						"case-sensitive": 0,
 					},
 				})
@@ -398,7 +397,6 @@ export const ServerProvider = ({ children }) => {
 						op: "execute_genquery",
 						query: base_query + ` AND RESC_LOC LIKE '%${name}%'`,
 						count: 500,
-						offset: 0,
 					},
 				})
 					.then((res) => {
@@ -424,6 +422,8 @@ export const ServerProvider = ({ children }) => {
 		setRescPanelStatus(text);
 	};
 
+	// First api request sent out when user lands after authentication, check if 502 bad gateway occurs
+	// 	- 502 bad gateway => auth token is expired, so remove from local storage and re-login
 	const loadZones = async () => {
 		setIsLoadingZones(true);
 		let zonesRes = [];
@@ -436,10 +436,15 @@ export const ServerProvider = ({ children }) => {
 			params: {
 				op: "execute_genquery",
 				query: `SELECT ZONE_NAME, order(ZONE_TYPE), ZONE_CONNECTION, ZONE_COMMENT`,
-				count: 0,
-				offset: 0,
 			},
-		});
+		})
+		.catch(() => {
+			setZones([]);
+			setIsLoadingZones(false);
+			localStorage.removeItem("zmt-token");
+			navigate("/", { replace: true });
+			return;
+		})
 		if (zoneData.status === 200) {
 			setLocalZoneName(
 				zoneData.data.rows.filter((a) => a[1] === "local")[0][0]
@@ -453,7 +458,8 @@ export const ServerProvider = ({ children }) => {
 					comment: zone[3],
 				};
 			});
-		} else {
+		}
+		else {
 			// handle error if the request failed
 			setZones([]);
 			setIsLoadingZones(false);
@@ -472,8 +478,6 @@ export const ServerProvider = ({ children }) => {
 				params: {
 					op: "execute_genquery",
 					query: `SELECT USER_NAME WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE = '${zone[0]}'`,
-					count: 0,
-					offset: 0,
 				},
 			});
 		});
@@ -482,7 +486,6 @@ export const ServerProvider = ({ children }) => {
 			(zone, index) => (zone.users = zoneUserData[index].data.rows.length)
 		);
 		setZones(zonesRes);
-		console.log(zonesRes)
 		setIsLoadingZones(false);
 	};
 
@@ -514,7 +517,6 @@ export const ServerProvider = ({ children }) => {
 				op: "execute_genquery",
 				query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
 				count: 100,
-				offset: 0,
 			},
 		});
 	};
@@ -669,6 +671,10 @@ export const ServerProvider = ({ children }) => {
 	};
 
 	const loadSpecificQueries = (term) => {
+		// https://docs.irods.org/4.3.2/system_overview/genquery/
+		// Instead do SELECT RULE_ACCESS_NAME, ...?
+		// Not sure if this column corresponds to specific queries or if it's something different
+		// current query doesn't work, not seeing R_SPECIFIC_QUERY as a table in the docs
 		let _query = "select alias, sqlStr from R_SPECIFIC_QUERY";
 		if (term !== "") {
 			_query += ` where alias like '${term}'`;
@@ -681,14 +687,14 @@ export const ServerProvider = ({ children }) => {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
 			params: {
-				op: "execute_specific_query",
-				name: _query,
+				op: "execute_genquery",
+				query: _query,
 				count: 100,
-				offset: 0,
 			},
 		})
 			.then((res) => {
-				setSpecificQueryTotal(res.data.total);
+				console.log(res)
+				setSpecificQueryTotal(res.data.rows ? res.data.rows.length : 0);
 				setSpecificQueryContext(res.data);
 				setIsLoadingSpecificQueryContext(false);
 			})

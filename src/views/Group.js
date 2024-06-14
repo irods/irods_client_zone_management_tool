@@ -228,7 +228,6 @@ export const Group = () => {
 				`/groups?filter=${encodeURIComponent(e.target.value)}`
 			);
 	};
-	// console.log(groupContext);
 
 	return (
 		<Fragment>
