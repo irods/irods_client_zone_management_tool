@@ -445,7 +445,7 @@ export const ServerProvider = ({ children }) => {
 			navigate("/", { replace: true });
 			return;
 		})
-		if (zoneData.status === 200) {
+		if (zoneData && zoneData.status === 200) {
 			setLocalZoneName(
 				zoneData.data.rows.filter((a) => a[1] === "local")[0][0]
 			);
