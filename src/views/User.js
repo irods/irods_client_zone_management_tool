@@ -226,7 +226,7 @@ export const User = () => {
 	const handleFilterChange = (e) => {
 		if (!filterUsername) setIsRunning(!isRunning);
 		setFilterName(e.target.value);
-		setUserData([]);
+		// setUserData([]);
 		// update the path without reload, filter is also encoded
 		if (e.target.value === "")
 			window.history.replaceState("", "", "/users");
@@ -249,6 +249,13 @@ export const User = () => {
 		environment.pageTitle = environment.usersTitle;
 		document.title = `${environment.titleFormat()}`;
 	}, [currPage, perPage, order, orderBy]);
+
+	useEffect(() => {
+		if (!userContext || userContext.rows.length === 0) {
+			return;
+		}
+		setUserData(userContext.rows);
+	}, [userContext]);
 
 	useEffect(() => {
 		if (firstUpdate.current) {
@@ -275,7 +282,7 @@ export const User = () => {
 	}, [filterUsername]);
 
 	useEffect(() => {
-		if (!userContext) return; // safety check
+		if (!userContext || userContext.rows.length === 0) return; // safety check
 
 		if (time < delayTimeUse) {
 			// filter on frontend since timer has not reached delay limit yet
@@ -289,8 +296,6 @@ export const User = () => {
 						.includes(filterUsername.toLowerCase()) ||
 					user[1].toLowerCase().includes(filterUsername.toLowerCase())
 			);
-			console.log(userContext);
-			console.log(filteredUsers);
 
 			setUserData(filteredUsers);
 		} else {
@@ -307,12 +312,6 @@ export const User = () => {
 		}
 	}, [time]);
 
-	useEffect(() => {
-		if (!userContext) {
-			setUserData(userContext.rows);
-		}
-	}, [userContext]);
-
 	return (
 		<Fragment>
 			{isLoadingUserContext ? (
@@ -321,7 +320,7 @@ export const User = () => {
 				<div className="table_view_spinner_holder" />
 			)}
 			<br />
-			{userContext === undefined ? (
+			{!userContext || (userContext && userContext.rows.length === 0) ? (
 				<div>
 					Cannot load user data. Please check your iRODS Client REST
 					API endpoint connection.

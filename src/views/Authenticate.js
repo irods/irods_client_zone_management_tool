@@ -60,7 +60,6 @@ export const Authenticate = () => {
 		try {
 			setServerError(false);
 			setIncorrect(false);
-			console.log("HI");
 			await axios
 				.post(`${restApiLocation}/authenticate`, null, {
 					headers: {
@@ -71,7 +70,6 @@ export const Authenticate = () => {
 				})
 				.then((res) => {
 					if (res.status === 200) {
-						console.log(res);
 						localStorage.setItem("zmt-token", res.data);
 						localStorage.setItem("zmt-username", username);
 						navigate("/home", { replace: true });
