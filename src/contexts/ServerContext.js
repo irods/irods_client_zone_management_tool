@@ -693,7 +693,7 @@ export const ServerProvider = ({ children }) => {
 			},
 		})
 			.then((res) => {
-				console.log(res)
+				// console.log(res)
 				setSpecificQueryTotal(res.data.rows ? res.data.rows.length : 0);
 				setSpecificQueryContext(res.data);
 				setIsLoadingSpecificQueryContext(false);

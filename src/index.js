@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-import { ServerProvider } from './contexts/ServerContext';
-import { EnvironmentProvider } from './contexts/EnvironmentContext';
+import { ServerProvider, EnvironmentProvider, CheckProvider } from './contexts';
 
 ReactDOM.render(
   <EnvironmentProvider>
       <ServerProvider>
-        <App />
+        <CheckProvider>
+          <App />
+        </CheckProvider>
       </ServerProvider>
   </EnvironmentProvider>
   ,
