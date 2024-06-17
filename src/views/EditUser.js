@@ -8,6 +8,8 @@ import { useEnvironment, useServer } from '../contexts';
 import MuiAlert from '@material-ui/lab/Alert';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { ModifyUserPasswordController, ModifyUserTypeController } from '../controllers/UserController';
+import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
 
 const useStyles = makeStyles((theme) => ({
     link_button: {
@@ -50,8 +52,8 @@ export const EditUser = () => {
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const { restApiLocation } = useEnvironment();
-    const { loadUser } = useServer();
-    const [groupsOfUser, setGroupOfUser] = useState([]);
+    const { loadUsers } = useServer();
+    const [groupsOfUser, setGroupsOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
     const [passwordConfirmation, setPasswordConfirmation] = useState(false)
@@ -69,23 +71,25 @@ export const EditUser = () => {
 
     useEffect(() => {
         // hide this interface for the current rodsadmin user or user that does not have name or zone
-        if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) navigate('/users')
+        if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) {
+            navigate('/users')
+        }
         axios({
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': auth
+                'Authorization': `Bearer ${auth}`
             },
             params: {
+                op: "execute_genquery",
                 query: `SELECT USER_TYPE WHERE USER_NAME = '${currentUserName}' AND USER_ZONE = '${currentUserZone}'`,
                 limit: 100,
                 offset: 0,
-                type: 'general'
             }
         }).then(res => {
             // navigate back to /user if the username provided does not exist
-            res.data.total > 0 ? setUserType({ ...userType, value: res.data._embedded[0][0] }) : navigate('/users')
+            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : navigate('/users')
         }).catch(() => {
             navigate('/users')
         })
@@ -99,16 +103,16 @@ export const EditUser = () => {
                 url: `${restApiLocation}/query`,
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization': auth
+                    'Authorization': `Bearer ${auth}`
                 },
                 params: {
+                    op: "execute_genquery",
                     query: `SELECT USER_GROUP_NAME WHERE USER_NAME = '${currentUserName}' AND USER_GROUP_NAME != '${currentUserName}'`,
                     limit: 100,
                     offset: 0,
-                    type: 'general'
                 }
             }).then((res) => {
-                setGroupOfUser(res.data._embedded);
+                setGroupsOfUser(res.data.rows);
                 setLoading(false);
             })
         }
@@ -120,39 +124,30 @@ export const EditUser = () => {
                 method: 'GET',
                 url: `${restApiLocation}/query`,
                 headers: {
-                    'Authorization': auth,
+                    'Authorization': `Bearer ${auth}`
                 },
                 params: {
+                    op: "execute_genquery",
                     query: `SELECT USER_NAME WHERE USER_GROUP_NAME LIKE '%${filterGroupName.toUpperCase()}%' AND USER_TYPE = 'RODSGROUP'`,
                     limit: 100,
                     offset: 0,
-                    type: 'general',
                     'case-sensitive': 0
                 }
             }).then((res) => {
-                setFilterNameResult(res.data._embedded);
+                setFilterNameResult(res.data.rows);
             })
         }
     }, [auth, restApiLocation, filterGroupName])
 
     async function removeGroupFromUser(group) {
         try {
-            await axios({
-                method: 'POST',
-                url: `${restApiLocation}/admin`,
-                params: {
-                    action: 'modify',
-                    target: 'group',
-                    arg2: group[0],
-                    arg3: 'remove',
-                    arg4: currentUserName,
-                    arg5: currentUserZone
-                },
-                headers: {
-                    'Authorization': auth,
-                    'Accept': 'application/json'
-                }
-            }).then(() => {
+            await RemoveUserFromGroupController(
+                currentUserName,
+                currentUserZone,
+                group[0],
+                restApiLocation
+            )
+            .then(() => {
                 setRefresh(!refresh);
             })
         } catch (e) {
@@ -163,22 +158,13 @@ export const EditUser = () => {
 
     async function addGroupToUser(group) {
         try {
-            await axios({
-                method: 'POST',
-                url: `${restApiLocation}/admin`,
-                params: {
-                    action: 'modify',
-                    target: 'group',
-                    arg2: group[0],
-                    arg3: 'add',
-                    arg4: currentUserName,
-                    arg5: currentUserZone
-                },
-                headers: {
-                    'Authorization': auth,
-                    'Accept': 'application/json'
-                }
-            }).then(() => {
+            AddUserToGroupController(
+                currentUserName,
+                currentUserZone,
+                group[0],
+                restApiLocation
+            )
+           .then(() => {
                 setRefresh(!refresh);
             })
         }
@@ -198,21 +184,14 @@ export const EditUser = () => {
     }
 
     const resetPwd = () => {
-        axios({
-            method: 'POST',
-            url: `${restApiLocation}/admin`,
-            params: {
-                action: 'modify', // arg0
-                target: 'user', // arg1
-                arg2: `${currentUserName}#${currentUserZone}`, // user#zone
-                arg3: 'password',
-                arg4: password.confirmPassword,
-            },
-            headers: {
-                'Authorization': auth,
-                'Accept': 'application/json'
-            }
-        }).then(() => {
+
+        ModifyUserPasswordController(
+            currentUserName,
+            currentUserZone,
+            password.confirmPassword,
+            restApiLocation
+        )
+        .then(() => {
             setPasswordConfirmation(false)
             setPassword({
                 newPassword: '',
@@ -233,23 +212,14 @@ export const EditUser = () => {
     }
 
     const updateUserType = (newType) => {
-        axios({
-            method: 'POST',
-            url: `${restApiLocation}/admin`,
-            params: {
-                action: 'modify',
-                target: 'user',
-                arg2: currentUserName,
-                arg3: 'type',
-                arg4: newType,
-            },
-            headers: {
-                'Authorization': auth,
-                'Accept': 'application/json'
-            }
-        }).then(() => {
+        ModifyUserTypeController(
+            currentUserName,
+            currentUserZone,
+            newType,
+            restApiLocation
+        ).then(() => {
             setUserType({ value: newType, status: 'changed' })
-            loadUser(0, 0, '', 'asc', 'USER_NAME')
+            // loadUsers(0, 0, '', 'asc', 'USER_NAME')
         }).catch(() => {
             setUserType({ ...userType, status: 'failed' })
         })
@@ -273,9 +243,16 @@ export const EditUser = () => {
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <Paper className={classes.user_info}>
                         <h2>Basic Information</h2>
-                        <div style={{ wordWrap: 'break-word' }}><Typography>User: {currentUserName}#{currentUserZone}</Typography></div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}><Typography>User Type: </Typography>
-                            <Select style={{ marginLeft: '10px' }} value={userType.value} onChange={(e) => updateUserType(e.target.value)}>
+                        <div style={{ wordWrap: 'break-word' }}>
+                            <Typography>User: {currentUserName}#{currentUserZone}</Typography>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography>User Type: </Typography>
+                            <Select 
+                                style={{ marginLeft: '10px' }} 
+                                value={userType.value} 
+                                onChange={(e) => updateUserType(e.target.value)}
+                            >
                                 <MenuItem value="rodsuser">rodsuser</MenuItem>
                                 <MenuItem value="rodsadmin">rodsadmin</MenuItem>
                                 <MenuItem value="groupadmin">groupadmin</MenuItem>
@@ -355,13 +332,25 @@ export const EditUser = () => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {filterGroupNameResult.length === 0 ? <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterGroupName}].</div></TableCell></TableRow> : filterGroupNameResult.map((thisGroup) => <TableRow key={thisGroup[0]}>
-                                                <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
-                                                <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
-                                                <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
-                                            </TableRow>)}
-                                        </TableBody>
-                                    </Table></TableContainer>}
+                                            {filterGroupNameResult.length === 0 ? 
+                                                <TableRow>
+                                                    <TableCell colSpan={3}>
+                                                        <div className="table_view_no_results_container">
+                                                            No results found for [{filterGroupName}].
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow> 
+                                            : 
+                                            filterGroupNameResult.map((thisGroup) => (
+                                                <TableRow key={thisGroup[0]}>
+                                                    <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
+                                                    <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
+                                                    <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
+                                                </TableRow>
+                                                ))}
+                                            </TableBody>
+                                    </Table>
+                            </TableContainer>}
                         </div>
                     </Paper>
                 </div>

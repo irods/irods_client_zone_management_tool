@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import axios from "axios";
 import {
 	makeStyles,
 	Button,
@@ -39,8 +38,6 @@ import { navigate, useLocation } from "@reach/router";
 
 import { 
 	AddResourceController,
-	ModifyResourceController,
-	RemoveResourceController
  } from "../../controllers/ResourceController"
 
 const useStyles = makeStyles((theme) => ({
@@ -78,7 +75,6 @@ export const ResourceListView = () => {
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
-	const auth = localStorage.getItem("zmt-token");
 	const classes = useStyles();
 	const tab = "list";
 	const [isLoading, setLoading] = useState(false);

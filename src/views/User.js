@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useEffect, useRef } from "react";
 import { Link, navigate, useLocation } from "@reach/router";
-import axios from "axios";
 import { useEnvironment, useServer } from "../contexts";
 import {
 	makeStyles,
@@ -29,6 +28,7 @@ import {
 import SaveIcon from "@material-ui/icons/Save";
 import CloseIcon from "@material-ui/icons/Close";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
+import { AddUserController, RemoveUserController } from "../controllers/UserController";
 
 const useStyles = makeStyles((theme) => ({
 	tableContainer: {
@@ -76,7 +76,6 @@ export const User = () => {
 	const params = new URLSearchParams(location.search);
 	const environment = useEnvironment();
 	const usersPageKey = environment.usersPageKey;
-	const auth = localStorage.getItem("zmt-token");
 	const loggedUserName = localStorage.getItem("zmt-username");
 	const classes = useStyles();
 	const [currUser, setCurrUser] = useState([]);
@@ -108,6 +107,15 @@ export const User = () => {
 	const firstUpdate = useRef(true); // used to prevent filtering useEffect from running on initial render
 	const delayTimeUse = environment.filterTimeInMilliseconds / 100; // convert into tenths of a second
 
+	let initialAddData = {
+		name: "",
+		zone: localZoneName ? localZoneName : "tempZone",
+		type: "rodsuser"
+	}
+
+	const [newUserData, setNewUserData] = useState(initialAddData);
+	const [addRowOpen, setAddRowOpen] = useState(false);
+
 	useEffect(() => {
 		// runs on initial render
 		const usersPerPage = localStorage.getItem(usersPageKey);
@@ -127,23 +135,15 @@ export const User = () => {
 	}, [isRunning, time]);
 
 	async function addUser() {
+		if (!newUserData.name) return;
 		try {
-			await axios({
-				method: "POST",
-				url: `${environment.restApiLocation}/admin`,
-				headers: {
-					Authorization: auth,
-				},
-				params: {
-					action: "add",
-					target: "user",
-					arg2: `${document.getElementById("add-user-name").value}#${
-						document.getElementById("add-user-zone").value
-					}`, // format: username#userzone
-					arg3: document.getElementById("add-user-type").value,
-					arg4: "",
-				},
-			}).then(() => {
+			await AddUserController(
+				newUserData.name, 
+				newUserData.zone, 
+				newUserData.type,
+				environment.restApiLocation
+			)
+			.then(() => {
 				window.location.reload();
 			});
 		} catch (e) {
@@ -159,19 +159,12 @@ export const User = () => {
 
 	async function removeUser() {
 		try {
-			await axios({
-				method: "POST",
-				url: `${environment.restApiLocation}/admin`,
-				headers: {
-					Authorization: auth,
-				},
-				params: {
-					action: "rm",
-					target: "user",
-					arg2: currUser[0],
-					arg3: localZoneName,
-				},
-			}).then(() => {
+			await RemoveUserController(
+				currUser[0],
+				currUser[2],
+				environment.restApiLocation
+			)
+			.then(() => {
 				window.location.reload();
 			});
 		} catch (e) {
@@ -197,15 +190,13 @@ export const User = () => {
 		setRemoveConfirmation(false);
 	};
 
-	const handleAddRowOpen = () => {
-		document.getElementById("add-user-row").style["display"] = "contents";
-	};
-
 	const handleAddRowClose = () => {
-		document.getElementById("add-user-row").style["display"] = "none";
-		document.getElementById("add-user-name").value = "";
-		document.getElementById("add-user-zone").value = localZoneName;
-		document.getElementById("add-user-type").value = "rodsuser";
+		// document.getElementById("add-user-row").style["display"] = "none";
+		// document.getElementById("add-user-name").value = "";
+		// document.getElementById("add-user-zone").value = localZoneName;
+		// document.getElementById("add-user-type").value = "rodsuser";
+		setAddRowOpen(false)
+		setNewUserData(initialAddData);
 	};
 
 	const handleAddFormClose = () => {
@@ -340,7 +331,7 @@ export const User = () => {
 							className={classes.add_button}
 							variant="outlined"
 							color="primary"
-							onClick={handleAddRowOpen}
+							onClick={() => setAddRowOpen(true)}
 						>
 							Add New User
 						</Button>
@@ -434,79 +425,87 @@ export const User = () => {
 								</StylesProvider>
 							</TableHead>
 							<TableBody>
-								<TableRow
-									id="add-user-row"
-									style={{ display: "none" }}
-								>
-									<TableCell>
-										<Input
-											className={
-												(classes.add_user_name,
-												classes.fontInherit)
-											}
-											id="add-user-name"
-											placeholder="Enter new User Name"
-											onKeyDown={(event) =>
-												handleKeyDown(event)
-											}
-										/>
-									</TableCell>
-									<TableCell>
-										<Select
-											native
-											className={classes.fontInherit}
-											id="add-user-zone"
-											onKeyDown={(event) =>
-												handleKeyDown(event)
-											}
-										>
-											{zones &&
-												zones.map((zone) => (
+								{addRowOpen &&
+									<TableRow
+										id="add-user-row"
+									>
+										<TableCell>
+											<Input
+												className={
+													(classes.add_user_name,
+													classes.fontInherit)
+												}
+												id="add-user-name"
+												placeholder="Enter new User Name"
+												value={newUserData.name}
+												onChange={(e) => {setNewUserData({...newUserData, name: e.target.value})}}
+												onKeyDown={(event) =>
+													handleKeyDown(event)
+												}
+											/>
+										</TableCell>
+										<TableCell>
+											<Select
+												native
+												className={classes.fontInherit}
+												id="add-user-zone"
+												value={newUserData.zone}
+												onChange={(e) => {setNewUserData({...newUserData, zone: e.target.value})}}
+												onKeyDown={(event) =>
+													handleKeyDown(event)
+												}
+											>
+												{zones &&
+													zones.map((zone) => (
+														<option
+															key={`zone-option-${zone.name}`}
+															value={zone.name}
+														>
+															{zone.name}
+														</option>
+													))}
+											</Select>
+										</TableCell>
+										<TableCell>
+											<Select
+												native
+												className={classes.fontInherit}
+												id="add-user-type"
+												value={newUserData.type}
+												onChange={(e) => {setNewUserData({...newUserData, type: e.target.value})}}
+												onKeyDown={(event) =>
+													handleKeyDown(event)
+												}
+											>
+												{userTypes.map((this_user_type) => (
 													<option
-														key={`zone-option-${zone.name}`}
-														value={zone.name}
+														key={this_user_type}
+														value={this_user_type}
 													>
-														{zone.name}
+														{this_user_type}
 													</option>
 												))}
-										</Select>
-									</TableCell>
-									<TableCell>
-										<Select
-											native
-											className={classes.fontInherit}
-											id="add-user-type"
-											onKeyDown={(event) =>
-												handleKeyDown(event)
-											}
-										>
-											{userTypes.map((this_user_type) => (
-												<option
-													key={this_user_type}
-													value={this_user_type}
+											</Select>
+										</TableCell>
+										<TableCell align="right">
+											<ToggleButtonGroup size="small">
+												<ToggleButton
+													value="save"
+													onClick={addUser}
 												>
-													{this_user_type}
-												</option>
-											))}
-										</Select>
-									</TableCell>
-									<TableCell align="right">
-										<ToggleButtonGroup size="small">
-											<ToggleButton
-												value="save"
-												onClick={addUser}
-											>
-												<SaveIcon />
-											</ToggleButton>
-											<ToggleButton
-												value="close"
-												onClick={handleAddRowClose}
-											>
-												<CloseIcon />
-											</ToggleButton>
-										</ToggleButtonGroup>
-									</TableCell>
-								</TableRow>
+													<SaveIcon />
+												</ToggleButton>
+												<ToggleButton
+													value="close"
+													onClick={handleAddRowClose}
+												>
+													<CloseIcon />
+												</ToggleButton>
+											</ToggleButtonGroup>
+										</TableCell>
+									</TableRow>
+								}
+								
 								{userData && userData.length === 0 ? (
 									<TableRow>
 										<TableCell colSpan={3}>

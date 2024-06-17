@@ -443,6 +443,7 @@ export const ServerProvider = ({ children }) => {
 			setIsLoadingZones(false);
 			localStorage.removeItem("zmt-token");
 			navigate("/", { replace: true });
+			window.location.reload();
 			return;
 		})
 		if (zoneData && zoneData.status === 200) {
