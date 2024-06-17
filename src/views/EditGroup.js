@@ -5,6 +5,7 @@ import { Link, navigate } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
 import { useEnvironment, useServer } from '../contexts';
+import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
 
 const useStyles = makeStyles(() => ({
     link_button: {
@@ -42,16 +43,16 @@ export const EditGroup = (props) => {
             url: `${restApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': auth
+                'Authorization': `Bearer ${auth}`
             },
             params: {
+                op: "execute_genquery",
                 query: `SELECT USER_NAME, USER_TYPE WHERE USER_GROUP_NAME = '${currentGroup[0]}' AND USER_TYPE != 'rodsgroup'`,
                 limit: 100,
                 offset: 0,
-                type: 'general'
             }
         }).then((res) => {
-            setUsersInGroup(res.data._embedded);
+            setUsersInGroup(res.data.rows);
             setLoading(false);
         })
     }, [auth, currentGroup, restApiLocation])
@@ -62,39 +63,30 @@ export const EditGroup = (props) => {
             method: 'GET',
             url: `${restApiLocation}/query`,
             headers: {
-                'Authorization': auth,
+                'Authorization': `Bearer ${auth}`,
             },
             params: {
+                op: "execute_genquery",
                 query: `SELECT USER_NAME, USER_TYPE WHERE USER_NAME LIKE '%${filterUserName.toUpperCase()}%' AND USER_TYPE != 'RODSGROUP'`,
                 limit: 10,
                 offset: 0,
-                type: 'general',
                 'case-sensitive': 0
             }
         }).then((res) => {
-            setFilterNameResult(res.data._embedded);
+            setFilterNameResult(res.data.rows);
             setLoading(false);
         })
     }, [auth, restApiLocation, filterUserName])
 
     async function removeUserFromGroup(user) {
         try {
-            await axios({
-                method: 'POST',
-                url: `${restApiLocation}/admin`,
-                params: {
-                    action: 'modify',
-                    target: 'group',
-                    arg2: currentGroup[0],
-                    arg3: 'remove',
-                    arg4: user[0],
-                    arg5: localZoneName
-                },
-                headers: {
-                    'Authorization': auth,
-                    'Accept': 'application/json'
-                }
-            }).then(() => {
+            await RemoveUserFromGroupController(
+                user[0],
+                localZoneName,
+                currentGroup[0],
+                restApiLocation
+            )
+            .then(() => {
                 setRefresh(!refresh);
             })
         } catch (e) {
@@ -104,22 +96,13 @@ export const EditGroup = (props) => {
 
     async function addUserToGroup(user) {
         try {
-            await axios({
-                method: 'POST',
-                url: `${restApiLocation}/admin`,
-                params: {
-                    action: 'modify',
-                    target: 'group',
-                    arg2: currentGroup[0],
-                    arg3: 'add',
-                    arg4: user[0],
-                    arg5: localZoneName
-                },
-                headers: {
-                    'Authorization': auth,
-                    'Accept': 'application/json'
-                }
-            }).then(() => {
+            await AddUserToGroupController(
+                user[0],
+                localZoneName,
+                currentGroup[0],
+                restApiLocation
+            )
+            .then(() => {
                 setRefresh(!refresh);
             })
         }

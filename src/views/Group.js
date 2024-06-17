@@ -1,5 +1,4 @@
 import React, { Fragment, useState, useEffect } from "react";
-import axios from "axios";
 import { Link, navigate, useLocation } from "@reach/router";
 import { useEnvironment, useServer } from "../contexts";
 import {
@@ -29,6 +28,7 @@ import {
 import SaveIcon from "@material-ui/icons/Save";
 import CloseIcon from "@material-ui/icons/Close";
 import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
+import { AddGroupController, RemoveGroupController } from "../controllers/GroupController";
 
 const useStyles = makeStyles((theme) => ({
 	link_button: {
@@ -70,10 +70,8 @@ export const Group = () => {
 	const params = new URLSearchParams(location.search);
 	const environment = useEnvironment();
 	const groupsPerPageKey = environment.groupsPerPageKey;
-	const auth = localStorage.getItem("zmt-token");
 	const classes = useStyles();
-	const { isLoadingGroupContext, localZoneName, groupContext, loadGroups } =
-		useServer();
+	const { isLoadingGroupContext, localZoneName, groupContext, loadGroups } = useServer();
 	const [addErrorMsg, setAddErrorMsg] = useState();
 	const [removeErrorMsg, setRemoveErrorMsg] = useState();
 	const [addFormOpen, setAddFormOpen] = useState(false);
@@ -120,22 +118,11 @@ export const Group = () => {
 
 	async function addGroup() {
 		try {
-			await axios({
-				method: "POST",
-				url: `${environment.restApiLocation}/admin`,
-				params: {
-					action: "add",
-					target: "user",
-					arg2: document.getElementById("add-group-name").value,
-					arg3: "rodsgroup",
-					arg4: localZoneName,
-					arg5: "",
-				},
-				headers: {
-					Authorization: auth,
-					Accept: "application/json",
-				},
-			}).then(() => {
+			await AddGroupController(
+				document.getElementById("add-group-name").value,
+				environment.restApiLocation
+			)
+			.then(() => {
 				window.location.reload();
 			});
 		} catch (e) {
@@ -151,20 +138,11 @@ export const Group = () => {
 
 	async function removeGroup() {
 		try {
-			await axios({
-				method: "POST",
-				url: `${environment.restApiLocation}/admin`,
-				params: {
-					action: "rm",
-					target: "user",
-					arg2: currGroup[0],
-					arg3: localZoneName,
-				},
-				headers: {
-					Authorization: auth,
-					Accept: "application/json",
-				},
-			}).then(() => {
+			await RemoveGroupController(
+				currGroup[0],
+				environment.restApiLocation
+			)
+			.then(() => {
 				window.location.reload();
 			});
 		} catch (e) {
