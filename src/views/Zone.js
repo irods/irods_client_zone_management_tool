@@ -117,7 +117,7 @@ export const Zone = () => {
 
     const editZoneHandler = async () => {
         let newZoneName = modifiedCurrZone.name
-        let newConnString = modifiedCurrZone.hostname + ":" + modifiedCurrZone.port
+        let newConnString = `${modifiedCurrZone.hostname}:${modifiedCurrZone.port}`
         let newComment = modifiedCurrZone.comment
         try {
             let updated = true
@@ -126,7 +126,7 @@ export const Zone = () => {
                 if (nameModificationRes.status !== 200) updated = false
             }
             if (newConnString !== (currZone.hostname + ":" + currZone.port)) {
-                let hostModificationRes = await ModifyZoneController(newZoneName, 'conn', newConnString, environment.restApiLocation)
+                let hostModificationRes = await ModifyZoneController(newZoneName, 'connection_info', newConnString, environment.restApiLocation)
                 if (hostModificationRes.status !== 200) updated = false
             }
             if (newComment !== currZone.comment) {
