@@ -1,54 +1,41 @@
 import axios from 'axios'
 
 export const AddZoneController = (name, type, location, comment, restApiLocation) => {
-    return axios({
-        method: 'POST',
-        url: `${restApiLocation}/admin`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': localStorage.getItem('zmt-token')
-        },
-        params: {
-            action: 'add',
-            target: 'zone',
-            arg2: name,
-            arg3: type,
-            arg4: location,
-            arg5: comment
-        }
-    })
-}
+	const params = new URLSearchParams({
+		op: "add",
+		name: name,
+		"connection-info": location,
+		comment: comment
+	});
+	return axios.post(`${restApiLocation}/zones`, params, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+		},
+	});
+};
 
 export const DeleteZoneController = (name, restApiLocation) => {
-    return axios({
-        method: 'POST',
-        url: `${restApiLocation}/admin`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': localStorage.getItem('zmt-token')
-        },
-        params: {
-            action: 'remove',
-            target: 'zone',
-            arg2: name
-        }
-    })
-}
+	const params = new URLSearchParams({
+		op: "remove",
+		name: name,
+	});
+	return axios.post(`${restApiLocation}/zones`, params, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+		},
+	});
+};
 
 export const ModifyZoneController = (name, target, value, restApiLocation) => {
-    return axios({
-        method: 'POST',
-        url: `${restApiLocation}/admin`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': localStorage.getItem('zmt-token')
-        },
-        params: {
-            action: 'modify',
-            target: 'zone',
-            arg2: name,
-            arg3: target,
-            arg4: value
-        }
-    })
+    const params = new URLSearchParams({
+		op: "modify",
+		name: name,
+        property: target,
+        value: value
+	});
+	return axios.post(`${restApiLocation}/zones`, params, {
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
+		},
+	});
 }
