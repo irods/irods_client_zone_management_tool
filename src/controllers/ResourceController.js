@@ -22,7 +22,22 @@ export const AddResourceController = (name, type, host, vaultPath, restApiLocati
 
 //Not seeing anything for modifying resources in the docs, not implemented yet probably
 export const ModifyResourceController = (name, arg, value, restApiLocation) => {
-    return null;
+    const params = new URLSearchParams({
+        op: "modify",
+        name: name,
+        property: arg,
+        value: value
+    })
+
+    return axios.post(
+        `${restApiLocation}/resources`,
+        params,
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
+            }
+        } 
+    )
 }
 
 
