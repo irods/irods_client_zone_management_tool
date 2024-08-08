@@ -671,15 +671,7 @@ export const ServerProvider = ({ children }) => {
 		}
 	};
 
-	const loadSpecificQueries = (term) => {
-		// https://docs.irods.org/4.3.2/system_overview/genquery/
-		// Instead do SELECT RULE_ACCESS_NAME, ...?
-		// Not sure if this column corresponds to specific queries or if it's something different
-		// current query doesn't work, not seeing R_SPECIFIC_QUERY as a table in the docs
-		let _query = "select alias, sqlStr from R_SPECIFIC_QUERY";
-		if (term !== "") {
-			_query += ` where alias like '${term}'`;
-		}
+	const loadSpecificQueries = () => {
 		setIsLoadingSpecificQueryContext(true);
 		axios({
 			method: "GET",
@@ -688,8 +680,8 @@ export const ServerProvider = ({ children }) => {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
 			params: {
-				op: "execute_genquery",
-				query: _query,
+				op: "execute_specific_query",
+				name: "ls",
 				count: 100,
 			},
 		})
@@ -744,7 +736,7 @@ export const ServerProvider = ({ children }) => {
 			loadResources(0, rescPerPage, "", "asc", "RESC_NAME");
 		!isLoadingUserContext &&
 			loadUsers(0, usersPerPage, "", "asc", "USER_NAME");
-		!isLoadingSpecificQueryContext && loadSpecificQueries("");
+		!isLoadingSpecificQueryContext && loadSpecificQueries();
 	};
 
 	// load all zone data at each render if user is logged in

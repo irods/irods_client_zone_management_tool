@@ -1,34 +1,36 @@
 import axios from 'axios'
 
 export const AddSpecificQueryController = (alias, sqlStr, restApiLocation) => {
-    return axios({
-        method: 'POST',
-        url: `${restApiLocation}/admin`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': localStorage.getItem('zmt-token')
-        },
-        params: {
-            action: 'add',
-            target: 'specificQuery',
-            arg2: sqlStr,
-            arg3: alias 
-        }
-    })
+    const params = new URLSearchParams({
+        op: "add_specific_query",
+        name: alias,
+        sql: sqlStr
+    });
+
+    return axios.post(
+        `${restApiLocation}/query`,
+        params,
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
+            }
+        } 
+    )
 }
 
 export const DeleteSpecificQueryController = (alias, restApiLocation) => {
-    return axios({
-        method: 'POST',
-        url: `${restApiLocation}/admin`,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': localStorage.getItem('zmt-token')
-        },
-        params: {
-            action: 'remove',
-            target: 'specificQuery',
-            arg2: alias 
-        }
-    })
+    const params = new URLSearchParams({
+        op: "remove_specific_query",
+        name: alias,
+    });
+
+    return axios.post(
+        `${restApiLocation}/query`,
+        params,
+        {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
+            }
+        } 
+    )
 }

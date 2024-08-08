@@ -77,7 +77,7 @@ export const SpecificQuery = () => {
         await AddSpecificQueryController(newAlias, newSqlStr, environment.restApiLocation)
             .then(res => {
                 if (res.status === 200) {
-                    loadSpecificQueries('')
+                    loadSpecificQueries()
                     setNewSqlStr("")
                     setStatus('add-success')
                 } else setStatus('add-failed')
@@ -98,7 +98,7 @@ export const SpecificQuery = () => {
         await DeleteSpecificQueryController(aliasToDelete, environment.restApiLocation)
             .then(res => {
                 if (res.status === 200) {
-                    loadSpecificQueries('')
+                    loadSpecificQueries()
                     setStatus('delete-success')
                 } else setStatus('delete-failed')
             }
@@ -121,9 +121,9 @@ export const SpecificQuery = () => {
     }
 
     useEffect(() => {
-        if (specificQueryContext?._embedded) {
+        if (specificQueryContext?.rows) {
             // sort by column 
-            let newSortedSpecificQueryContext = [...specificQueryContext._embedded].sort((a, b) => {
+            let newSortedSpecificQueryContext = [...specificQueryContext.rows].sort((a, b) => {
                 return (order === 'asc' ? 1 : -1) * (orderBy === 'alias' ? a[0].localeCompare(b[0]) : a[1].localeCompare(b[1]))
             })
             // filter by input
@@ -163,7 +163,7 @@ export const SpecificQuery = () => {
                         {!isLoadingSpecificQueryContext && (sortedSpecificQueryContext && sortedSpecificQueryContext.length > 0 ? sortedSpecificQueryContext.map(specificQuery =>
                             <TableRow key={`specific-query-${specificQuery[0]}`}>
                                 <TableCell style={{ width: '1em', whiteSpace: 'nowrap' }}>{specificQuery[0]}</TableCell>
-                                <TableCell className={classes.table_cell}><TextareaAutosize disabled value={format(specificQuery[1])} rowsMax={15} style={{ whiteSpace: 'pre', overflowX: 'auto', width: '100%' }} /></TableCell>
+                                <TableCell className={classes.table_cell}><TextareaAutosize disabled value={format(specificQuery[1])} rowsMax={15} style={{ whiteSpace: 'pre', width: '100%' }} /></TableCell>
                                 <TableCell align="center" className={classes.table_cell}><IconButton size="small" disabled={specificQuery[0] === 'ls'} onClick={() => deleteButtonEventHandler(specificQuery[0])}><DeleteIcon /></IconButton></TableCell>
                             </TableRow>
                         ) : <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterInput}].</div></TableCell></TableRow>)}
