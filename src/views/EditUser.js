@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Link, navigate } from '@reach/router';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { makeStyles, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@material-ui/core';
-import { useEnvironment, useServer } from '../contexts';
+import { useEnvironment } from '../contexts';
 import MuiAlert from '@material-ui/lab/Alert';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -52,7 +52,6 @@ export const EditUser = () => {
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const { restApiLocation } = useEnvironment();
-    const { loadUsers } = useServer();
     const [groupsOfUser, setGroupsOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
@@ -219,7 +218,6 @@ export const EditUser = () => {
             restApiLocation
         ).then(() => {
             setUserType({ value: newType, status: 'changed' })
-            // loadUsers(0, 0, '', 'asc', 'USER_NAME')
         }).catch(() => {
             setUserType({ ...userType, status: 'failed' })
         })
