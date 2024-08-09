@@ -120,7 +120,7 @@ export const Group = () => {
 		try {
 			await AddGroupController(
 				document.getElementById("add-group-name").value,
-				environment.restApiLocation
+				environment.httpApiLocation
 			)
 			.then(() => {
 				window.location.reload();
@@ -140,7 +140,7 @@ export const Group = () => {
 		try {
 			await RemoveGroupController(
 				currGroup[0],
-				environment.restApiLocation
+				environment.httpApiLocation
 			)
 			.then(() => {
 				window.location.reload();
@@ -217,7 +217,7 @@ export const Group = () => {
 			<br />
 			{groupContext === undefined ? (
 				<div>
-					Cannot load group data. Please check your iRODS Client REST
+					Cannot load group data. Please check your iRODS Client HTTP
 					API endpoint connection.
 				</div>
 			) : (

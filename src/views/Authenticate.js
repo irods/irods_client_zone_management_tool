@@ -37,7 +37,7 @@ export const Authenticate = () => {
 	const classes = useStyles();
 	const navigate = useNavigate();
 
-	const { restApiLocation, loginLogo, brandingName } = useEnvironment();
+	const { httpApiLocation, loginLogo, brandingName } = useEnvironment();
 
 	const { loadData } = useServer();
 	const renderLogo = require(`../img/${loginLogo}`).default;
@@ -61,7 +61,7 @@ export const Authenticate = () => {
 			setServerError(false);
 			setIncorrect(false);
 			await axios
-				.post(`${restApiLocation}/authenticate`, null, {
+				.post(`${httpApiLocation}/authenticate`, null, {
 					headers: {
 						Authorization: `Basic ${btoa(
 							username + ":" + password
@@ -122,7 +122,7 @@ export const Authenticate = () => {
 					<br />
 				) : (
 					<Typography className={classes.error}>
-						Server error. Please check the Client REST API
+						Server error. Please check the Client HTTP API
 						Connection.
 					</Typography>
 				)}

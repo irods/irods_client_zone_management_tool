@@ -138,10 +138,10 @@ export const User = () => {
 		if (!newUserData.name) return;
 		try {
 			await AddUserController(
-				newUserData.name, 
-				newUserData.zone, 
+				newUserData.name,
+				newUserData.zone,
 				newUserData.type,
-				environment.restApiLocation
+				environment.httpApiLocation
 			)
 			.then(() => {
 				window.location.reload();
@@ -162,7 +162,7 @@ export const User = () => {
 			await RemoveUserController(
 				currUser[0],
 				currUser[2],
-				environment.restApiLocation
+				environment.httpApiLocation
 			)
 			.then(() => {
 				window.location.reload();
@@ -313,7 +313,7 @@ export const User = () => {
 			<br />
 			{!userContext || (userContext && userContext.rows.length === 0) ? (
 				<div>
-					Cannot load user data. Please check your iRODS Client REST
+					Cannot load user data. Please check your iRODS Client HTTP
 					API endpoint connection.
 				</div>
 			) : (

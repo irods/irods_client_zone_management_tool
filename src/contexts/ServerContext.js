@@ -64,7 +64,7 @@ export const ServerProvider = ({ children }) => {
 
 			return axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -107,7 +107,7 @@ export const ServerProvider = ({ children }) => {
 
 			const resp1 = await axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -124,7 +124,7 @@ export const ServerProvider = ({ children }) => {
 
 			const resp2 = await axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -141,7 +141,7 @@ export const ServerProvider = ({ children }) => {
 
 			const resp3 = await axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -212,7 +212,7 @@ export const ServerProvider = ({ children }) => {
 		let groupUserCountPromises = inputArray.rows.map((group) =>
 			axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -261,7 +261,7 @@ export const ServerProvider = ({ children }) => {
 		_query = queryGenerator(_query, order, orderBy);
 		await axios({
 			method: "GET",
-			url: `${environment.restApiLocation}/query`,
+			url: `${environment.httpApiLocation}/query`,
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
@@ -331,7 +331,7 @@ export const ServerProvider = ({ children }) => {
 				let _query = queryGenerator(base_query, order, orderBy);
 				return axios({
 					method: "GET",
-					url: `${environment.restApiLocation}/query`,
+					url: `${environment.httpApiLocation}/query`,
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem(
 							"zmt-token"
@@ -363,7 +363,7 @@ export const ServerProvider = ({ children }) => {
 				let filteredResults = {};
 				await axios({
 					method: "GET",
-					url: `${environment.restApiLocation}/query`,
+					url: `${environment.httpApiLocation}/query`,
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem(
 							"zmt-token"
@@ -387,7 +387,7 @@ export const ServerProvider = ({ children }) => {
 					});
 				await axios({
 					method: "GET",
-					url: `${environment.restApiLocation}/query`,
+					url: `${environment.httpApiLocation}/query`,
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem(
 							"zmt-token"
@@ -415,7 +415,7 @@ export const ServerProvider = ({ children }) => {
 					});
 			}
 		},
-		[environment.restApiLocation]
+		[environment.httpApiLocation]
 	);
 
 	const updatingRescPanelStatus = (text) => {
@@ -429,7 +429,7 @@ export const ServerProvider = ({ children }) => {
 		let zonesRes = [];
 		const zoneData = await axios({
 			method: "GET",
-			url: `${environment.restApiLocation}/query`,
+			url: `${environment.httpApiLocation}/query`,
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
@@ -470,7 +470,7 @@ export const ServerProvider = ({ children }) => {
 		const zoneUserDataPromises = zoneData.data.rows.map((zone) => {
 			return axios({
 				method: "GET",
-				url: `${environment.restApiLocation}/query`,
+				url: `${environment.httpApiLocation}/query`,
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem(
 						"zmt-token"
@@ -493,7 +493,7 @@ export const ServerProvider = ({ children }) => {
 	const loadZoneReport = () => {
 		return axios({
 			method: "GET",
-			url: `${environment.restApiLocation}/zones`,
+			url: `${environment.httpApiLocation}/zones`,
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
@@ -510,7 +510,7 @@ export const ServerProvider = ({ children }) => {
 	const fetchServerResources = (server_hostname) => {
 		return axios({
 			method: "GET",
-			url: `${environment.restApiLocation}/query`,
+			url: `${environment.httpApiLocation}/query`,
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},
@@ -675,7 +675,7 @@ export const ServerProvider = ({ children }) => {
 		setIsLoadingSpecificQueryContext(true);
 		axios({
 			method: "GET",
-			url: `${environment.restApiLocation}/query`,
+			url: `${environment.httpApiLocation}/query`,
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 			},

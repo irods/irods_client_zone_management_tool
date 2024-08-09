@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-export const AddGroupController = (name, restApiLocation) => {
+export const AddGroupController = (name, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "create_group",
         name: name,
     });
 
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -17,14 +17,14 @@ export const AddGroupController = (name, restApiLocation) => {
     )
 }
 
-export const RemoveGroupController = async (name, restApiLocation) => {
+export const RemoveGroupController = async (name, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "remove_group",
         name: name,
     });
 
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -34,7 +34,7 @@ export const RemoveGroupController = async (name, restApiLocation) => {
     )
 }
 
-export const AddUserToGroupController = (user, zone, group, restApiLocation) => {
+export const AddUserToGroupController = (user, zone, group, httpApiLocation) => {
     const params = new URLSearchParams({
         op: 'add_to_group',
         user: user,
@@ -43,7 +43,7 @@ export const AddUserToGroupController = (user, zone, group, restApiLocation) => 
     });
 
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -53,7 +53,7 @@ export const AddUserToGroupController = (user, zone, group, restApiLocation) => 
     )
 }
 
-export const RemoveUserFromGroupController = (user, zone, group, restApiLocation) => {
+export const RemoveUserFromGroupController = (user, zone, group, httpApiLocation) => {
     const params = new URLSearchParams({
         op: 'remove_from_group',
         user: user,
@@ -62,7 +62,7 @@ export const RemoveUserFromGroupController = (user, zone, group, restApiLocation
     });
 
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {

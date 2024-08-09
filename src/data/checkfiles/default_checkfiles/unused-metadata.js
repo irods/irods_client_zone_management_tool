@@ -29,7 +29,7 @@ export default {
 		let authToken = localStorage.getItem("zmt-token");
 
 		const specificResp = await axios({
-			url: `${this.restApiLocation}/query`,
+			url: `${this.httpApiLocation}/query`,
 			method: "GET",
 			headers: {
 				Authorization: `Bearer ${authToken}`,
@@ -52,7 +52,7 @@ export default {
 			let totalMetaQuery = "SELECT COUNT(META_DATA_ATTR_ID)";
 
 			const totalMetaResp = await axios({
-				url: `${this.restApiLocation}/query`,
+				url: `${this.httpApiLocation}/query`,
 				method: "GET",
 				headers: {
 					Authorization: `Bearer ${authToken}`,
@@ -103,7 +103,7 @@ export default {
 			const getMeta = async (query) => {
 				// returns a set of metadata
 				const resp = await axios({
-					url: `${this.restApiLocation}/query`,
+					url: `${this.httpApiLocation}/query`,
 					method: "GET",
 					headers: {
 						Authorization: `Bearer ${authToken}`,

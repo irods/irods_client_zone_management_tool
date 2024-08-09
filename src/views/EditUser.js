@@ -51,7 +51,7 @@ export const EditUser = () => {
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const { restApiLocation } = useEnvironment();
+    const { httpApiLocation } = useEnvironment();
     const [groupsOfUser, setGroupsOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
@@ -75,7 +75,7 @@ export const EditUser = () => {
         }
         axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${httpApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${auth}`
@@ -99,7 +99,7 @@ export const EditUser = () => {
             setLoading(true);
             axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${httpApiLocation}/query`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${auth}`
@@ -121,7 +121,7 @@ export const EditUser = () => {
         if (currentUserName) {
             axios({
                 method: 'GET',
-                url: `${restApiLocation}/query`,
+                url: `${httpApiLocation}/query`,
                 headers: {
                     'Authorization': `Bearer ${auth}`
                 },
@@ -136,7 +136,7 @@ export const EditUser = () => {
                 setFilterNameResult(res.data.rows);
             })
         }
-    }, [auth, restApiLocation, filterGroupName])
+    }, [auth, httpApiLocation, filterGroupName])
 
     async function removeGroupFromUser(group) {
         try {
@@ -144,7 +144,7 @@ export const EditUser = () => {
                 currentUserName,
                 currentUserZone,
                 group[0],
-                restApiLocation
+                httpApiLocation
             )
             .then(() => {
                 setRefresh(!refresh);
@@ -161,7 +161,7 @@ export const EditUser = () => {
                 currentUserName,
                 currentUserZone,
                 group[0],
-                restApiLocation
+                httpApiLocation
             )
            .then(() => {
                 setRefresh(!refresh);
@@ -188,7 +188,7 @@ export const EditUser = () => {
             currentUserName,
             currentUserZone,
             password.confirmPassword,
-            restApiLocation
+            httpApiLocation
         )
         .then(() => {
             setPasswordConfirmation(false)
@@ -215,7 +215,7 @@ export const EditUser = () => {
             currentUserName,
             currentUserZone,
             newType,
-            restApiLocation
+            httpApiLocation
         ).then(() => {
             setUserType({ value: newType, status: 'changed' })
         }).catch(() => {

@@ -82,7 +82,7 @@ export const Zone = () => {
 
     const addZoneHandler = async () => {
         try {
-            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, environment.restApiLocation)
+            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, environment.httpApiLocation)
             if (res.status === 200) {
                 setStatus('add-success')
                 loadZones()
@@ -99,7 +99,7 @@ export const Zone = () => {
         setConfirmationDialog({ state: 'remove', visibility: true })
     }
     const deleteZoneHandler = async () => {
-        const res = await DeleteZoneController(currZone.name, environment.restApiLocation)
+        const res = await DeleteZoneController(currZone.name, environment.httpApiLocation)
         setConfirmationDialog({ state: 'remove', visibility: false })
         if (res.status === 200) {
             setStatus('remove-success')
@@ -122,15 +122,15 @@ export const Zone = () => {
         try {
             let updated = true
             if (newZoneName !== currZone.name) {
-                let nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, environment.restApiLocation)
+                let nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, environment.httpApiLocation)
                 if (nameModificationRes.status !== 200) updated = false
             }
             if (newConnString !== (currZone.hostname + ":" + currZone.port)) {
-                let hostModificationRes = await ModifyZoneController(newZoneName, 'connection_info', newConnString, environment.restApiLocation)
+                let hostModificationRes = await ModifyZoneController(newZoneName, 'connection_info', newConnString, environment.httpApiLocation)
                 if (hostModificationRes.status !== 200) updated = false
             }
             if (newComment !== currZone.comment) {
-                let commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, environment.restApiLocation)
+                let commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, environment.httpApiLocation)
                 if (commentModificationRes.status !== 200) updated = false
             }
             if (updated) {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const AddSpecificQueryController = (alias, sqlStr, restApiLocation) => {
+export const AddSpecificQueryController = (alias, sqlStr, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "add_specific_query",
         name: alias,
@@ -8,7 +8,7 @@ export const AddSpecificQueryController = (alias, sqlStr, restApiLocation) => {
     });
 
     return axios.post(
-        `${restApiLocation}/query`,
+        `${httpApiLocation}/query`,
         params,
         {
             headers: {
@@ -18,14 +18,14 @@ export const AddSpecificQueryController = (alias, sqlStr, restApiLocation) => {
     )
 }
 
-export const DeleteSpecificQueryController = (alias, restApiLocation) => {
+export const DeleteSpecificQueryController = (alias, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "remove_specific_query",
         name: alias,
     });
 
     return axios.post(
-        `${restApiLocation}/query`,
+        `${httpApiLocation}/query`,
         params,
         {
             headers: {
