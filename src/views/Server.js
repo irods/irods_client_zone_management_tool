@@ -154,7 +154,6 @@ export const Server = () => {
                                     <p className={classes.info}>Server Control Plane Encryption Num Hash Rounds: {currServer['server_config']['server_control_plane_encryption_num_hash_rounds']}</p>
                                     <p className={classes.info}>Server Control Plane Port: {currServer['server_config']['server_control_plane_port']}</p>
                                     <p className={classes.info}>Server Port Range: {currServer['server_config']['server_port_range_start']} - {currServer['server_config']['server_port_range_end']}</p>
-                                    <p className={classes.info}>XMSG Port: {currServer['server_config']['xmsg_port']}</p>
                                     <p className={classes.info}>Zone Auth Scheme: {currServer['server_config']['zone_auth_scheme']}</p>
                                     <p className={classes.info}>Zone Port: {currServer['server_config']['zone_port']}</p>
                                     <p className={classes.info}>Zone User: {currServer['server_config']['zone_user']}</p>
