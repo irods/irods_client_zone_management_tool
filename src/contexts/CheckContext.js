@@ -59,7 +59,7 @@ export const CheckProvider = ({ children }) => {
     const [checkTimers, setCheckTimers] = useState({})
     const [statusResult, setStatusResult] = useState({})
     const { zoneContext, rescAll, serverVersions, isLoadingZoneContext, validServerHosts } = useServer()
-    const { restApiLocation, restApiTimeout } = useEnvironment()
+    const { httpApiLocation, httpApiTimeout } = useEnvironment()
     const [timeStamp, setTimeStamp] = useState()
     const [inactiveChecks, setInactiveChecks] = useState(localStorage.getItem('zmt-inactiveChecks') ? new Set(JSON.parse(localStorage.getItem('zmt-inactiveChecks'))) : new Set(checks.reduce((prev, check, index) => {
         if (!check.active) {
@@ -67,7 +67,7 @@ export const CheckProvider = ({ children }) => {
         }
         return prev
     }, [])))
-    let context = { rescAll, restApiLocation, restApiTimeout, validServerHosts, zoneContext } // zmt context that can be accessed in checkfile, i.e. this.zoneContext
+    let context = { rescAll, httpApiLocation, httpApiTimeout, validServerHosts, zoneContext } // zmt context that can be accessed in checkfile, i.e. this.zoneContext
     const callBackFn = useRef(null)
 
     useEffect(() => {

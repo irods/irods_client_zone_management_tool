@@ -155,7 +155,7 @@ export const ResourceListView = () => {
 			rescType, 
 			rescLocation, 
 			rescVaultPath, 
-			environment.restApiLocation
+			environment.httpApiLocation
 		)
         .then(res => {
 			if (res.status === 200) {

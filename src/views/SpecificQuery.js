@@ -74,7 +74,7 @@ export const SpecificQuery = () => {
 
     const addSpecificQueryHandler = async () => {
         setConfirmationVisibility(false)
-        await AddSpecificQueryController(newAlias, newSqlStr, environment.restApiLocation)
+        await AddSpecificQueryController(newAlias, newSqlStr, environment.httpApiLocation)
             .then(res => {
                 if (res.status === 200) {
                     loadSpecificQueries()
@@ -95,7 +95,7 @@ export const SpecificQuery = () => {
 
     const deleteSpecificQueryHandler = async () => {
         setConfirmationVisibility(false)
-        await DeleteSpecificQueryController(aliasToDelete, environment.restApiLocation)
+        await DeleteSpecificQueryController(aliasToDelete, environment.httpApiLocation)
             .then(res => {
                 if (res.status === 200) {
                     loadSpecificQueries()

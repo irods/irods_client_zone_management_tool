@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const AddUserController = (name, zone, userType, restApiLocation) => {
+export const AddUserController = (name, zone, userType, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "create_user",
         name: name,
@@ -9,7 +9,7 @@ export const AddUserController = (name, zone, userType, restApiLocation) => {
     });
 
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -19,7 +19,7 @@ export const AddUserController = (name, zone, userType, restApiLocation) => {
     )
 }
 
-export const ModifyUserPasswordController = (name, zone, newPassword, restApiLocation) => {
+export const ModifyUserPasswordController = (name, zone, newPassword, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "set_password",
         name: name,
@@ -27,7 +27,7 @@ export const ModifyUserPasswordController = (name, zone, newPassword, restApiLoc
         "new-password": newPassword
     })
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -37,7 +37,7 @@ export const ModifyUserPasswordController = (name, zone, newPassword, restApiLoc
     )
 }
 
-export const ModifyUserTypeController = (name, zone, newUserType, restApiLocation) => {
+export const ModifyUserTypeController = (name, zone, newUserType, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "set_user_type",
         name: name,
@@ -45,7 +45,7 @@ export const ModifyUserTypeController = (name, zone, newUserType, restApiLocatio
         "new-user-type": newUserType
     })
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {
@@ -56,14 +56,14 @@ export const ModifyUserTypeController = (name, zone, newUserType, restApiLocatio
 }
 
 
-export const RemoveUserController = async (name, zone, restApiLocation) => {
+export const RemoveUserController = async (name, zone, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "remove_user",
         name: name,
         zone: zone
     })
     return axios.post(
-        `${restApiLocation}/users-groups`,
+        `${httpApiLocation}/users-groups`,
         params,
         {
             headers: {

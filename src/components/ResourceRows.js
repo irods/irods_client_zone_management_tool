@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 function ResourceRows({ row, validServerHosts }) {
   const classes = useStyles();
-  const { restApiLocation } = useEnvironment();
+  const { httpApiLocation } = useEnvironment();
   const { rescTypes, rescPanelStatus, updatingRescPanelStatus, isLoadingZoneContext } = useServer();
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -93,35 +93,35 @@ function ResourceRows({ row, validServerHosts }) {
     let updatedResc = [...resc];
     try {
       if (currentResc[0] !== resc[0]) {
-        await ModifyResourceController(resc[0], 'name', currentResc[0], restApiLocation)
+        await ModifyResourceController(resc[0], 'name', currentResc[0], httpApiLocation)
         updatedResc[0] = currentResc[0];
       }
       if (currentResc[1] !== resc[1]) {
-        await ModifyResourceController(currentResc[0], 'type', currentResc[1], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'type', currentResc[1], httpApiLocation)
         updatedResc[1] = currentResc[1];
       }
       if (currentResc[3] !== resc[3]) {
-        await ModifyResourceController(currentResc[0], 'path', currentResc[3], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'path', currentResc[3], httpApiLocation)
         updatedResc[3] = currentResc[3];
       }
       if (currentResc[4] !== resc[4]) {
-        await ModifyResourceController(currentResc[0], 'host', currentResc[4], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'host', currentResc[4], httpApiLocation)
         updatedResc[4] = currentResc[4];
       }
       if (currentResc[5] !== resc[5]) {
-        await ModifyResourceController(currentResc[0], 'info', currentResc[5], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'info', currentResc[5], httpApiLocation)
         updatedResc[5] = currentResc[5];
       }
       if (currentResc[6] !== resc[6]) {
-        await ModifyResourceController(currentResc[0], 'free_space', currentResc[6], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'free_space', currentResc[6], httpApiLocation)
         updatedResc[6] = currentResc[6];
       }
       if (currentResc[7] !== resc[7]) {
-        await ModifyResourceController(currentResc[0], 'comment', currentResc[7], restApiLocation)
+        await ModifyResourceController(currentResc[0], 'comment', currentResc[7], httpApiLocation)
         updatedResc[7] = currentResc[7];
       }
       if (currentResc[9] !== resc[9]) {
-        await ModifyResourceController(currentResc[0], 'context', currentResc[9], restApiLocation);
+        await ModifyResourceController(currentResc[0], 'context', currentResc[9], httpApiLocation);
         updatedResc[9] = currentResc[9];
       }
       setIsUpdating(false);
@@ -143,7 +143,7 @@ function ResourceRows({ row, validServerHosts }) {
 
   const removeResource = async (name) => {
     try {
-      await RemoveResourceController(name, restApiLocation);
+      await RemoveResourceController(name, httpApiLocation);
       window.location.reload();
     } catch (e) {
       setRemoveErrorMsg("Error: " + e.message);

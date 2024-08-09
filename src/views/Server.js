@@ -88,7 +88,7 @@ export const Server = () => {
         <Fragment>
             {isLoadingZoneContext ? <LinearProgress /> : <div className="table_view_spinner_holder" />}
             <br />
-            {zoneContext === undefined ? <div>Cannot load server data. Please check your iRODS Client REST API endpoint connection.</div> :
+            {zoneContext === undefined ? <div>Cannot load server data. Please check your iRODS Client HTTP API endpoint connection.</div> :
                 <Fragment>
                     <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(zoneContext.length)} rowsPerPage={perPage} onChangePage={(event, value) => { setCurrPage(value + 1) }} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(serversPageKey, e.target.value) }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>

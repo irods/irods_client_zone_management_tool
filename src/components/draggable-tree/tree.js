@@ -38,7 +38,7 @@ export const Tree = (props) => {
     let dataMap = props.dataMap;
     let originalChildrenMap = JSON.stringify(childrenMap, replacer);
     let originalDataMap = JSON.stringify(dataMap, replacer);
-    const { restApiLocation } = useEnvironment();
+    const { httpApiLocation } = useEnvironment();
     const { localZoneName } = useServer();
     const [stagedChildrenMap, setStagedChildrenMap] = useState(JSON.parse(originalChildrenMap, reviver));
     const [stagedDataMap, setStagedDataMap] = useState(JSON.parse(originalDataMap, reviver));
@@ -80,7 +80,7 @@ export const Tree = (props) => {
             for (let task of tasks_copy) {
                 try {
                     if (task[1][0] !== localZoneName) {
-                        await RemoveChildResourceController(task[1][0], task[0][0], restApiLocation);
+                        await RemoveChildResourceController(task[1][0], task[0][0], httpApiLocation);
                         task[3] = 'success'
                     }
                     else {
@@ -95,7 +95,7 @@ export const Tree = (props) => {
                 setTasks(tasks_copy)
                 try {
                     if (task[2][0] !== localZoneName) {
-                        await AddChildResourceController(task[2][0], task[0][0], restApiLocation, task[5]);
+                        await AddChildResourceController(task[2][0], task[0][0], httpApiLocation, task[5]);
                         task[4] = 'success'
                     }
                     else {

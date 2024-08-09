@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const AddResourceController = (name, type, host, vaultPath, restApiLocation) => {
+export const AddResourceController = (name, type, host, vaultPath, httpApiLocation) => {
     const params = new URLSearchParams({
         op: 'create',
         name: name,
@@ -10,7 +10,7 @@ export const AddResourceController = (name, type, host, vaultPath, restApiLocati
     });
 
     return axios.post(
-        `${restApiLocation}/resources`,
+        `${httpApiLocation}/resources`,
         params,
         {
             headers: {
@@ -21,7 +21,7 @@ export const AddResourceController = (name, type, host, vaultPath, restApiLocati
 }
 
 //Not seeing anything for modifying resources in the docs, not implemented yet probably
-export const ModifyResourceController = (name, arg, value, restApiLocation) => {
+export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "modify",
         name: name,
@@ -30,7 +30,7 @@ export const ModifyResourceController = (name, arg, value, restApiLocation) => {
     })
 
     return axios.post(
-        `${restApiLocation}/resources`,
+        `${httpApiLocation}/resources`,
         params,
         {
             headers: {
@@ -41,14 +41,14 @@ export const ModifyResourceController = (name, arg, value, restApiLocation) => {
 }
 
 
-export const RemoveResourceController = async (name, restApiLocation) => {
+export const RemoveResourceController = async (name, httpApiLocation) => {
     const params = new URLSearchParams({
         op: "remove",
         name: name
     });
 
     return axios.post(
-        `${restApiLocation}/resources`,
+        `${httpApiLocation}/resources`,
         params,
         {
             headers: {
@@ -58,7 +58,7 @@ export const RemoveResourceController = async (name, restApiLocation) => {
     )
 }
 
-export const AddChildResourceController = async (parent, child, restApiLocation, parent_context_string) => {
+export const AddChildResourceController = async (parent, child, httpApiLocation, parent_context_string) => {
     const params = new URLSearchParams({
         action: 'add_child',
         "parent-name": parent,
@@ -67,7 +67,7 @@ export const AddChildResourceController = async (parent, child, restApiLocation,
     });
 
     return axios.post(
-        `${restApiLocation}/resources`,
+        `${httpApiLocation}/resources`,
         params,
         {
             headers: {
@@ -77,7 +77,7 @@ export const AddChildResourceController = async (parent, child, restApiLocation,
     )
 }
 
-export const RemoveChildResourceController = async (parent, child, restApiLocation) => {
+export const RemoveChildResourceController = async (parent, child, httpApiLocation) => {
     const params = new URLSearchParams({
         action: 'remove_child',
         "parent-name": parent,
@@ -85,7 +85,7 @@ export const RemoveChildResourceController = async (parent, child, restApiLocati
     });
 
     return axios.post(
-        `${restApiLocation}/resources`,
+        `${httpApiLocation}/resources`,
         params,
         {
             headers: {

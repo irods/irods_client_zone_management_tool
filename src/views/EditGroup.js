@@ -31,7 +31,7 @@ export const EditGroup = (props) => {
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
-    const { restApiLocation } = useEnvironment();
+    const { httpApiLocation } = useEnvironment();
     const [usersInGroup, setUsersInGroup] = useState([]);
     const [filterUserName, setFilterName] = useState('');
     const [filterUserNameResult, setFilterNameResult] = useState();
@@ -40,7 +40,7 @@ export const EditGroup = (props) => {
         setLoading(true);
         axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${httpApiLocation}/query`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${auth}`
@@ -55,13 +55,13 @@ export const EditGroup = (props) => {
             setUsersInGroup(res.data.rows);
             setLoading(false);
         })
-    }, [auth, currentGroup, restApiLocation])
+    }, [auth, currentGroup, httpApiLocation])
 
     const loadFilteredUsers = useCallback(() => {
         setLoading(true);
         axios({
             method: 'GET',
-            url: `${restApiLocation}/query`,
+            url: `${httpApiLocation}/query`,
             headers: {
                 'Authorization': `Bearer ${auth}`,
             },
@@ -76,7 +76,7 @@ export const EditGroup = (props) => {
             setFilterNameResult(res.data.rows);
             setLoading(false);
         })
-    }, [auth, restApiLocation, filterUserName])
+    }, [auth, httpApiLocation, filterUserName])
 
     async function removeUserFromGroup(user) {
         try {
@@ -84,7 +84,7 @@ export const EditGroup = (props) => {
                 user[0],
                 localZoneName,
                 currentGroup[0],
-                restApiLocation
+                httpApiLocation
             )
             .then(() => {
                 setRefresh(!refresh);
@@ -100,7 +100,7 @@ export const EditGroup = (props) => {
                 user[0],
                 localZoneName,
                 currentGroup[0],
-                restApiLocation
+                httpApiLocation
             )
             .then(() => {
                 setRefresh(!refresh);

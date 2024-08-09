@@ -25,7 +25,7 @@ export default {
 		let resultsArr = [];
 
 		const resp = await axios({
-			url: `${this.restApiLocation}/query`,
+			url: `${this.httpApiLocation}/query`,
 			method: "GET",
 			headers: {
 				Authorization: `Bearer ${authToken}`,
@@ -54,7 +54,7 @@ export default {
 				"SELECT USER_NAME, USER_ZONE WHERE USER_TYPE != 'rodsgroup'";
 
 			const resp1 = await axios({
-				url: `${this.restApiLocation}/query`,
+				url: `${this.httpApiLocation}/query`,
 				method: "GET",
 				headers: {
 					Authorization: `Bearer ${authToken}`,
@@ -70,7 +70,7 @@ export default {
 			const generalQuery2 = "SELECT ZONE_NAME";
 
 			const resp2 = await axios({
-				url: `${this.restApiLocation}/query`,
+				url: `${this.httpApiLocation}/query`,
 				method: "GET",
 				headers: {
 					Authorization: `Bearer ${authToken}`,
