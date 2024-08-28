@@ -1,5 +1,3 @@
-version: "3"
-
 services: 
   frontend:
       container_name: zmt_frontend
@@ -13,4 +11,4 @@ services:
         - /usr/src/app/node_modules
       ports: 
         - $LISTEN_PORT:3000
-      
+
