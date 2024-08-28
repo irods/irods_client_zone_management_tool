@@ -27,7 +27,7 @@ Create a file named '.env' and place under the root directory. Please refer to s
 # Location of the iRODS Client HTTP API
 # <protocol>://<host>:<port>/irods-http-api/<http_api_version>
 #
-# e.g. https://example.org:8080/irods-http-api/0.3.0
+# e.g. https://example.org:8080/irods-http-api/0.4.0
 
 REACT_APP_HTTP_API_URL=
 
@@ -46,12 +46,12 @@ REACT_APP_PRIMARY_COLOR=#04bdaf
 #### Start Service
 Use the following code to start service.
 ```
-docker-compose up
+docker compose up
 ```
 
 #### Stop Service
 ```
-docker-compose down
+docker compose down
 ```
 
 ## Health checks in ZMT
