@@ -1,13 +1,13 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useEnvironment, useServer } from "../../contexts";
-import { Tree } from "../../components/draggable-tree/tree";
-import { navigate } from "@reach/router";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import ListIcon from "@material-ui/icons/List";
-import AccountTreeIcon from "@material-ui/icons/AccountTree";
+import { Tree } from "../../components/draggable-tree";
+import { Navigate } from "react-router-dom";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
 
 export const ResourceTreeView = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const tab = "tree";
 	const { loadResources, rescContext } = useServer();
@@ -15,7 +15,7 @@ export const ResourceTreeView = () => {
 	const [childrenMap, setChildrenMap] = useState();
 	const [dataMap, setDataMap] = useState();
 
-	// load all resources to render the hierachy
+	// load all resources to render the hierarchy
 	useEffect(() => {
 		loadResources(0, 0, "", "asc", "RESC_NAME");
 	}, [loadResources]);
@@ -26,9 +26,9 @@ export const ResourceTreeView = () => {
 			rescContext.total !== 0 &&
 			rescContext.total === rescContext.count
 		) {
-			let childrenMap = new Map();
-			let dataMap = new Map();
-			let tempZoneData = ["tempZone"];
+			const childrenMap = new Map();
+			const dataMap = new Map();
+			const tempZoneData = ["tempZone"];
 			for (let i = 0; i < 11; i++) {
 				tempZoneData.push("");
 			}
@@ -39,9 +39,9 @@ export const ResourceTreeView = () => {
 				if (!childrenMap.has(resc[10])) {
 					childrenMap.set(resc[10], []);
 				}
-				let childrens = childrenMap.get(resc[10]);
-				childrens.push(resc);
-				childrenMap.set(resc[10], childrens);
+				const children = childrenMap.get(resc[10]);
+				children.push(resc);
+				childrenMap.set(resc[10], children);
 			});
 			setChildrenMap(childrenMap);
 			setDataMap(dataMap);
@@ -54,14 +54,14 @@ export const ResourceTreeView = () => {
 				<ToggleButton
 					value="list"
 					aria-label="list"
-					onClick={() => navigate("/resources")}
+					onClick={() => <Navigate to='/resources' noThrow />}
 				>
 					<ListIcon />
 				</ToggleButton>
 				<ToggleButton
 					value="tree"
 					aria-label="tree"
-					onClick={() => navigate("/resources/tree")}
+					onClick={() => <Navigate to='/resources/tree' noThrow />}
 				>
 					<AccountTreeIcon />
 				</ToggleButton>

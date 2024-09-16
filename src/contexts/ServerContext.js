@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useEnvironment } from "./";
 import { irodsVersionComparator } from "../utils";
-import { navigate } from "@reach/router";
+import { Navigate } from "react-router-dom";
 
 export const ServerContext = createContext();
 
@@ -57,7 +57,7 @@ export const ServerProvider = ({ children }) => {
 	const loadUsers = async (offset, limit, order, orderBy, name) => {
 		setIsLoadingUserContext(true);
 
-		if (!name || name == "USER_NAME") {
+		if (!name || name === "USER_NAME") {
 			let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
 
 			_query = queryGenerator(_query, order, orderBy);
@@ -81,7 +81,7 @@ export const ServerProvider = ({ children }) => {
 				.then((res) => {
 					if (name === "") setUserTotal(res.data.rows.length);
 					setUserTotal(res.data.rows.length);
-					let newUserContext = {
+					const newUserContext = {
 						rows: res.data.rows,
 						count: Math.min(25, res.data.rows.length),
 						total: res.data.rows.length,
@@ -96,14 +96,14 @@ export const ServerProvider = ({ children }) => {
 		} else {
 			let totalData = [];
 
-			let queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`;
-			let q1 = queryGenerator(queryTry1, order, orderBy);
+			const queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`;
+			const q1 = queryGenerator(queryTry1, order, orderBy);
 
-			let queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`;
-			let q2 = queryGenerator(queryTry2, order, orderBy);
+			const queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`;
+			const q2 = queryGenerator(queryTry2, order, orderBy);
 
-			let queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`;
-			let q3 = queryGenerator(queryTry3, order, orderBy);
+			const queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`;
+			const q3 = queryGenerator(queryTry3, order, orderBy);
 
 			const resp1 = await axios({
 				method: "GET",
@@ -197,7 +197,6 @@ export const ServerProvider = ({ children }) => {
 				total: userTotal,
 			});
 			setIsLoadingUserContext(false);
-			return;
 		}
 	};
 
@@ -209,7 +208,7 @@ export const ServerProvider = ({ children }) => {
 		order,
 		orderBy
 	) => {
-		let groupUserCountPromises = inputArray.rows.map((group) =>
+		const groupUserCountPromises = inputArray.rows.map((group) =>
 			axios({
 				method: "GET",
 				url: `${environment.httpApiLocation}/query`,
@@ -243,7 +242,7 @@ export const ServerProvider = ({ children }) => {
 				.sort((a, b) => (order === "asc" ? 1 : -1) * (a[1] - b[1]))
 				.slice(offset, offset + limit);
 		}
-		let newGroupContext = {
+		const newGroupContext = {
 			rows: inputArray.rows,
 			count: inputArray.rows.length,
 			total: inputArray.rows.length,
@@ -291,19 +290,19 @@ export const ServerProvider = ({ children }) => {
 		order,
 		orderBy
 	) => {
-		let filteredRescContext = {
+		const filteredRescContext = {
 			rows: rescArray,
 			total: 0,
 		};
-		let uniqueResc = new Set();
-		let filteredResc = [];
+		const uniqueResc = new Set();
+		const filteredResc = [];
 		for (let i = 0; i < rescArray.length; i++) {
 			if (!uniqueResc.has(rescArray[i][11])) {
 				uniqueResc.add(rescArray[i][11]);
 				filteredResc.push(rescArray[i]);
 			}
 		}
-		let orderSyntax = order === "asc" ? 1 : -1;
+		const orderSyntax = order === "asc" ? 1 : -1;
 		const resourceComparator = (a, b) => {
 			switch (orderBy) {
 				case "RESC_TYPE_NAME":
@@ -326,9 +325,9 @@ export const ServerProvider = ({ children }) => {
 	const loadResources = useCallback(
 		async (offset, limit, name, order, orderBy) => {
 			setIsLoadingRescContext(true);
-			let base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`;
+			const base_query = `SELECT RESC_NAME,RESC_TYPE_NAME,RESC_ZONE_NAME,RESC_VAULT_PATH,RESC_LOC,RESC_INFO, RESC_FREE_SPACE, RESC_COMMENT,RESC_STATUS,RESC_CONTEXT,RESC_PARENT,RESC_ID,RESC_PARENT_CONTEXT WHERE RESC_NAME != 'bundleResc'`;
 			if (name === "") {
-				let _query = queryGenerator(base_query, order, orderBy);
+				const _query = queryGenerator(base_query, order, orderBy);
 				return axios({
 					method: "GET",
 					url: `${environment.httpApiLocation}/query`,
@@ -442,10 +441,9 @@ export const ServerProvider = ({ children }) => {
 			setZones([]);
 			setIsLoadingZones(false);
 			localStorage.removeItem("zmt-token");
-			navigate("/", { replace: true });
-			window.location.reload();
-			return;
-		})
+			return <Navigate to='/' noThrow />;
+		});
+
 		if (zoneData && zoneData.status === 200) {
 			setLocalZoneName(
 				zoneData.data.rows.filter((a) => a[1] === "local")[0][0]
@@ -522,17 +520,14 @@ export const ServerProvider = ({ children }) => {
 		});
 	};
 
-	// load all servers at each render, and iterate through server list to fetch resources which have the same hostname
+	// load all servers at each render, and iterate through the server list to fetch resources which have the same hostname
 	const loadServers = async () => {
 		setIsLoadingZoneContext(true);
-		let zone_report = await loadZoneReport();
+		const zone_report = await loadZoneReport();
 
 		if (zone_report !== undefined) {
-			let resc_types = new Set();
-			let version_4_3_1_or_after = zone_report.data.zone_report.zones[0]
-				.icat_server
-				? false
-				: true;
+			const resc_types = new Set();
+			const version_4_3_1_or_after = !zone_report.data.zone_report.zones[0].icat_server;
 			let fullServersArray;
 
 			if (version_4_3_1_or_after) {
@@ -540,16 +535,16 @@ export const ServerProvider = ({ children }) => {
 					zone_report.data.zone_report.zones[0]["servers"];
 			} else {
 				// before 4.3.1, icat_server was separately defined in the zonereport
-				let catalog_service_provider = [
+				const catalog_service_provider = [
 					zone_report.data.zone_report.zones[0]["icat_server"],
 				];
 				fullServersArray = catalog_service_provider.concat(
 					zone_report.data.zone_report.zones[0]["servers"]
 				);
 			}
-			let newValidHostSet = new Set(["EMPTY_RESC_HOST"]);
-			for (let curr_server of fullServersArray) {
-				// check and load resource plugins from zone report
+			const newValidHostSet = new Set(["EMPTY_RESC_HOST"]);
+			for (const curr_server of fullServersArray) {
+				// check and load resource plugins from the zone report
 				if (curr_server.plugins) {
 					for (let i = 0; i < curr_server.plugins.length; i++) {
 						if (
@@ -563,7 +558,7 @@ export const ServerProvider = ({ children }) => {
 				newValidHostSet.add(
 					curr_server["host_system_information"]["hostname"]
 				);
-				let resource_counts = await fetchServerResources(
+				const resource_counts = await fetchServerResources(
 					curr_server["host_system_information"]["hostname"]
 				);
 				if (resource_counts === undefined) curr_server["resources"] = 0;
@@ -604,7 +599,7 @@ export const ServerProvider = ({ children }) => {
 	const loadCurrServers = async (offset, perPage, order, orderBy) => {
 		if (zoneContext !== undefined && zoneContext.length !== 0) {
 			let tem_servers = zoneContext;
-			let orderSyntax = order === "asc" ? 1 : -1;
+			const orderSyntax = order === "asc" ? 1 : -1;
 			const server_sort_comparator = (a, b) => {
 				switch (orderBy) {
 					case "hostname":
@@ -706,7 +701,7 @@ export const ServerProvider = ({ children }) => {
 			"usersPageKey",
 		];
 
-		for (let key of pageKeys) {
+		for (const key of pageKeys) {
 			if (!localStorage.getItem(environment[key])) {
 				localStorage.setItem(
 					environment[key],
@@ -747,7 +742,7 @@ export const ServerProvider = ({ children }) => {
 		) {
 			loadData();
 		}
-	}, []);
+	}, [loadData, localZoneName]);
 
 	return (
 		<ServerContext.Provider

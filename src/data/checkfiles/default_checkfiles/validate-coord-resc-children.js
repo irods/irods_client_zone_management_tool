@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "react-router-dom";
 
 export default {
 	name: "Coordinating resources have at least one child",
@@ -9,7 +9,7 @@ export default {
 	interval_in_seconds: 86400,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,
@@ -41,7 +41,7 @@ export default {
 			}
 		});
 
-		// if any ids in coordResourceIds are not in parentResourceIds (they have no children), add them to failed
+		// if any ids in coordResourceIds are not in parentResourceIds (they have no children), add them to the failed result
 		coordResourceIds.forEach((coordResc) => {
 			if (!parentResourceIds.has(coordResc[0])) {
 				result.failed.push(coordResc);

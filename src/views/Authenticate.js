@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button, Container, TextField, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { useNavigate } from "@reach/router";
+import { Button, Container, TextField, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import { renderLayout, hideLayout } from "../utils";
 
@@ -34,7 +34,7 @@ export const Authenticate = () => {
 	const [incorrect, setIncorrect] = useState(false);
 	const [serverError, setServerError] = useState(false);
 
-	const classes = useStyles();
+	const classes = useStyles({ });
 	const navigate = useNavigate();
 
 	const { httpApiLocation, loginLogo, brandingName } = useEnvironment();

@@ -1,7 +1,9 @@
 import React from 'react';
-import { fade, withStyles } from '@material-ui/core/styles';
-import TreeItem from '@material-ui/lab/TreeItem';
+import { withStyles } from '@mui/styles';
+import { TreeItem } from '@mui/x-tree-view';
 import { TransitionComponent } from './transition-component';
+
+const fade = require('fade');
 
 export const StyledTreeItem = withStyles((theme) => ({
     iconContainer: {
@@ -12,6 +14,6 @@ export const StyledTreeItem = withStyles((theme) => ({
     group: {
         marginLeft: 7,
         paddingLeft: 18,
-        borderLeft: `1px dashed ${fade(theme.palette.text.primary, 0.4)}`,
+        borderLeft: `1px dashed ${ fade(theme.palette.text.primary, 0.4) }`,
     },
 }))((props) => <TreeItem draggable={props.draggable} {...props} TransitionComponent={TransitionComponent}>{props.children}</TreeItem>);

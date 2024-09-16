@@ -1,4 +1,4 @@
-import { Link } from "@reach/router";
+import { Link } from "react-router-dom";
 import React from "react";
 
 export default {
@@ -9,7 +9,7 @@ export default {
 	interval_in_seconds: 3600,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,

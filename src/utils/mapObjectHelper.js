@@ -7,7 +7,7 @@ export const replacer = (key, value) => {
     } else {
         return value;
     }
-}
+};
 export const reviver = (key, value) =>{
     if (typeof value === 'object' && value !== null) {
         if (value.dataType === 'Map') {
@@ -15,4 +15,4 @@ export const reviver = (key, value) =>{
         }
     }
     return value;
-}
+};

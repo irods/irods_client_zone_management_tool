@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export const AddZoneController = (name, type, location, comment, httpApiLocation) => {
 	const params = new URLSearchParams({
@@ -38,4 +38,4 @@ export const ModifyZoneController = (name, target, value, httpApiLocation) => {
 			Authorization: `Bearer ${localStorage.getItem("zmt-token")}`,
 		},
 	});
-}
+};

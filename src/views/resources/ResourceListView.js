@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
 import {
-	makeStyles,
 	Button,
 	CircularProgress,
 	Input,
@@ -8,8 +7,6 @@ import {
 	TextField,
 	LinearProgress,
 	Tooltip,
-} from "@material-ui/core";
-import {
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -25,20 +22,18 @@ import {
 	TableSortLabel,
 	Paper,
 	IconButton,
-} from "@material-ui/core";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import SaveIcon from "@material-ui/icons/Save";
-import CloseIcon from "@material-ui/icons/Close";
+	ToggleButton,
+	ToggleButtonGroup } from "@mui/material";
+import { makeStyles } from '@mui/styles';
 import { useEnvironment, useServer } from "../../contexts";
 import "../../App.css";
 import ResourceRows from "../../components/ResourceRows";
-import ListIcon from "@material-ui/icons/List";
-import AccountTreeIcon from "@material-ui/icons/AccountTree";
-import { navigate, useLocation } from "@reach/router";
+import { Save as SaveIcon ,Close as CloseIcon, List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
+import { Navigate, useLocation } from "react-router-dom";
 
 import { 
 	AddResourceController,
- } from "../../controllers/ResourceController"
+ } from "../../controllers/ResourceController";
 
 const useStyles = makeStyles((theme) => ({
 	dialog_action: {
@@ -71,7 +66,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ResourceListView = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -116,7 +112,7 @@ export const ResourceListView = () => {
 			);
 			setPerPage(environment.defaultItemsPerPage);
 		}
-	}, []);
+	}, [environment.defaultItemsPerPage, resourcesPageKey]);
 
 	useEffect(() => {
 		if (localZoneName) {
@@ -130,7 +126,7 @@ export const ResourceListView = () => {
 		}
 		environment.pageTitle = environment.resourcesTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, filterRescName, order, orderBy]);
+	}, [currPage, perPage, filterRescName, order, orderBy, environment, loadResources, localZoneName]);
 
 	useEffect(() => {
 		if (rescPanelStatus !== "creation") {
@@ -139,10 +135,10 @@ export const ResourceListView = () => {
 			setRescLocation("");
 			setRescVaultPath("");
 		}
-	}, [rescPanelStatus]);
+	}, [rescPanelStatus, environment, loadResources, localZoneName]);
 
 	// validate resource hostname and vault path
-	// return FALSE if one of two attributes is empty string
+	// return FALSE if one of two attributes is an empty string
 	const rescInputValidator = () => {
 		return !((rescLocation === "") ^ (rescVaultPath === ""));
 	};
@@ -169,8 +165,8 @@ export const ResourceListView = () => {
 				`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`
 			);
 			setLoading(false);
-		})
-	}
+		});
+	};
 
 	const handleKeyDown = (e) => {
 		if (e.keyCode === 13) addResource();
@@ -193,7 +189,7 @@ export const ResourceListView = () => {
 	};
 
 	const handleRescNameChange = (event) => {
-		// trim all whitespace in the resource name
+		// trim all whitespaces in the resource name
 		setRescName(event.target.value.trim());
 	};
 
@@ -254,14 +250,14 @@ export const ResourceListView = () => {
 						<ToggleButton
 							value="list"
 							aria-label="list"
-							onClick={() => navigate("/resources")}
+							onClick={() => <Navigate to='/resources' noThrow />}
 						>
 							<ListIcon />
 						</ToggleButton>
 						<ToggleButton
 							value="tree"
 							aria-label="tree"
-							onClick={() => navigate("/resources/tree")}
+							onClick={() => <Navigate to='/resources/tree' noThrow />}
 						>
 							<AccountTreeIcon />
 						</ToggleButton>

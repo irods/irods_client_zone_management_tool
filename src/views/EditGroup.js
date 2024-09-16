@@ -1,9 +1,10 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link, navigate } from '@reach/router';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@material-ui/core';
+import { Link, Navigate } from 'react-router-dom';
+import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
+import { Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useEnvironment, useServer } from '../contexts';
 import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
 
@@ -20,10 +21,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const EditGroup = (props) => {
-    // navigate to groups page if no group info is passed along
-    if (!props.location.state) navigate('/groups')
-    // navigate to login page if no token is found
-    if (!localStorage.getItem('zmt-token')) navigate('/')
+    // navigate to a group page if no group info is passed along
+    if (!props.location.state)
+       return <Navigate to='/groups' noThrow />;
+
+    // navigate to the login page if no token is found
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
     
     const auth = localStorage.getItem('zmt-token');
     const currentGroup = props.location.state ? props.location.state.groupInfo : new Array(2);
@@ -54,8 +58,8 @@ export const EditGroup = (props) => {
         }).then((res) => {
             setUsersInGroup(res.data.rows);
             setLoading(false);
-        })
-    }, [auth, currentGroup, httpApiLocation])
+        });
+    }, [auth, currentGroup, httpApiLocation]);
 
     const loadFilteredUsers = useCallback(() => {
         setLoading(true);
@@ -75,8 +79,8 @@ export const EditGroup = (props) => {
         }).then((res) => {
             setFilterNameResult(res.data.rows);
             setLoading(false);
-        })
-    }, [auth, httpApiLocation, filterUserName])
+        });
+    }, [auth, httpApiLocation, filterUserName]);
 
     async function removeUserFromGroup(user) {
         try {
@@ -88,9 +92,9 @@ export const EditGroup = (props) => {
             )
             .then(() => {
                 setRefresh(!refresh);
-            })
+            });
         } catch (e) {
-            alert(e)
+            alert(e);
         }
     }
 
@@ -104,10 +108,10 @@ export const EditGroup = (props) => {
             )
             .then(() => {
                 setRefresh(!refresh);
-            })
+            });
         }
         catch (e) {
-            alert(e)
+            alert(e);
         }
     }
 
@@ -118,19 +122,19 @@ export const EditGroup = (props) => {
             }
         }
         return false;
-    }
+    };
 
     const handleFilterUserName = (event) => {
         setFilterName(event.target.value);
-    }
+    };
 
     useEffect(() => {
-        if (currentGroup[0]) loadCurrentGroupInfo()
-    }, [refresh, loadCurrentGroupInfo])
+        if (currentGroup[0]) loadCurrentGroupInfo();
+    }, [refresh, loadCurrentGroupInfo, currentGroup]);
 
     useEffect(() => {
-        if (currentGroup[0]) loadFilteredUsers()
-    }, [loadFilteredUsers])
+        if (currentGroup[0]) loadFilteredUsers();
+    }, [loadFilteredUsers, currentGroup]);
 
     return (
         <Fragment>
@@ -165,15 +169,15 @@ export const EditGroup = (props) => {
                                 <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                 <TableCell align="right">{thisUser[1]}</TableCell>
                                 <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>
-                                <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser) }}>Add</Button>}</TableCell>
+                                <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser).then(); }}>Add</Button>}</TableCell>
                             </TableRow>)}
                         </TableBody>
                     </Table>}
             </div>
         </Fragment>
     );
-}
+};
 
 EditGroup.propTypes = {
     location: PropTypes.any
-}
+};
