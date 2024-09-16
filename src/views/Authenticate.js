@@ -52,7 +52,7 @@ export const Authenticate = () => {
 
 	const handleKeyDown = (event) => {
 		if (event.keyCode === 13) {
-			handleAuthenticate();
+			handleAuthenticate().then();
 		}
 	};
 

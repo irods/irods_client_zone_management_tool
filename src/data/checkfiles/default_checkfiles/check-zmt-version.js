@@ -9,10 +9,9 @@ export default {
     active: true,
     checker: async function () {
         const latestTag = await axios.get('https://api.github.com/repos/irods/irods_client_zone_management_tool/releases/latest');
-        const result = {
+        return {
             status: latestTag.data.tag_name === process.env.REACT_APP_VERSION ? 'healthy' : 'warning',
             message: latestTag.data.tag_name === process.env.REACT_APP_VERSION ? `ZMT is running the latest version ${latestTag.data.tag_name}.` : `Latest ZMT version is ${latestTag.data.tag_name}, yours is ${process.env.REACT_APP_VERSION}`,
         };
-        return result;
     }
 };

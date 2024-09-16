@@ -18,7 +18,7 @@ export const TransitionComponent = (props) => {
 
 TransitionComponent.propTypes = {
     /**
-     * Show the component; triggers the enter or exit states
+     * Show the component; triggers the entered or exit states
      */
     in: PropTypes.bool,
 };

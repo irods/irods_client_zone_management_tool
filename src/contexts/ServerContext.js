@@ -57,7 +57,7 @@ export const ServerProvider = ({ children }) => {
 	const loadUsers = async (offset, limit, order, orderBy, name) => {
 		setIsLoadingUserContext(true);
 
-		if (!name || name == "USER_NAME") {
+		if (!name || name === "USER_NAME") {
 			let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
 
 			_query = queryGenerator(_query, order, orderBy);
@@ -197,7 +197,6 @@ export const ServerProvider = ({ children }) => {
 				total: userTotal,
 			});
 			setIsLoadingUserContext(false);
-			return;
 		}
 	};
 
@@ -444,8 +443,8 @@ export const ServerProvider = ({ children }) => {
 			localStorage.removeItem("zmt-token");
 			navigate("/", { replace: true });
 			window.location.reload();
-			return;
 		});
+
 		if (zoneData && zoneData.status === 200) {
 			setLocalZoneName(
 				zoneData.data.rows.filter((a) => a[1] === "local")[0][0]
@@ -522,17 +521,14 @@ export const ServerProvider = ({ children }) => {
 		});
 	};
 
-	// load all servers at each render, and iterate through server list to fetch resources which have the same hostname
+	// load all servers at each render, and iterate through the server list to fetch resources which have the same hostname
 	const loadServers = async () => {
 		setIsLoadingZoneContext(true);
 		const zone_report = await loadZoneReport();
 
 		if (zone_report !== undefined) {
 			const resc_types = new Set();
-			const version_4_3_1_or_after = zone_report.data.zone_report.zones[0]
-				.icat_server
-				? false
-				: true;
+			const version_4_3_1_or_after = !zone_report.data.zone_report.zones[0].icat_server;
 			let fullServersArray;
 
 			if (version_4_3_1_or_after) {
@@ -549,7 +545,7 @@ export const ServerProvider = ({ children }) => {
 			}
 			const newValidHostSet = new Set(["EMPTY_RESC_HOST"]);
 			for (const curr_server of fullServersArray) {
-				// check and load resource plugins from zone report
+				// check and load resource plugins from the zone report
 				if (curr_server.plugins) {
 					for (let i = 0; i < curr_server.plugins.length; i++) {
 						if (

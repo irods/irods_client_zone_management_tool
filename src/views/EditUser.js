@@ -340,7 +340,7 @@ export const EditUser = () => {
                                                 <TableRow key={thisGroup[0]}>
                                                     <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                                     <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
-                                                    <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup); }}>Add</Button>}</TableCell>
+                                                    <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup).then(); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup).then(); }}>Add</Button>}</TableCell>
                                                 </TableRow>
                                                 ))}
                                             </TableBody>

@@ -59,7 +59,6 @@ export default {
 					freeSpaceInBytes,
 					freeSpaceInGB.toFixed(1),
 				]);
-				return;
 			}
 		});
 
@@ -97,7 +96,7 @@ export default {
 			result.message.push(
 				<span key="notEnoughSpaceRescs">
 					<span>
-						{result.message.length != 0 && ". "}These resources have
+						{result.message.length !== 0 && ". "}These resources have
 						less than {minimum_size_in_gb} GB of free space:{" "}
 					</span>
 					{notEnoughSpaceRescs.map((failedResc, index) => (

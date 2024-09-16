@@ -21,7 +21,7 @@ import { useEnvironment, useServer } from "../../contexts";
 const drawerWidth = "200px";
 
 export const Layout = ({ children }) => {
-	// load first part of a url path
+	// load the first part of the url path
 	const pathname = useLocation().pathname.split("/")[1];
 	const environment = useEnvironment();
 	const useStyles = makeStyles((theme) => ({

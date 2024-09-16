@@ -20,7 +20,7 @@ export default {
 		};
 
 		let totalMeta = 0; // represents all metadata in the system (not just the ones that are used)
-		let numUnusedMeta = 0; // represents the number of metadata that are not used (not associated with a user, resource, data object, or collection)
+		let numUnusedMeta = 0; // represents the number of metadata that is not used (not associated with a user, resource, data object, or collection)
 
 		const specificQuery =
 			"SELECT count(unused.*) FROM (select meta_id from R_META_MAIN except select meta_id from R_OBJT_METAMAP) unused";

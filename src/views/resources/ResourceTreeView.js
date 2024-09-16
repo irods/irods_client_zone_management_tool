@@ -14,7 +14,7 @@ export const ResourceTreeView = () => {
 	const [childrenMap, setChildrenMap] = useState();
 	const [dataMap, setDataMap] = useState();
 
-	// load all resources to render the hierachy
+	// load all resources to render the hierarchy
 	useEffect(() => {
 		loadResources(0, 0, "", "asc", "RESC_NAME");
 	}, [loadResources]);
@@ -38,9 +38,9 @@ export const ResourceTreeView = () => {
 				if (!childrenMap.has(resc[10])) {
 					childrenMap.set(resc[10], []);
 				}
-				const childrens = childrenMap.get(resc[10]);
-				childrens.push(resc);
-				childrenMap.set(resc[10], childrens);
+				const children = childrenMap.get(resc[10]);
+				children.push(resc);
+				childrenMap.set(resc[10], children);
 			});
 			setChildrenMap(childrenMap);
 			setDataMap(dataMap);

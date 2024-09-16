@@ -176,7 +176,7 @@ export const User = () => {
 	}
 
 	const handleKeyDown = (e) => {
-		if (e.keyCode === 13) addUser();
+		if (e.keyCode === 13) addUser().then();
 	};
 
 	const handleRemoveConfirmationOpen = (props) => {
@@ -429,10 +429,7 @@ export const User = () => {
 									>
 										<TableCell>
 											<Input
-												className={
-													(classes.add_user_name,
-													classes.fontInherit)
-												}
+												className={ [classes.add_user_name, classes.fontInherit].join(" ") }
 												id="add-user-name"
 												placeholder="Enter new User Name"
 												value={newUserData.name}
