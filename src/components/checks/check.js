@@ -1,45 +1,40 @@
-import React, { Fragment, useEffect, useState } from 'react'
-import { useCheck } from '../../contexts'
-import { CircularProgress, Chip, Paper, Table, TableHead, TableBody, TableCell, TableRow, TableSortLabel, TextField, TableContainer } from '@material-ui/core';
+import React, { Fragment, useEffect, useState } from 'react';
+import { useCheck } from '../../contexts';
+import { CircularProgress, Chip, Paper, Table, TableHead, TableBody, TableCell, TableRow, TableSortLabel, TextField, TableContainer } from '@mui/material';
 import { CheckResult } from '.';
-import CheckIcon from '@material-ui/icons/Check'
-import ErrorIcon from '@material-ui/icons/Error'
-import WarningIcon from '@material-ui/icons/Warning'
-import BlockIcon from '@material-ui/icons/Block'
-import HighlightOffIcon from '@material-ui/icons/HighlightOff'
-import CancelIcon from '@material-ui/icons/Cancel'
+import { Check as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Block as BlockIcon, Highlight as HighlightOffIcon, Cancel as CancelIcon } from '@mui/icons-material';
 
 export const Check = () => {
-    const { isChecking, checks, runAllCheck, checkObject, checkResults, statusResult, timeStamp } = useCheck()
-    const [statusFilter, setStatusFilter] = useState('All')
-    const [titleFilter, setTitleFilter] = useState('')
-    const [filteredResults, setFilteredResults] = useState([])
-    const [order, setOrder] = useState('asc')
-    const [orderBy, setOrderBy] = useState('CHECK_NAME')
+    const { isChecking, checks, runAllCheck, checkObject, checkResults, statusResult, timeStamp } = useCheck();
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [titleFilter, setTitleFilter] = useState('');
+    const [filteredResults, setFilteredResults] = useState([]);
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('CHECK_NAME');
 
     const handleSort = (props) => {
         const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
-    }
+    };
 
     useEffect(() => {
         if (Object.keys(checkResults).length > 0) {
-            let newFilteredResults = []
-            if (statusFilter == 'All' && titleFilter === '') newFilteredResults = Object.entries(checkResults)
+            let newFilteredResults = [];
+            if (statusFilter === 'All' && titleFilter === '') newFilteredResults = Object.entries(checkResults);
             else {
                 // case-insensitive filtering
                 for (const [id, details] of Object.entries(checkResults)) {
-                    if ((details[1]['status'] === statusFilter || statusFilter === 'All') && details[0]['name'].toLowerCase().includes(titleFilter.toLowerCase())) newFilteredResults.push([id, details])
+                    if ((details[1]['status'] === statusFilter || statusFilter === 'All') && details[0]['name'].toLowerCase().includes(titleFilter.toLowerCase())) newFilteredResults.push([id, details]);
                 }
             }
             // sorting by column name
             newFilteredResults.sort((a, b) => {
-                return (order === 'asc' ? 1 : -1) * (orderBy === 'CHECK_NAME' ? a[1][0].name.localeCompare(b[1][0].name) : (orderBy === 'LAST_CHECKED' ? a[1][1]['timestamp'] - b[1][1]['timestamp'] : a[1][1]['status'].localeCompare(b[1][1]['status'])))
-            })
-            setFilteredResults(newFilteredResults)
+                return (order === 'asc' ? 1 : -1) * (orderBy === 'CHECK_NAME' ? a[1][0].name.localeCompare(b[1][0].name) : (orderBy === 'LAST_CHECKED' ? a[1][1]['timestamp'] - b[1][1]['timestamp'] : a[1][1]['status'].localeCompare(b[1][1]['status'])));
+            });
+            setFilteredResults(newFilteredResults);
         }
-    }, [timeStamp, checkResults, statusFilter, titleFilter, order, orderBy])
+    }, [timeStamp, checkResults, statusFilter, titleFilter, order, orderBy]);
 
     return (
         <Fragment>
@@ -72,5 +67,5 @@ export const Check = () => {
                 </TableContainer>
             </Paper>
         </Fragment>
-    )
-}
+    );
+};

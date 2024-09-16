@@ -1,27 +1,20 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Link, navigate, useLocation } from "@reach/router";
+import { Link, Navigate, useLocation } from "react-router-dom";
+
 import {
-	AppBar,
-	CssBaseline,
-	Drawer,
-	Divider,
+	AppBar, CssBaseline, Drawer, Divider, IconButton,
+	List, ListItemText, MenuItem, Toolbar, Typography,
 	Hidden,
-	IconButton,
-	List,
-	ListItemText,
-	MenuItem,
-	Toolbar,
-	Typography,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
+import { makeStyles } from "@mui/styles";
 import { useEnvironment, useServer } from "../../contexts";
 
 const drawerWidth = "200px";
 
 export const Layout = ({ children }) => {
-	// load first part of a url path
+	// load the first part of the url path
 	const pathname = useLocation().pathname.split("/")[1];
 	const environment = useEnvironment();
 	const useStyles = makeStyles((theme) => ({
@@ -97,7 +90,8 @@ export const Layout = ({ children }) => {
 		localStorage.removeItem("zmt-username");
 		localStorage.removeItem("zmt-inactiveChecks");
 		localStorage.removeItem("zmt-checkIntervals");
-		navigate("/");
+
+		return <Navigate to='/' noThrow />;
 	};
 
 	const drawer = (

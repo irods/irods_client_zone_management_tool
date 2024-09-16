@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export const AddSpecificQueryController = (alias, sqlStr, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -15,8 +15,8 @@ export const AddSpecificQueryController = (alias, sqlStr, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const DeleteSpecificQueryController = (alias, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -32,5 +32,5 @@ export const DeleteSpecificQueryController = (alias, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};

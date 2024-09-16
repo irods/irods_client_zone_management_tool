@@ -1,2 +1,2 @@
-export * from './check'
-export * from './check-result'
+export * from './check';
+export * from './check-result';

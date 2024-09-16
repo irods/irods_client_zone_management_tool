@@ -1,9 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { TabPanel } from '../components'
+import { TabPanel } from '../components';
 import { useEnvironment, useServer } from '../contexts';
-import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@material-ui/core';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@material-ui/core';
-import { navigate } from '@reach/router';
+import { Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@mui/material';
+import { Navigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     pagination: {
@@ -38,10 +40,11 @@ const useStyles = makeStyles((theme) => ({
         textTransform: 'none',
         fontSize: 15
     }
-}))
+}));
 
 export const Server = () => {
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
 
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
@@ -63,19 +66,19 @@ export const Server = () => {
             localStorage.setItem(serversPageKey, environment.defaultItemsPerPage);
             setPerPage(environment.defaultItemsPerPage);
         } 
-    }, [])
+    }, [environment.defaultItemsPerPage, serversPageKey]);
 
     useEffect(() => {
         loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
         environment.pageTitle = environment.serversTitle;
-        document.title = `${environment.titleFormat()}`
-    }, [perPage, currPage, order, orderBy])
+        document.title = `${environment.titleFormat()}`;
+    }, [perPage, currPage, order, orderBy, environment, loadCurrServers]);
 
     const handleSort = props => {
         const isAsc = orderBy === props && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
         setOrderBy(props);
-    }
+    };
 
     function a11yProps(index) {
         return {
@@ -90,16 +93,16 @@ export const Server = () => {
             <br />
             {zoneContext === undefined ? <div>Cannot load server data. Please check your iRODS Client HTTP API endpoint connection.</div> :
                 <Fragment>
-                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(zoneContext.length)} rowsPerPage={perPage} onChangePage={(event, value) => { setCurrPage(value + 1) }} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(serversPageKey, e.target.value) }} />
+                    <TablePagination component="div" className={classes.pagination} page={currPage - 1} count={parseInt(zoneContext.length)} rowsPerPage={perPage} onChangePage={(event, value) => { setCurrPage(value + 1); }} onChangeRowsPerPage={(e) => { setPerPage(e.target.value); setCurrPage(1); localStorage.setItem(serversPageKey, e.target.value); }} />
                     <TableContainer className={classes.tableContainer} component={Paper}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role") }}><b>Role</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ width: '15%' }}><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version") }}><b>iRODS Version</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname") }}><b>Hostname</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ width: '10%' }}><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources") }}><b>Resources</b></TableSortLabel></TableCell>
-                                    <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os") }}><b>OS Distribution</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "role"} direction={orderBy === "role" ? order : 'asc'} onClick={() => { handleSort("role"); }}><b>Role</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '15%' }}><TableSortLabel active={orderBy === "irods-version"} direction={orderBy === "irods-version" ? order : 'asc'} onClick={() => { handleSort("irods-version"); }}><b>iRODS Version</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '25%' }}><TableSortLabel active={orderBy === "hostname"} direction={orderBy === "hostname" ? order : 'asc'} onClick={() => { handleSort("hostname"); }}><b>Hostname</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '10%' }}><TableSortLabel active={orderBy === "resources"} direction={orderBy === "resources" ? order : 'asc'} onClick={() => { handleSort("resources"); }}><b>Resources</b></TableSortLabel></TableCell>
+                                    <TableCell style={{ width: '20%' }}><TableSortLabel active={orderBy === "os"} direction={orderBy === "os" ? order : 'asc'} onClick={() => { handleSort("os"); }}><b>OS Distribution</b></TableSortLabel></TableCell>
                                     <TableCell style={{ width: '5%' }} align="right"></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -202,5 +205,5 @@ export const Server = () => {
                 </Fragment>
             }
         </Fragment>
-    )
-}
+    );
+};

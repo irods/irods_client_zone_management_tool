@@ -1,38 +1,55 @@
-import React, { Component } from 'react';
-import { LocationProvider, Router } from '@reach/router';
+import React from 'react';
+import { Route, Routes } from "react-router-dom";
 import { Layout, Footer } from './components';
-import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone } from './views';
+import { Landing, Home, NotFound, EditGroup, EditUser, Group,
+        ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone
+} from './views';
+
+import {ServerProvider, EnvironmentProvider, CheckProvider} from './contexts';
+
+import { createTheme } from '@mui/material';
+import { ThemeProvider } from '@mui/styles';
+
 import './App.css';
 
-class App extends Component {
-  render() {
+const App = () => {
+    const theme = createTheme();
+
     return (
-      <LocationProvider>
         <div className="app_body">
-          <div className="app_wrap">
-            <Layout>
-              <Router primary={false}>
-                <Home path="/home" timeStamp={new Date()} />
-                <EditUser path='/users/edit' />
-                <User path="/users" />
-                <EditGroup path='groups/edit' />
-                <Group path='/groups' />
-                <ResourceListView path='/resources' />
-                <ResourceTreeView path='/resources/tree' />
-                <Server path='/servers' />
-                <SpecificQuery path='/specific-query' />
-                <Zone path='/zones' />
-                <Landing path="/" />
-                <NotFound default />
-              </Router>
-            </Layout>
-          </div>
-          <Footer />
+            <div className="app_wrap">
+
+                <EnvironmentProvider>
+                    <ServerProvider>
+                        <CheckProvider>
+                            <ThemeProvider theme={theme}>
+                                <Layout>
+                                    <Routes>
+                                        <Route path="/" element={<Landing/>}/>
+                                        <Route path="/home" element={ <Home timeStamp={new Date()} /> }/>
+                                        <Route path='/users/edit' element={ <EditUser /> }/>
+                                        <Route path="/users" element={ <User /> }/>
+                                        <Route path='groups/edit' element={ <EditGroup /> }/>
+                                        <Route path='/groups' element={ <Group /> }/>
+                                        <Route path='/resources' element={ <ResourceListView /> }/>
+                                        <Route path='/resources/tree' element={ <ResourceTreeView /> }/>
+                                        <Route path='/servers' element={ <Server /> }/>
+                                        <Route path='/specific-query' element={ <SpecificQuery /> }/>
+                                        <Route path='/zones' element={ <Zone /> }/>
+                                        <Route default element={ <NotFound /> }/>
+                                    </Routes>
+                                </Layout>
+
+                                <Footer />
+                            </ThemeProvider>
+                        </CheckProvider>
+                    </ServerProvider>
+                </EnvironmentProvider>
+
+            </div>
         </div>
-      </LocationProvider>
     );
-  }
-}
+};
 
 export default App;
 

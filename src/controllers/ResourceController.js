@@ -17,8 +17,8 @@ export const AddResourceController = (name, type, host, vaultPath, httpApiLocati
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 //Not seeing anything for modifying resources in the docs, not implemented yet probably
 export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
@@ -27,7 +27,7 @@ export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
         name: name,
         property: arg,
         value: value
-    })
+    });
 
     return axios.post(
         `${httpApiLocation}/resources`,
@@ -37,8 +37,8 @@ export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 
 export const RemoveResourceController = async (name, httpApiLocation) => {
@@ -55,8 +55,8 @@ export const RemoveResourceController = async (name, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const AddChildResourceController = async (parent, child, httpApiLocation, parent_context_string) => {
     const params = new URLSearchParams({
@@ -74,8 +74,8 @@ export const AddChildResourceController = async (parent, child, httpApiLocation,
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const RemoveChildResourceController = async (parent, child, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -92,5 +92,5 @@ export const RemoveChildResourceController = async (parent, child, httpApiLocati
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};

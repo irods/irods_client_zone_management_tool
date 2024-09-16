@@ -1,6 +1,6 @@
-import { Link } from "@reach/router";
+import { Link } from "react-router-dom";
 import React from "react";
-import { Tooltip } from "@material-ui/core";
+import { Tooltip } from "@mui/material";
 
 const minimum_size_in_gb = 10;
 
@@ -12,7 +12,7 @@ export default {
 	interval_in_seconds: 86400,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,
@@ -20,8 +20,8 @@ export default {
 		};
 
 		const digitRegex = /^\d+$/;
-		let invalidSpaceRescs = [];
-		let notEnoughSpaceRescs = [];
+		const invalidSpaceRescs = [];
+		const notEnoughSpaceRescs = [];
 
 		this.rescAll.rows.forEach((resc) => {
 			const type = resc[1];
@@ -59,7 +59,6 @@ export default {
 					freeSpaceInBytes,
 					freeSpaceInGB.toFixed(1),
 				]);
-				return;
 			}
 		});
 
@@ -97,7 +96,7 @@ export default {
 			result.message.push(
 				<span key="notEnoughSpaceRescs">
 					<span>
-						{result.message.length != 0 && ". "}These resources have
+						{result.message.length !== 0 && ". "}These resources have
 						less than {minimum_size_in_gb} GB of free space:{" "}
 					</span>
 					{notEnoughSpaceRescs.map((failedResc, index) => (

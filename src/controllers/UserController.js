@@ -16,8 +16,8 @@ export const AddUserController = (name, zone, userType, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const ModifyUserPasswordController = (name, zone, newPassword, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -25,7 +25,7 @@ export const ModifyUserPasswordController = (name, zone, newPassword, httpApiLoc
         name: name,
         zone: zone,
         "new-password": newPassword
-    })
+    });
     return axios.post(
         `${httpApiLocation}/users-groups`,
         params,
@@ -34,8 +34,8 @@ export const ModifyUserPasswordController = (name, zone, newPassword, httpApiLoc
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`
             }
         }
-    )
-}
+    );
+};
 
 export const ModifyUserTypeController = (name, zone, newUserType, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -43,7 +43,7 @@ export const ModifyUserTypeController = (name, zone, newUserType, httpApiLocatio
         name: name,
         zone: zone,
         "new-user-type": newUserType
-    })
+    });
     return axios.post(
         `${httpApiLocation}/users-groups`,
         params,
@@ -52,8 +52,8 @@ export const ModifyUserTypeController = (name, zone, newUserType, httpApiLocatio
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`
             }
         }
-    )
-}
+    );
+};
 
 
 export const RemoveUserController = async (name, zone, httpApiLocation) => {
@@ -61,7 +61,7 @@ export const RemoveUserController = async (name, zone, httpApiLocation) => {
         op: "remove_user",
         name: name,
         zone: zone
-    })
+    });
     return axios.post(
         `${httpApiLocation}/users-groups`,
         params,
@@ -70,5 +70,5 @@ export const RemoveUserController = async (name, zone, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`
             }
         }
-    )
-}
+    );
+};

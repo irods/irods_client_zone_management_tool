@@ -1,19 +1,12 @@
-import React, { useState, Fragment } from 'react'
-import { Collapse, IconButton, Input, makeStyles, TableCell, TableRow, Tooltip } from '@material-ui/core'
-import { useCheck } from '../../contexts'
-import LoopIcon from '@material-ui/icons/Autorenew'
-import CheckIcon from '@material-ui/icons/Check';
-import ErrorIcon from '@material-ui/icons/Error';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import BlockIcon from '@material-ui/icons/Block';
-import WarningIcon from '@material-ui/icons/Warning';
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
-import HighlightOffIcon from '@material-ui/icons/HighlightOff'
-import EditIcon from '@material-ui/icons/Edit'
-import CloseIcon from '@material-ui/icons/Close';
-import CancelIcon from '@material-ui/icons/Cancel';
-import PropTypes from 'prop-types'
-import TimeAgo from 'timeago-react'
+import React, { useState, Fragment } from 'react';
+import { Collapse, IconButton, Input, TableCell, TableRow, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useCheck } from '../../contexts';
+import { Loop as LoopIcon, Check as CheckIcon, Error as ErrorIcon, ExpandMore as ExpandMoreIcon, Block as BlockIcon, BugReport as WarningIcon,
+    ArrowRight as KeyboardArrowRightIcon, Highlight as HighlightOffIcon, Edit as EditIcon, Close as CloseIcon, Cancel as CancelIcon } from '@mui/icons-material';
+
+import PropTypes from 'prop-types';
+import TimeAgo from 'react-timeago';
 
 const useRowStyles = makeStyles({
     root: {
@@ -24,27 +17,27 @@ const useRowStyles = makeStyles({
 });
 
 export const CheckResult = ({ status, check, result }) => {
-    const { runOneCheck, checkIntervals, inactiveChecks, modifyCheckActivity, modifyCheckInterval } = useCheck()
-    const [expanded, setExpanded] = useState(false)
-    const [interval, setInterval] = useState(checkIntervals[check.id])
-    const [isEditingInterval, setIsEditingInterval] = useState(false)
-    const classes = useRowStyles()
+    const { runOneCheck, checkIntervals, inactiveChecks, modifyCheckActivity, modifyCheckInterval } = useCheck();
+    const [expanded, setExpanded] = useState(false);
+    const [interval, setInterval] = useState(checkIntervals[check.id]);
+    const [isEditingInterval, setIsEditingInterval] = useState(false);
+    const classes = useRowStyles();
 
     const intervalHandler = () => {
-        setIsEditingInterval(false)
-        modifyCheckInterval(check.id, interval)
-    }
+        setIsEditingInterval(false);
+        modifyCheckInterval(check.id, interval);
+    };
 
     const handleKeyDown = (e) => {
         if (e.keyCode === 13) intervalHandler();
-    }
+    };
 
     return (
         <Fragment>
             <TableRow hover={true} className={classes.root}>
                 <TableCell><IconButton size="small" onClick={() => setExpanded(!expanded)}>{expanded ? <ExpandMoreIcon /> : <KeyboardArrowRightIcon />}</IconButton></TableCell>
                 <TableCell style={{ cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>{result[0].name}</TableCell>
-                <TableCell><i>{result[1].timestamp === 'N/A' ? 'N/A' : <TimeAgo datetime={result[1].timestamp} />}</i></TableCell>
+                <TableCell><i>{result[1].timestamp === 'N/A' ? 'N/A' : <TimeAgo date={result[1].timestamp} />}</i></TableCell>
                 <TableCell align="center"><input defaultChecked={!inactiveChecks.has(result[0].id)} disabled={!check.isValid} type="checkbox" onClick={() => modifyCheckActivity(result[0].id)} /></TableCell>
                 <TableCell align="center">{checkIntervals[check.id]} {checkIntervals[check.id] !== 'N/A' && 'seconds'}</TableCell>
                 <TableCell align="center"><Tooltip title={inactiveChecks.has(result[0].id) ? "This check is inactive" : "Run this check again"}><span><IconButton size="small" disabled={inactiveChecks.has(result[0].id) || !check.isValid} onClick={() => runOneCheck(check)}><LoopIcon /></IconButton></span></Tooltip></TableCell>
@@ -62,11 +55,11 @@ export const CheckResult = ({ status, check, result }) => {
                 </TableCell>
             </TableRow>
         </Fragment>
-    )
-}
+    );
+};
 
 CheckResult.propTypes = {
     status: PropTypes.string.isRequired,
     check: PropTypes.object.isRequired,
     result: PropTypes.any.isRequired
-}
+};
