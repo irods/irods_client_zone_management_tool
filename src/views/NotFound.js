@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation} from 'gatsby';
+import { Link, useLocation} from 'react-router-dom';
 import { Container, Typography } from '@mui/material';
-import { makeStyles } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
 import { useEnvironment } from '../contexts';
 import { renderLayout, hideLayout } from '../utils';
 

@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useEnvironment, useServer } from "../../contexts";
 import { Tree } from "../../components/draggable-tree";
-import { navigate } from "gatsby";
+import { Navigate } from "react-router-dom";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
 
 export const ResourceTreeView = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token")) Navigate("/");
 
 	const tab = "tree";
 	const { loadResources, rescContext } = useServer();
@@ -53,14 +53,14 @@ export const ResourceTreeView = () => {
 				<ToggleButton
 					value="list"
 					aria-label="list"
-					onClick={() => navigate("/resources")}
+					onClick={() => Navigate("/resources")}
 				>
 					<ListIcon />
 				</ToggleButton>
 				<ToggleButton
 					value="tree"
 					aria-label="tree"
-					onClick={() => navigate("/resources/tree")}
+					onClick={() => Navigate("/resources/tree")}
 				>
 					<AccountTreeIcon />
 				</ToggleButton>

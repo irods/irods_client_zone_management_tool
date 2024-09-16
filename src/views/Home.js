@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useCheck, useServer, useEnvironment } from "../contexts";
-import { navigate } from "gatsby";
+import { Navigate } from "react-router-dom";
 import { Check } from "../components";
 import { makeStyles, CircularProgress, Fade, Paper } from "@mui/material";
 import { Build as BuildIcon, Check as CheckIcon, Error as ErrorIcon, Block as BlockIcon, Warning as WarningIcon, Highlight as HighlightOffIcon, Cancel as CancelIcon } from "@mui/icons-material";
@@ -40,7 +40,7 @@ const useStyles = makeStyles({
 });
 
 export const Home = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token")) Navigate("/");
 	const classes = useStyles();
 	const { statusResult } = useCheck();
 	const { loadData } = useServer();

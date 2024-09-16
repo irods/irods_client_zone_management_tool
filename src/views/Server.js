@@ -3,7 +3,7 @@ import { TabPanel } from '../components';
 import { useEnvironment, useServer } from '../contexts';
 import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@mui/material';
-import { navigate } from 'gatsby';
+import { Navigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     pagination: {
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Server = () => {
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token')) Navigate('/');
 
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();

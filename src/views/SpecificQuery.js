@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { navigate, useLocation } from 'gatsby';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useEnvironment, useServer } from '../contexts';
 import { Alert, makeStyles, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody, TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
 import { Delete as DeleteIcon, Close as CloseIcon, Save as SaveIcon }  from '@mui/icons-material';
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const SpecificQuery = () => {
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token')) Navigate('/');
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const classes = useStyles();

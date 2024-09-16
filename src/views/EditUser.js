@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link, navigate } from 'gatsby';
+import { Link, Navigate } from 'react-router-dom';
 import { useEnvironment } from '../contexts';
 import { makeStyles, Alert, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Visibility, VisibilityOff } from '@mui/icons-material';
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const EditUser = () => {
     // navigate to the login page if no token is found
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token')) Navigate('/');
     const auth = localStorage.getItem('zmt-token');
     const loggedUserName = localStorage.getItem('zmt-username');
     const params = new URLSearchParams(location.search);
@@ -68,7 +68,7 @@ export const EditUser = () => {
     useEffect(() => {
         // hide this interface for the current rodsadmin user or user that does not have a name or zone
         if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) {
-            navigate('/users');
+            Navigate('/users');
         }
         axios({
             method: 'GET',
@@ -85,9 +85,9 @@ export const EditUser = () => {
             }
         }).then(res => {
             // navigate back to /user if the username provided does not exist
-            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : navigate('/users');
+            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : Navigate('/users');
         }).catch(() => {
-            navigate('/users');
+            Navigate('/users');
         });
     }, [currentUserName]);
 

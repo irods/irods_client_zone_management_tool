@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "gatsby";
+import { Link } from "react-router-dom";
 
 export default {
 	name: "Each passthru resource has exactly one child",

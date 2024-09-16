@@ -29,7 +29,7 @@ import { useEnvironment, useServer } from "../../contexts";
 import "../../App.css";
 import ResourceRows from "../../components/ResourceRows";
 import { Save as SaveIcon ,Close as CloseIcon, List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
-import { navigate, useLocation } from "gatsby";
+import { Navigate, useLocation } from "react-router-dom";
 
 import { 
 	AddResourceController,
@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ResourceListView = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token")) Navigate("/");
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -249,14 +249,14 @@ export const ResourceListView = () => {
 						<ToggleButton
 							value="list"
 							aria-label="list"
-							onClick={() => navigate("/resources")}
+							onClick={() => Navigate("/resources")}
 						>
 							<ListIcon />
 						</ToggleButton>
 						<ToggleButton
 							value="tree"
 							aria-label="tree"
-							onClick={() => navigate("/resources/tree")}
+							onClick={() => Navigate("/resources/tree")}
 						>
 							<AccountTreeIcon />
 						</ToggleButton>

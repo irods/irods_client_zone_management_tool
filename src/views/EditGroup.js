@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link, navigate } from 'gatsby';
+import { Link, Navigate } from 'react-router-dom';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { useEnvironment, useServer } from '../contexts';
@@ -21,9 +21,9 @@ const useStyles = makeStyles(() => ({
 
 export const EditGroup = (props) => {
     // navigate to a group page if no group info is passed along
-    if (!props.location.state) navigate('/groups');
+    if (!props.location.state) Navigate('/groups');
     // navigate to the login page if no token is found
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token')) Navigate('/');
     
     const auth = localStorage.getItem('zmt-token');
     const currentGroup = props.location.state ? props.location.state.groupInfo : new Array(2);

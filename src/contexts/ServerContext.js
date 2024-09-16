@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useEnvironment } from "./";
 import { irodsVersionComparator } from "../utils";
-import { navigate } from "gatsby";
+import { Navigate } from "react-router-dom";
 
 export const ServerContext = createContext();
 
@@ -441,7 +441,7 @@ export const ServerProvider = ({ children }) => {
 			setZones([]);
 			setIsLoadingZones(false);
 			localStorage.removeItem("zmt-token");
-			navigate("/", { replace: true });
+			Navigate("/", { replace: true });
 			window.location.reload();
 		});
 

@@ -3,11 +3,11 @@ import { Alert, Button, Dialog, DialogTitle, DialogActions,
     DialogContent, LinearProgress, Table, TableCell, TableContainer,
     TableHead, TableRow, Paper, TableBody, Typography, IconButton,
     Input, Select, Snackbar, TableSortLabel } from '@mui/material';
-import { navigate } from 'gatsby';
+import { Navigate } from 'react-router-dom';
 import { useEnvironment, useServer } from '../contexts';
 import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon, Close as CloseIcon } from '@mui/icons-material';
 import { AddZoneController, DeleteZoneController, ModifyZoneController } from '../controllers/ZoneController';
-import { makeStyles } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
 
 const initialZoneState = {
     name: '',
@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const Zone = () => {
-    if (!localStorage.getItem('zmt-token')) navigate('/');
+    if (!localStorage.getItem('zmt-token')) Navigate('/');
     const { zones, loadZones, isLoadingZones } = useServer();
     const [sortedZones, setSortedZones] = useState([]);
     const [status, setStatus] = useState('none');

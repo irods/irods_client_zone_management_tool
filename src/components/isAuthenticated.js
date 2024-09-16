@@ -6,7 +6,7 @@ import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
 
-import { makeStyles } from '@mui/material/styles';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { withStyles } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
 import { TreeItem } from '@mui/x-tree-view';
 import { TransitionComponent } from './transition-component';
 

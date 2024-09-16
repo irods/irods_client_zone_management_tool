@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Container, TextField, Typography } from "@mui/material";
-import { makeStyles } from "@mui/material/styles";
-import { useNavigate } from "gatsby";
+import { makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import { renderLayout, hideLayout } from "../utils";
 

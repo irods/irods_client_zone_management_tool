@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Link, navigate, useLocation } from "gatsby";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import {
 	makeStyles,
@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Group = () => {
-	if (!localStorage.getItem("zmt-token")) navigate("/");
+	if (!localStorage.getItem("zmt-token")) Navigate("/");
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
