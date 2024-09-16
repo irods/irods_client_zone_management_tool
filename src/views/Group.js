@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { Link, navigate, useLocation } from "@reach/router";
+import { Link, navigate, useLocation } from "gatsby";
 import { useEnvironment, useServer } from "../contexts";
 import {
 	makeStyles,
@@ -13,8 +13,6 @@ import {
 	Input,
 	Typography,
 	LinearProgress,
-} from "@material-ui/core";
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -24,10 +22,10 @@ import {
 	TableRow,
 	TableSortLabel,
 	Paper,
-} from "@material-ui/core";
-import SaveIcon from "@material-ui/icons/Save";
-import CloseIcon from "@material-ui/icons/Close";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
+	ToggleButton,
+	ToggleButtonGroup
+} from "@mui/material";
+import { Save as SaveIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AddGroupController, RemoveGroupController } from "../controllers/GroupController";
 
 const useStyles = makeStyles((theme) => ({

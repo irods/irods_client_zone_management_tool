@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, TreeView } from '@material-ui/lab';
+import { SimpleTreeView as TreeView } from '@mui/x-tree-view';
 import { StyledTreeItem } from './tree-item';
-import { Badge, Button, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@material-ui/core';
-import CloseIcon from '@material-ui/icons/Close';
-import UndoIcon from '@material-ui/icons/Undo'
-import RedoIcon from '@material-ui/icons/Redo';
-import ReplayIcon from '@material-ui/icons/Replay';
-import SaveIcon from '@material-ui/icons/Save';
-import LowPriorityIcon from '@material-ui/icons/LowPriority';
+import { Alert, Badge, Button, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Close as CloseIcon, Undo as UndoIcon, Redo as RedoIcon, Replay as ReplayIcon, Save as SaveIcon, LowPriority as LowPriorityIcon } from '@mui/icons-material';
 import { useEnvironment, useServer } from '../../contexts';
 import { AddChildResourceController, RemoveChildResourceController } from '../../controllers/ResourceController';
 import { MinusSquare, PlusSquare } from '../../icons';
@@ -21,23 +16,23 @@ const checkIfDescendent = (node, target, map) => {
     else {
         const descendents = map.get(nodeId);
         for (let i = 0; i < descendents.length; i++) {
-            console.log("checking " + descendents[i][0])
-            if (descendents[i][11] == target[11]) {
+            console.log("checking " + descendents[i][0]);
+            if (descendents[i][11] === target[11]) {
                 return true;
             }
             if (map.has(descendents[i][11])) {
-                isDescendent = isDescendent || checkIfDescendent(descendents[i], target, map)
+                isDescendent = isDescendent || checkIfDescendent(descendents[i], target, map);
             }
         }
     }
     return isDescendent;
-}
+};
 
 export const Tree = (props) => {
-    let childrenMap = props.childrenMap;
-    let dataMap = props.dataMap;
-    let originalChildrenMap = JSON.stringify(childrenMap, replacer);
-    let originalDataMap = JSON.stringify(dataMap, replacer);
+    const childrenMap = props.childrenMap;
+    const dataMap = props.dataMap;
+    const originalChildrenMap = JSON.stringify(childrenMap, replacer);
+    const originalDataMap = JSON.stringify(dataMap, replacer);
     const { httpApiLocation } = useEnvironment();
     const { localZoneName } = useServer();
     const [stagedChildrenMap, setStagedChildrenMap] = useState(JSON.parse(originalChildrenMap, reviver));
@@ -51,14 +46,14 @@ export const Tree = (props) => {
     const [isComplete, setIsComplete] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
-    const [currExpanded, setExpanded] = useState([])
-    let expanded = [];
+    const [currExpanded, setExpanded] = useState([]);
+    const expanded = [];
 
     const dragndropController = async (curr, prev) => {
         setAlertOpen(false);
-        let new_tasks = tasks;
-        let currNode = curr;
-        let prevParentNode = prev;
+        const new_tasks = tasks;
+        const currNode = curr;
+        const prevParentNode = prev;
         if (newParentNode[11] !== prevParentNode[11]) {
             if (!checkIfDescendent(currNode, newParentNode, stagedChildrenMap)) {
                 updateParentID(currNode, newParentNode);
@@ -66,95 +61,98 @@ export const Tree = (props) => {
                 addChild(newParentNode, currNode);
                 // pass in default parent context string for each dnd operation
                 // 'cache' for compound child resource, empty string for the rest
-                setTasks([...new_tasks, [currNode, prevParentNode, newParentNode, 'pending', 'pending', newParentNode[1] === 'compound' ? 'cache' : '']])
+                setTasks([...new_tasks, [currNode, prevParentNode, newParentNode, 'pending', 'pending', newParentNode[1] === 'compound' ? 'cache' : '']]);
             }
             else {
                 setAlertOpen(true);
             }
         }
-    }
+    };
 
     const runTask = () => {
         const tasks_copy = [...tasks];
         (async function asyncProcessTask() {
-            for (let task of tasks_copy) {
+            for (const task of tasks_copy) {
                 try {
                     if (task[1][0] !== localZoneName) {
                         await RemoveChildResourceController(task[1][0], task[0][0], httpApiLocation);
-                        task[3] = 'success'
+                        task[3] = 'success';
                     }
                     else {
-                        task[3] = 'success'
+                        task[3] = 'success';
                     }
                 }
                 catch (e) {
-                    task[3] = 'failed'
-                    setHasError(true)
+                    console.error(e, e.stack);
+                    task[3] = 'failed';
+                    setHasError(true);
                     break;
                 }
-                setTasks(tasks_copy)
+                setTasks(tasks_copy);
                 try {
                     if (task[2][0] !== localZoneName) {
                         await AddChildResourceController(task[2][0], task[0][0], httpApiLocation, task[5]);
-                        task[4] = 'success'
+                        task[4] = 'success';
                     }
                     else {
-                        task[4] = 'success'
+                        task[4] = 'success';
                     }
-                } catch (e) {
-                    task[4] = 'failed'
-                    setHasError(true)
+                }
+                catch (e) {
+                    console.error(e, e.stack);
+                    task[4] = 'failed';
+                    setHasError(true);
                     break;
                 }
-                setTasks(tasks_copy)
+                setTasks(tasks_copy);
             }
-            setIsComplete(true)
-        })()
-    }
+            setIsComplete(true);
+        })();
+    };
 
     const updateParentID = (node, parent) => {
-        let new_stagedDataMap = new Map(stagedDataMap);
+        const new_stagedDataMap = new Map(stagedDataMap);
         node[10] = parent[11];
         new_stagedDataMap.set(node[11], node);
         setStagedDataMap(new_stagedDataMap);
-    }
+    };
 
     const addChild = (parent, child) => {
-        let new_stagedChildrenMap = new Map(stagedChildrenMap);
-        let stagedNewParentList = stagedChildrenMap.has(parent[11]) ? stagedChildrenMap.get(parent[11]) : [];
-        stagedNewParentList.push(child)
+        const new_stagedChildrenMap = new Map(stagedChildrenMap);
+        const stagedNewParentList = stagedChildrenMap.has(parent[11]) ? stagedChildrenMap.get(parent[11]) : [];
+        stagedNewParentList.push(child);
         new_stagedChildrenMap.set(parent[11], stagedNewParentList);
         setStagedChildrenMap(new_stagedChildrenMap);
-    }
+    };
 
     const removeChild = (parent, child) => {
-        let new_stagedChildrenMap = new Map(stagedChildrenMap);
-        let stagedPrevParentList = stagedChildrenMap.get(parent[11]);
+        const new_stagedChildrenMap = new Map(stagedChildrenMap);
+        const stagedPrevParentList = stagedChildrenMap.get(parent[11]);
         for (let i = stagedPrevParentList.length - 1; i >= 0; i--) {
-            if (stagedPrevParentList[i][11] == child[11]) {
+            if (stagedPrevParentList[i][11] === child[11]) {
                 stagedPrevParentList.splice(i, 1);
             }
         }
-        new_stagedChildrenMap.set(parent[11], stagedPrevParentList)
+        new_stagedChildrenMap.set(parent[11], stagedPrevParentList);
         setStagedChildrenMap(new_stagedChildrenMap);
-    }
+    };
 
     const undoTask = () => {
         setAlertOpen(false);
-        let lastTask = tasks[tasks.length - 1];
-        addChild(lastTask[1], lastTask[0])
+        const lastTask = tasks[tasks.length - 1];
+        addChild(lastTask[1], lastTask[0]);
         removeChild(lastTask[2], lastTask[0]);
         setRedo([...redo, lastTask]);
-        setTasks(tasks.filter((task, i) => i !== tasks.length - 1))
-    }
+        setTasks(tasks.filter((task, i) => i !== tasks.length - 1));
+    };
 
     const redoTask = () => {
-        let lastUndoTask = redo[redo.length - 1];
+        const lastUndoTask = redo[redo.length - 1];
         addChild(lastUndoTask[2], lastUndoTask[0]);
         removeChild(lastUndoTask[1], lastUndoTask[0]);
         setTasks([...tasks, lastUndoTask]);
-        setRedo(redo.filter(task => task !== lastUndoTask))
-    }
+        setRedo(redo.filter(task => task !== lastUndoTask));
+    };
 
     const resetTree = () => {
         setAlertOpen(false);
@@ -162,42 +160,42 @@ export const Tree = (props) => {
         setStagedChildrenMap(JSON.parse(originalChildrenMap, reviver));
         setRedo([]);
         setTasks([]);
-    }
+    };
 
     const handleToggle = (event, nodeIds) => {
-        setExpanded(nodeIds)
-    }
+        setExpanded(nodeIds);
+    };
 
     const renderTreeNode = (node) => {
-        const nodeName = `${node[0]}${node[0] !== localZoneName ? `:${node[1]}` : ''}`
+        const nodeName = `${node[0]}${node[0] !== localZoneName ? `:${node[1]}` : ''}`;
         const nodeId = node[0] === localZoneName ? "" : node[11];
-        expanded.push(nodeId)
+        expanded.push(nodeId);
         const handleDragEnd = (e) => {
             if (newParentNode !== undefined && e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && nodeName === e.target.children[0].children[1].innerHTML && node[11] !== newParentNode[11]) {
                 dragndropController(node, stagedDataMap.get(node[10]));
             }
-        }
+        };
 
         const handleDragStart = (e) => {
             if (e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && e.target.children[0].children[1].innerHTML === nodeName) {
                 setCurrNode(node);
             }
-        }
+        };
 
         const handleDragOver = (e) => {
             e.preventDefault();
             if (e.target.innerHTML === nodeName) {
                 setTargetNode(node);
             }
-        }
+        };
 
         const handleDragEnter = (e) => {
             e.target.style.background = "#CDCDCD";
-        }
+        };
 
         const handleDragLeave = (e) => {
             e.target.style.background = "";
-        }
+        };
 
         const handleDrop = (e) => {
             if (e.target !== undefined && e.target.innerHTML === nodeName) {
@@ -206,14 +204,14 @@ export const Tree = (props) => {
                 setCurrNode();
                 setTargetNode();
             }
-        }
+        };
 
         return (
             <StyledTreeItem
                 key={`tree-item-${nodeId}`}
                 nodeId={nodeId}
                 label={nodeName}
-                draggable={node[11] === '' ? false : true}
+                draggable={(node[11] !== '')}
                 onDragEnter={e => handleDragEnter(e)}
                 onDragEnd={e => handleDragEnd(e)}
                 onDragOver={e => handleDragOver(e)}
@@ -222,12 +220,12 @@ export const Tree = (props) => {
                 onDrop={(e) => handleDrop(e)}>
                 {stagedChildrenMap.has(nodeId) && stagedChildrenMap.get(nodeId).map(children => renderTreeNode(children))}
             </StyledTreeItem>
-        )
-    }
+        );
+    };
 
     useEffect(() => {
-        renderTreeNode(stagedDataMap.get(""))
-    }, [stagedChildrenMap])
+        renderTreeNode(stagedDataMap.get(""));
+    }, [stagedChildrenMap]);
 
     return (
         <div>
@@ -288,7 +286,7 @@ export const Tree = (props) => {
                                 </div>
                                 {task[2][1] === 'compound' &&
                                     <div className="resource_tree_parent_info">
-                                        {console.log(task)}
+                                        { console.log(task) }
                                         <span> Parent Context: <select defaultValue={task[5]} onChange={(e) => task[5] = e.target.value}><option value='cache'>Cache</option><option value='archive'>Archive</option></select></span>
                                         {task[4] === 'pending' ? <span className="resource_tree_status">Awaiting</span> : (task[4] === 'success' ? <span className="green resource_tree_status">Complete</span> : <span className="red resource_tree_status">Failed</span>)}
                                     </div>
@@ -304,10 +302,10 @@ export const Tree = (props) => {
                 </div>
             </div>
         </div >
-    )
-}
+    );
+};
 
 Tree.propTypes = {
     childrenMap: PropTypes.node,
     dataMap: PropTypes.node
-}
+};

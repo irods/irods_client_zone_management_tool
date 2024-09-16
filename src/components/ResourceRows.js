@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
-import Collapse from '@material-ui/core/Collapse';
-import Typography from '@material-ui/core/Typography';
-import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import CancelIcon from '@material-ui/icons/Cancel';
-import EditIcon from '@material-ui/icons/Edit';
-import WarningIcon from '@material-ui/icons/Warning';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import {
+  Button, Collapse, Typography, makeStyles, CircularProgress, Dialog, DialogActions,
+  DialogContent, DialogContentText, Icon, IconButton, Table, TableBody, TableCell,
+  TableRow, Tooltip, Snackbar, TextField, Alert } from '@mui/material';
+
+import {
+  SaveAs as SaveIcon, Delete as DeleteIcon, Cancel as CancelIcon, Edit as EditIcon, BugReport as WarningIcon,
+  ArrowDownward as KeyboardArrowDownIcon, ArrowUpward as KeyboardArrowUpIcon
+} from '@mui/icons-material';
+
 import { useEnvironment, useServer } from '../contexts';
 import { ModifyResourceController, RemoveResourceController } from '../controllers/ResourceController';
-import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, Icon, IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Snackbar, TextField } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   link_button: {
@@ -79,45 +77,45 @@ function ResourceRows({ row, validServerHosts }) {
       setCurrentResc(resc);
       setIsEditing(false);
     }
-  }, [rescPanelStatus])
+  }, [rescPanelStatus]);
 
   const handleKeyDown = event => {
     // support key event if any field has been changed
     if (event.keyCode === 13 && checkIfChanged()) {
       saveResource();
     }
-  }
+  };
 
   const saveResource = async () => {
-    setIsUpdating(true)
-    let updatedResc = [...resc];
+    setIsUpdating(true);
+    const updatedResc = [...resc];
     try {
       if (currentResc[0] !== resc[0]) {
-        await ModifyResourceController(resc[0], 'name', currentResc[0], httpApiLocation)
+        await ModifyResourceController(resc[0], 'name', currentResc[0], httpApiLocation);
         updatedResc[0] = currentResc[0];
       }
       if (currentResc[1] !== resc[1]) {
-        await ModifyResourceController(currentResc[0], 'type', currentResc[1], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'type', currentResc[1], httpApiLocation);
         updatedResc[1] = currentResc[1];
       }
       if (currentResc[3] !== resc[3]) {
-        await ModifyResourceController(currentResc[0], 'path', currentResc[3], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'path', currentResc[3], httpApiLocation);
         updatedResc[3] = currentResc[3];
       }
       if (currentResc[4] !== resc[4]) {
-        await ModifyResourceController(currentResc[0], 'host', currentResc[4], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'host', currentResc[4], httpApiLocation);
         updatedResc[4] = currentResc[4];
       }
       if (currentResc[5] !== resc[5]) {
-        await ModifyResourceController(currentResc[0], 'info', currentResc[5], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'info', currentResc[5], httpApiLocation);
         updatedResc[5] = currentResc[5];
       }
       if (currentResc[6] !== resc[6]) {
-        await ModifyResourceController(currentResc[0], 'free_space', currentResc[6], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'free_space', currentResc[6], httpApiLocation);
         updatedResc[6] = currentResc[6];
       }
       if (currentResc[7] !== resc[7]) {
-        await ModifyResourceController(currentResc[0], 'comment', currentResc[7], httpApiLocation)
+        await ModifyResourceController(currentResc[0], 'comment', currentResc[7], httpApiLocation);
         updatedResc[7] = currentResc[7];
       }
       if (currentResc[9] !== resc[9]) {
@@ -135,11 +133,11 @@ function ResourceRows({ row, validServerHosts }) {
       setCurrentResc(updatedResc);
       setFailNotification(true);
     }
-  }
+  };
 
   const checkIfChanged = () => {
     return !(currentResc[0] === resc[0] && currentResc[1] === resc[1] && currentResc[3] === resc[3] && currentResc[4] === resc[4] && currentResc[5] === resc[5] && currentResc[6] === resc[6] && currentResc[7] === resc[7] && currentResc[9] === resc[9]);
-  }
+  };
 
   const removeResource = async (name) => {
     try {
@@ -148,22 +146,22 @@ function ResourceRows({ row, validServerHosts }) {
     } catch (e) {
       setRemoveErrorMsg("Error: " + e.message);
     }
-  }
+  };
 
   const removeFormClose = () => {
     setRemoveForm(false);
     setRemoveErrorMsg();
-  }
+  };
 
   const updateCurrentRescHandler = (index, value) => {
-    let newCurrResc = [...currentResc];
+    const newCurrResc = [...currentResc];
     newCurrResc[index] = value;
     setCurrentResc(newCurrResc);
-  }
+  };
 
   const closeEditFormHandler = () => {
     updatingRescPanelStatus('idle');
-  }
+  };
 
   return (
     <React.Fragment >
@@ -187,20 +185,20 @@ function ResourceRows({ row, validServerHosts }) {
               <Table style={{ width: '100%', tableLayout: 'fixed'}} size="small" aria-label="purchases">
                 <TableBody>
                   <TableRow>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Name" defaultValue={currentResc[0]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(0, event.target.value) }} /> : <span>Name: {resc[0]}</span>}</TableCell>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} select label="Type" defaultValue={currentResc[1]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(1, event.target.value) }} SelectProps={{ native: true }}>{rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}</TextField> : <span>Type: {resc[1]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Name" defaultValue={currentResc[0]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(0, event.target.value); }} /> : <span>Name: {resc[0]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} select label="Type" defaultValue={currentResc[1]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(1, event.target.value); }} SelectProps={{ native: true }}>{rescTypes.map(type => <option key={`resource-type-${type}`} value={type}>{type}</option>)}</TextField> : <span>Type: {resc[1]}</span>}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Hostname" defaultValue={currentResc[4]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(4, event.target.value === '' ? 'EMPTY_RESC_HOST' : event.target.value) }} /> : <span>Hostname: {resc[4]}</span>}</TableCell>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Vault Path" defaultValue={currentResc[3]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(3, event.target.value === '' ? 'EMPTY_RESC_PATH' : event.target.value) }} /> : <span>Vault Path: {resc[3]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Hostname" defaultValue={currentResc[4]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(4, event.target.value === '' ? 'EMPTY_RESC_HOST' : event.target.value); }} /> : <span>Hostname: {resc[4]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Vault Path" defaultValue={currentResc[3]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(3, event.target.value === '' ? 'EMPTY_RESC_PATH' : event.target.value); }} /> : <span>Vault Path: {resc[3]}</span>}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Information" defaultValue={currentResc[5]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(5, event.target.value) }} /> : <span>Information: {resc[5]}</span>}</TableCell>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Freespace" defaultValue={currentResc[6]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(6, event.target.value) }} /> : <span>Freespace: {resc[6]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Information" defaultValue={currentResc[5]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(5, event.target.value); }} /> : <span>Information: {resc[5]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Freespace" defaultValue={currentResc[6]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(6, event.target.value); }} /> : <span>Freespace: {resc[6]}</span>}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Comment" defaultValue={currentResc[7]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(7, event.target.value) }} /> : <span>Comment: {resc[7]}</span>}</TableCell>
-                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Context" defaultValue={currentResc[9]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(9, event.target.value) }} /> : <span>Context: {resc[9]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Comment" defaultValue={currentResc[7]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(7, event.target.value); }} /> : <span>Comment: {resc[7]}</span>}</TableCell>
+                    <TableCell className={classes.table_cell}>{isEditing ? <TextField className={classes.resource_textfield} label="Context" defaultValue={currentResc[9]} onKeyDown={handleKeyDown} onChange={(event) => { updateCurrentRescHandler(9, event.target.value); }} /> : <span>Context: {resc[9]}</span>}</TableCell>
                   </TableRow>
                   {currentResc[10] !== '' && <TableRow>
                     <TableCell className={classes.table_cell}>Parent Context: {currentResc[12]}</TableCell>
@@ -214,10 +212,10 @@ function ResourceRows({ row, validServerHosts }) {
       <Dialog open={removeFormOpen} onClose={removeFormClose} aria-labelledby="form-dialog-title">
         <DialogContent className={classes.dialog_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
         <DialogContentText className={classes.remove_result}>{removeErrorMsg}</DialogContentText>
-        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]) }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
+        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]); }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
       </Dialog>
-      <Snackbar open={successNotification} autoHideDuration={5000} onClose={() => setSuccessNotification(false)}><MuiAlert elevation={6} variant="filled" severity="success">Success! Resource {row[0]} updated.</MuiAlert></Snackbar>
-      <Snackbar open={failNotification} autoHideDuration={5000} onClose={() => setFailNotification(false)}><MuiAlert elevation={6} variant="filled" severity="error">Failed to edit resource {row[0]}.</MuiAlert></Snackbar>
+      <Snackbar open={successNotification} autoHideDuration={5000} onClose={() => setSuccessNotification(false)}><Alert elevation={6} variant="filled" severity="success">Success! Resource {row[0]} updated.</Alert></Snackbar>
+      <Snackbar open={failNotification} autoHideDuration={5000} onClose={() => setFailNotification(false)}><Alert elevation={6} variant="filled" severity="error">Failed to edit resource {row[0]}.</Alert></Snackbar>
     </React.Fragment >
   );
 }
@@ -227,4 +225,4 @@ export default ResourceRows;
 ResourceRows.propTypes = {
   row: PropTypes.array,
   validServerHosts: PropTypes.object
-}
+};

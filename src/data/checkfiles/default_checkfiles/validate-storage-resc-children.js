@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "gatsby";
 
 export default {
 	name: "Storage resources have no children",
@@ -9,7 +9,7 @@ export default {
 	interval_in_seconds: 86400,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,
@@ -27,7 +27,7 @@ export default {
 			}
 		});
 
-		// loop through parentResourceIds and check if any are storage resources. if they are, add them to failed
+		// loop through parentResourceIds and check if any are storage resources. if they are, add them to the failed result
 		parentResourceIds.forEach((id) => {
 			const resc = this.rescAll.rows.find((resc) => resc[11] === id);
 			const name = resc[0];

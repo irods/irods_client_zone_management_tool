@@ -1,10 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useEnvironment, useServer } from "../../contexts";
-import { Tree } from "../../components/draggable-tree/tree";
-import { navigate } from "@reach/router";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import ListIcon from "@material-ui/icons/List";
-import AccountTreeIcon from "@material-ui/icons/AccountTree";
+import { Tree } from "../../components/draggable-tree";
+import { navigate } from "gatsby";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
 
 export const ResourceTreeView = () => {
 	if (!localStorage.getItem("zmt-token")) navigate("/");
@@ -26,9 +25,9 @@ export const ResourceTreeView = () => {
 			rescContext.total !== 0 &&
 			rescContext.total === rescContext.count
 		) {
-			let childrenMap = new Map();
-			let dataMap = new Map();
-			let tempZoneData = ["tempZone"];
+			const childrenMap = new Map();
+			const dataMap = new Map();
+			const tempZoneData = ["tempZone"];
 			for (let i = 0; i < 11; i++) {
 				tempZoneData.push("");
 			}
@@ -39,7 +38,7 @@ export const ResourceTreeView = () => {
 				if (!childrenMap.has(resc[10])) {
 					childrenMap.set(resc[10], []);
 				}
-				let childrens = childrenMap.get(resc[10]);
+				const childrens = childrenMap.get(resc[10]);
 				childrens.push(resc);
 				childrenMap.set(resc[10], childrens);
 			});

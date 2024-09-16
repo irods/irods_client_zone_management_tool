@@ -1,9 +1,7 @@
 import React, { Fragment, useState, useEffect, useRef } from "react";
-import { Link, navigate, useLocation } from "@reach/router";
+import { Link, navigate, useLocation } from "gatsby";
 import { useEnvironment, useServer } from "../contexts";
 import {
-	makeStyles,
-	StylesProvider,
 	Button,
 	Dialog,
 	DialogActions,
@@ -24,10 +22,10 @@ import {
 	TableSortLabel,
 	Select,
 	Paper,
-} from "@material-ui/core";
-import SaveIcon from "@material-ui/icons/Save";
-import CloseIcon from "@material-ui/icons/Close";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
+    ToggleButton,
+	ToggleButtonGroup } from "@mui/material";
+import { makeStyles, StylesProvider } from '@mui/styles';
+import { Save as SaveIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AddUserController, RemoveUserController } from "../controllers/UserController";
 
 const useStyles = makeStyles((theme) => ({
@@ -107,11 +105,11 @@ export const User = () => {
 	const firstUpdate = useRef(true); // used to prevent filtering useEffect from running on initial render
 	const delayTimeUse = environment.filterTimeInMilliseconds / 100; // convert into tenths of a second
 
-	let initialAddData = {
+	const initialAddData = {
 		name: "",
 		zone: localZoneName ? localZoneName : "tempZone",
 		type: "rodsuser"
-	}
+	};
 
 	const [newUserData, setNewUserData] = useState(initialAddData);
 	const [addRowOpen, setAddRowOpen] = useState(false);
@@ -195,7 +193,7 @@ export const User = () => {
 		// document.getElementById("add-user-name").value = "";
 		// document.getElementById("add-user-zone").value = localZoneName;
 		// document.getElementById("add-user-type").value = "rodsuser";
-		setAddRowOpen(false)
+		setAddRowOpen(false);
 		setNewUserData(initialAddData);
 	};
 
@@ -276,8 +274,8 @@ export const User = () => {
 		if (!userContext || userContext.rows.length === 0) return; // safety check
 
 		if (time < delayTimeUse) {
-			// filter on frontend since timer has not reached delay limit yet
-			let filteredUsers = userContext.rows.filter(
+			// filter on frontend since timer has not reached a delay limit yet
+			const filteredUsers = userContext.rows.filter(
 				(user) =>
 					user[0]
 						.toLowerCase()
@@ -438,7 +436,7 @@ export const User = () => {
 												id="add-user-name"
 												placeholder="Enter new User Name"
 												value={newUserData.name}
-												onChange={(e) => {setNewUserData({...newUserData, name: e.target.value})}}
+												onChange={(e) => {setNewUserData({...newUserData, name: e.target.value});}}
 												onKeyDown={(event) =>
 													handleKeyDown(event)
 												}
@@ -450,7 +448,7 @@ export const User = () => {
 												className={classes.fontInherit}
 												id="add-user-zone"
 												value={newUserData.zone}
-												onChange={(e) => {setNewUserData({...newUserData, zone: e.target.value})}}
+												onChange={(e) => {setNewUserData({...newUserData, zone: e.target.value});}}
 												onKeyDown={(event) =>
 													handleKeyDown(event)
 												}
@@ -472,7 +470,7 @@ export const User = () => {
 												className={classes.fontInherit}
 												id="add-user-type"
 												value={newUserData.type}
-												onChange={(e) => {setNewUserData({...newUserData, type: e.target.value})}}
+												onChange={(e) => {setNewUserData({...newUserData, type: e.target.value});}}
 												onKeyDown={(event) =>
 													handleKeyDown(event)
 												}

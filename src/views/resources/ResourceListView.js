@@ -8,8 +8,6 @@ import {
 	TextField,
 	LinearProgress,
 	Tooltip,
-} from "@material-ui/core";
-import {
 	Dialog,
 	DialogActions,
 	DialogContent,
@@ -25,20 +23,17 @@ import {
 	TableSortLabel,
 	Paper,
 	IconButton,
-} from "@material-ui/core";
-import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
-import SaveIcon from "@material-ui/icons/Save";
-import CloseIcon from "@material-ui/icons/Close";
+	ToggleButton,
+	ToggleButtonGroup } from "@mui/material";
 import { useEnvironment, useServer } from "../../contexts";
 import "../../App.css";
 import ResourceRows from "../../components/ResourceRows";
-import ListIcon from "@material-ui/icons/List";
-import AccountTreeIcon from "@material-ui/icons/AccountTree";
-import { navigate, useLocation } from "@reach/router";
+import { Save as SaveIcon ,Close as CloseIcon, List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
+import { navigate, useLocation } from "gatsby";
 
 import { 
 	AddResourceController,
- } from "../../controllers/ResourceController"
+ } from "../../controllers/ResourceController";
 
 const useStyles = makeStyles((theme) => ({
 	dialog_action: {
@@ -142,7 +137,7 @@ export const ResourceListView = () => {
 	}, [rescPanelStatus]);
 
 	// validate resource hostname and vault path
-	// return FALSE if one of two attributes is empty string
+	// return FALSE if one of two attributes is an empty string
 	const rescInputValidator = () => {
 		return !((rescLocation === "") ^ (rescVaultPath === ""));
 	};
@@ -169,8 +164,8 @@ export const ResourceListView = () => {
 				`Error Code ${e.response.data.error_code}: ${e.response.data.error_message}`
 			);
 			setLoading(false);
-		})
-	}
+		});
+	};
 
 	const handleKeyDown = (e) => {
 		if (e.keyCode === 13) addResource();
@@ -193,7 +188,7 @@ export const ResourceListView = () => {
 	};
 
 	const handleRescNameChange = (event) => {
-		// trim all whitespace in the resource name
+		// trim all whitespaces in the resource name
 		setRescName(event.target.value.trim());
 	};
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "gatsby";
 
 export default {
 	name: "Resources have valid names",
@@ -9,7 +9,7 @@ export default {
 	interval_in_seconds: 3600,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,

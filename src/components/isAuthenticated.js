@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import BlockIcon from '@material-ui/icons/Block';
+import { Block as BlockIcon } from '@mui/icons-material';
 
 import Appbar from './Appbar';
 import Sidebar from './Sidebar';
 import Cookies from 'js-cookie';
-import { makeStyles } from '@material-ui/core';
+
+import { makeStyles } from '@mui/material/styles';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,10 +35,10 @@ function Access() {
     console.log("Visited");
     const classes = useStyles();
     const token = Cookies.get('token');
-    const isAuthenticated = token != null ? true : false;
+    const isAuthenticated = token != null;
     return (
         <div>
-            {isAuthenticated == true ? <div className={classes.root}>
+            {isAuthenticated === true ? <div className={classes.root}>
                 <Appbar />
                 <Sidebar />
                 <main className={classes.content}>

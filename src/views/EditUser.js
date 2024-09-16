@@ -1,13 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { Link, navigate } from '@reach/router';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { makeStyles, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@material-ui/core';
+import { Link, navigate } from 'gatsby';
 import { useEnvironment } from '../contexts';
-import MuiAlert from '@material-ui/lab/Alert';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { makeStyles, Alert, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@mui/material';
+import { ArrowBack as ArrowBackIcon, Visibility, VisibilityOff } from '@mui/icons-material';
 import { ModifyUserPasswordController, ModifyUserTypeController } from '../controllers/UserController';
 import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
 
@@ -42,12 +39,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const EditUser = () => {
-    // navigate to login page if no token is found
-    if (!localStorage.getItem('zmt-token')) navigate('/')
+    // navigate to the login page if no token is found
+    if (!localStorage.getItem('zmt-token')) navigate('/');
     const auth = localStorage.getItem('zmt-token');
-    const loggedUserName = localStorage.getItem('zmt-username')
-    const params = new URLSearchParams(location.search)
-    const [currentUserName, currentUserZone] = params.get('user') ? params.get('user').split('#') : [undefined, undefined]
+    const loggedUserName = localStorage.getItem('zmt-username');
+    const params = new URLSearchParams(location.search);
+    const [currentUserName, currentUserZone] = params.get('user') ? params.get('user').split('#') : [undefined, undefined];
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
@@ -55,23 +52,23 @@ export const EditUser = () => {
     const [groupsOfUser, setGroupsOfUser] = useState([]);
     const [filterGroupName, setFilterName] = useState('');
     const [filterGroupNameResult, setFilterNameResult] = useState();
-    const [passwordConfirmation, setPasswordConfirmation] = useState(false)
+    const [passwordConfirmation, setPasswordConfirmation] = useState(false);
     const [userType, setUserType] = useState({
         value: '',
         status: ''
-    })
+    });
     const [password, setPassword] = useState({
         newPassword: '',
         confirmPassword: '',
         showPassword: false,
         showConfirmPassword: false,
         status: ''
-    })
+    });
 
     useEffect(() => {
-        // hide this interface for the current rodsadmin user or user that does not have name or zone
+        // hide this interface for the current rodsadmin user or user that does not have a name or zone
         if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) {
-            navigate('/users')
+            navigate('/users');
         }
         axios({
             method: 'GET',
@@ -88,11 +85,11 @@ export const EditUser = () => {
             }
         }).then(res => {
             // navigate back to /user if the username provided does not exist
-            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : navigate('/users')
+            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : navigate('/users');
         }).catch(() => {
-            navigate('/users')
-        })
-    }, [currentUserName])
+            navigate('/users');
+        });
+    }, [currentUserName]);
 
     useEffect(() => {
         if (currentUserName) {
@@ -113,9 +110,9 @@ export const EditUser = () => {
             }).then((res) => {
                 setGroupsOfUser(res.data.rows);
                 setLoading(false);
-            })
+            });
         }
-    }, [refresh])
+    }, [refresh]);
 
     useEffect(() => {
         if (currentUserName) {
@@ -134,9 +131,9 @@ export const EditUser = () => {
                 }
             }).then((res) => {
                 setFilterNameResult(res.data.rows);
-            })
+            });
         }
-    }, [auth, httpApiLocation, filterGroupName])
+    }, [auth, httpApiLocation, filterGroupName]);
 
     async function removeGroupFromUser(group) {
         try {
@@ -148,9 +145,9 @@ export const EditUser = () => {
             )
             .then(() => {
                 setRefresh(!refresh);
-            })
+            });
         } catch (e) {
-            alert(e)
+            alert(e);
         }
 
     }
@@ -165,22 +162,22 @@ export const EditUser = () => {
             )
            .then(() => {
                 setRefresh(!refresh);
-            })
+            });
         }
         catch (e) {
-            alert(e)
+            alert(e);
         }
     }
 
     const resetPwdHandler = () => {
         if (password.newPassword !== password.confirmPassword) {
             // throw error if two password fields do not match
-            setPassword({ ...password, status: 'Passwords do not match.' })
+            setPassword({ ...password, status: 'Passwords do not match.' });
         } else if (password.newPassword === '' && password.confirmPassword === '') {
             // pop up confirmation dialog if passwords are empty
-            setPasswordConfirmation(true)
-        } else resetPwd()
-    }
+            setPasswordConfirmation(true);
+        } else resetPwd();
+    };
 
     const resetPwd = () => {
 
@@ -191,14 +188,14 @@ export const EditUser = () => {
             httpApiLocation
         )
         .then(() => {
-            setPasswordConfirmation(false)
+            setPasswordConfirmation(false);
             setPassword({
                 newPassword: '',
                 confirmPassword: '',
                 showPassword: false,
                 showConfirmPassword: false,
                 status: 'changed'
-            })
+            });
         }).catch(() => {
             setPassword({
                 newPassword: '',
@@ -206,9 +203,9 @@ export const EditUser = () => {
                 showPassword: false,
                 showConfirmPassword: false,
                 status: 'failed'
-            })
-        })
-    }
+            });
+        });
+    };
 
     const updateUserType = (newType) => {
         ModifyUserTypeController(
@@ -217,11 +214,11 @@ export const EditUser = () => {
             newType,
             httpApiLocation
         ).then(() => {
-            setUserType({ value: newType, status: 'changed' })
+            setUserType({ value: newType, status: 'changed' });
         }).catch(() => {
-            setUserType({ ...userType, status: 'failed' })
-        })
-    }
+            setUserType({ ...userType, status: 'failed' });
+        });
+    };
 
 
     const checkGroup = (group) => {
@@ -231,7 +228,7 @@ export const EditUser = () => {
             }
         }
         return false;
-    }
+    };
 
     return (
         <Fragment>
@@ -343,7 +340,7 @@ export const EditUser = () => {
                                                 <TableRow key={thisGroup[0]}>
                                                     <TableCell component="th" scope="row">{thisGroup[0]}</TableCell>
                                                     <TableCell align="right">{checkGroup(thisGroup) ? "In group" : "Not in group"}</TableCell>
-                                                    <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup) }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup) }}>Add</Button>}</TableCell>
+                                                    <TableCell align='right'>{checkGroup(thisGroup) ? <Button color="secondary" onClick={() => { removeGroupFromUser(thisGroup); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addGroupToUser(thisGroup); }}>Add</Button>}</TableCell>
                                                 </TableRow>
                                                 ))}
                                             </TableBody>
@@ -353,10 +350,10 @@ export const EditUser = () => {
                     </Paper>
                 </div>
             </div>
-            <Snackbar open={userType.status === 'changed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><MuiAlert elevation={6} variant="filled" severity="success">Success! User type changed to {userType.value}.</MuiAlert></Snackbar>
-            <Snackbar open={userType.status === 'failed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><MuiAlert elevation={6} variant="filled" severity="error">Failed to change user type.</MuiAlert></Snackbar>
-            <Snackbar open={password.status === 'changed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><MuiAlert elevation={6} variant="filled" severity="success">Success! Password changed.</MuiAlert></Snackbar>
-            <Snackbar open={password.status === 'failed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><MuiAlert elevation={6} variant="filled" severity="error">Failed to change password.</MuiAlert></Snackbar>
+            <Snackbar open={userType.status === 'changed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><Alert elevation={6} variant="filled" severity="success">Success! User type changed to {userType.value}.</Alert></Snackbar>
+            <Snackbar open={userType.status === 'failed'} autoHideDuration={5000} onClose={() => setUserType({ ...userType, status: '' })}><Alert elevation={6} variant="filled" severity="error">Failed to change user type.</Alert></Snackbar>
+            <Snackbar open={password.status === 'changed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><Alert elevation={6} variant="filled" severity="success">Success! Password changed.</Alert></Snackbar>
+            <Snackbar open={password.status === 'failed'} autoHideDuration={5000} onClose={() => setPassword({ ...password, status: '' })}><Alert elevation={6} variant="filled" severity="error">Failed to change password.</Alert></Snackbar>
             <Dialog
                 open={passwordConfirmation}
                 onClose={() => setPasswordConfirmation(false)}
@@ -376,8 +373,8 @@ export const EditUser = () => {
             </Dialog>
         </Fragment>
     );
-}
+};
 
 EditUser.propTypes = {
     location: PropTypes.any
-}
+};

@@ -46,17 +46,17 @@ export const EnvironmentProvider = ({ children }) => {
 
             pageTitle: "", // placeholder that gets filled on each page
             titleFormat: function () {
-                return `${this.pageTitle} - ${this.brandingName}`
+                return `${this.pageTitle} - ${this.brandingName}`;
             }
 
         }}>
             {children}
         </EnvironmentContext.Provider>
-    )
-}
+    );
+};
 
 EnvironmentProvider.propTypes = {
     children: PropTypes.node.isRequired
-}
+};
 
 export const useEnvironment = () => useContext(EnvironmentContext);

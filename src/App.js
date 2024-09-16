@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { LocationProvider, Router } from '@reach/router';
+import { LocationProvider, Router } from 'gatsby';
 import { Layout, Footer } from './components';
 import { EditGroup, EditUser, Group, Home, NotFound, Landing, ResourceListView, ResourceTreeView, Server, SpecificQuery, User, Zone } from './views';
 import './App.css';

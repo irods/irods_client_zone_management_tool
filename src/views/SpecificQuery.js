@@ -1,11 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { navigate, useLocation } from '@reach/router';
+import { navigate, useLocation } from 'gatsby';
 import { useEnvironment, useServer } from '../contexts';
-import { makeStyles, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody, TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import CloseIcon from '@material-ui/icons/Close';
-import SaveIcon from '@material-ui/icons/Save';
-import MuiAlert from '@material-ui/lab/Alert';
+import { Alert, makeStyles, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody, TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
+import { Delete as DeleteIcon, Close as CloseIcon, Save as SaveIcon }  from '@mui/icons-material';
 import { format } from 'sql-formatter';
 import { AddSpecificQueryController, DeleteSpecificQueryController } from '../controllers/SpecificQueryController';
 
@@ -29,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 30,
         width: 300
     }
-}))
+}));
 
 export const SpecificQuery = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
@@ -49,89 +46,89 @@ export const SpecificQuery = () => {
     const { specificQueryContext, isLoadingSpecificQueryContext, loadSpecificQueries } = useServer();
 
     const addButtonEventHandler = () => {
-        setStatus('Adding')
-        setNewAlias("")
-        setNewSqlStr("")
-    }
+        setStatus('Adding');
+        setNewAlias("");
+        setNewSqlStr("");
+    };
 
     // Format: http://localhost:9000/specific-query?add=SELECT%20*%20FROM%20R_USER_MAIN&alias=selectAll
     // everything after ? needs to be URL encoded
 
     useEffect(() => {
         if (newAlias === "" && newSqlStr === "") {
-            window.history.replaceState('', '', '/specific-query')
+            window.history.replaceState('', '', '/specific-query');
         } else {
-            window.history.replaceState('', '', `/specific-query?sqlStr=${encodeURIComponent(newSqlStr)}&alias=${encodeURIComponent(newAlias)}`)
+            window.history.replaceState('', '', `/specific-query?sqlStr=${encodeURIComponent(newSqlStr)}&alias=${encodeURIComponent(newAlias)}`);
         }
 
-    }, [newAlias, newSqlStr])
+    }, [newAlias, newSqlStr]);
 
     useEffect(() => {
         if (newAlias || newSqlStr) {
             setStatus('Adding');
         }
-    }, [])
+    }, []);
 
     const addSpecificQueryHandler = async () => {
-        setConfirmationVisibility(false)
+        setConfirmationVisibility(false);
         await AddSpecificQueryController(newAlias, newSqlStr, environment.httpApiLocation)
             .then(res => {
                 if (res.status === 200) {
-                    loadSpecificQueries()
-                    setNewSqlStr("")
-                    setStatus('add-success')
-                } else setStatus('add-failed')
+                    loadSpecificQueries();
+                    setNewSqlStr("");
+                    setStatus('add-success');
+                } else setStatus('add-failed');
             })
             .catch(() => {
-                setStatus('add-failed')
-            })
-    }
+                setStatus('add-failed');
+            });
+    };
 
     const deleteButtonEventHandler = (alias) => {
-        setAliasToDelete(alias)
-        setStatus('Deleting')
-        setConfirmationVisibility(true)
-    }
+        setAliasToDelete(alias);
+        setStatus('Deleting');
+        setConfirmationVisibility(true);
+    };
 
     const deleteSpecificQueryHandler = async () => {
-        setConfirmationVisibility(false)
+        setConfirmationVisibility(false);
         await DeleteSpecificQueryController(aliasToDelete, environment.httpApiLocation)
             .then(res => {
                 if (res.status === 200) {
-                    loadSpecificQueries()
-                    setStatus('delete-success')
-                } else setStatus('delete-failed')
+                    loadSpecificQueries();
+                    setStatus('delete-success');
+                } else setStatus('delete-failed');
             }
             ).catch(() => {
-                setStatus('delete-failed')
-            })
-    }
+                setStatus('delete-failed');
+            });
+    };
 
     const handleSort = (newOrderBy) => {
         const isAsc = orderBy === newOrderBy && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
-        setOrderBy(newOrderBy)
-    }
+        setOrderBy(newOrderBy);
+    };
 
     const keyEventHandler = (event) => {
         // check if enter is pressed
         if (event.keyCode === 13 && status === 'Adding') {
-            setConfirmationVisibility(true)
+            setConfirmationVisibility(true);
         }
-    }
+    };
 
     useEffect(() => {
         if (specificQueryContext?.rows) {
             // sort by column 
-            let newSortedSpecificQueryContext = [...specificQueryContext.rows].sort((a, b) => {
-                return (order === 'asc' ? 1 : -1) * (orderBy === 'alias' ? a[0].localeCompare(b[0]) : a[1].localeCompare(b[1]))
-            })
+            const newSortedSpecificQueryContext = [...specificQueryContext.rows].sort((a, b) => {
+                return (order === 'asc' ? 1 : -1) * (orderBy === 'alias' ? a[0].localeCompare(b[0]) : a[1].localeCompare(b[1]));
+            });
             // filter by input
-            setSortedSpecificQueryContext(newSortedSpecificQueryContext.filter(query => query[0].toLowerCase().includes(filterInput.toLowerCase()) || query[1].toLowerCase().includes(filterInput.toLowerCase())))
+            setSortedSpecificQueryContext(newSortedSpecificQueryContext.filter(query => query[0].toLowerCase().includes(filterInput.toLowerCase()) || query[1].toLowerCase().includes(filterInput.toLowerCase())));
         }
         environment.pageTitle = environment.specificQueriesTitle;
-        document.title = `${environment.titleFormat()}`
-    }, [filterInput, specificQueryContext, order, orderBy])
+        document.title = `${environment.titleFormat()}`;
+    }, [filterInput, specificQueryContext, order, orderBy]);
 
     return (
         <Fragment>
@@ -192,10 +189,10 @@ export const SpecificQuery = () => {
                     }
                 </DialogActions>
             </Dialog>
-            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); setNewAlias("") }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{newAlias}&apos; is added.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to add specific query &apos;{newAlias}&apos;.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'delete-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{aliasToDelete}&apos; is deleted.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'delete-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><MuiAlert elevation={6} variant="filled" severity="error">Failed to delete specific query &apos;{aliasToDelete}&apos;.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); setNewAlias(""); }}><Alert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{newAlias}&apos; is added.</Alert></Snackbar>
+            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><Alert elevation={6} variant="filled" severity="error">Failed to add specific query &apos;{newAlias}&apos;.</Alert></Snackbar>
+            <Snackbar open={status === 'delete-success'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><Alert elevation={6} variant="filled" severity="success">Success! Specific query &apos;{aliasToDelete}&apos; is deleted.</Alert></Snackbar>
+            <Snackbar open={status === 'delete-failed'} autoHideDuration={5000} onClose={() => { setStatus('none'); }}><Alert elevation={6} variant="filled" severity="error">Failed to delete specific query &apos;{aliasToDelete}&apos;.</Alert></Snackbar>
         </Fragment>
-    )
-}
+    );
+};

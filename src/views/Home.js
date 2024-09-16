@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useCheck, useServer, useEnvironment } from "../contexts";
-import { navigate } from "@reach/router";
-import { Check } from "../components/checks/check";
-import { makeStyles, CircularProgress, Fade, Paper } from "@material-ui/core";
-import BuildIcon from "@material-ui/icons/Build";
-import CheckIcon from "@material-ui/icons/Check";
-import ErrorIcon from "@material-ui/icons/Error";
-import BlockIcon from "@material-ui/icons/Block";
-import WarningIcon from "@material-ui/icons/Warning";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import CancelIcon from "@material-ui/icons/Cancel";
+import { navigate } from "gatsby";
+import { Check } from "../components";
+import { makeStyles, CircularProgress, Fade, Paper } from "@mui/material";
+import { Build as BuildIcon, Check as CheckIcon, Error as ErrorIcon, Block as BlockIcon, Warning as WarningIcon, Highlight as HighlightOffIcon, Cancel as CancelIcon } from "@mui/icons-material";
 
 const useStyles = makeStyles({
 	root: {
@@ -54,7 +48,7 @@ export const Home = () => {
 	const environment = useEnvironment();
 
 	useEffect(() => {
-		// load data every time user visit /home, so all checks can get access to the latest server data
+		// load data every time the user visits /home, so all checks can get access to the latest server data
 		loadData();
 		environment.pageTitle = environment.homeTitle;
 		document.title = environment.titleFormat();

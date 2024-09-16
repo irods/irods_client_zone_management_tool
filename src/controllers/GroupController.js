@@ -14,8 +14,8 @@ export const AddGroupController = (name, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const RemoveGroupController = async (name, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -31,8 +31,8 @@ export const RemoveGroupController = async (name, httpApiLocation) => {
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const AddUserToGroupController = (user, zone, group, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -50,8 +50,8 @@ export const AddUserToGroupController = (user, zone, group, httpApiLocation) => 
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 
 export const RemoveUserFromGroupController = (user, zone, group, httpApiLocation) => {
     const params = new URLSearchParams({
@@ -69,6 +69,6 @@ export const RemoveUserFromGroupController = (user, zone, group, httpApiLocation
                 'Authorization': `Bearer ${localStorage.getItem('zmt-token')}`,
             }
         } 
-    )
-}
+    );
+};
 

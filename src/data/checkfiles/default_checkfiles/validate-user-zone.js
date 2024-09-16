@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "gatsby";
 import axios from "axios";
-import Chip from "@material-ui/core/Chip";
+import Chip from "@mui/material/Chip";
 
 export default {
 	name: "Each user is in a valid zone.",
@@ -11,7 +11,7 @@ export default {
 	interval_in_seconds: 86400,
 	active: true,
 	checker: async function () {
-		let result = {
+		const result = {
 			status: "",
 			message: [],
 			success: 0,
@@ -37,7 +37,7 @@ export default {
 				offset: 0,
 			},
 		}).catch((e) => {
-			if (!e.response || e.response.status == 400) {
+			if (!e.response || e.response.status === 400) {
 				warningAboutSpecificQuery = true;
 			}
 		});
@@ -86,7 +86,7 @@ export default {
 			if (resp1 && resp1.data && resp2 && resp2.data) {
 				resp1.data.rows.map((user) => {
 					for (let i = 0; i < resp2.data.rows.length; i++) {
-						if (user[1] == resp2.data.rows[i][0]) {
+						if (user[1] === resp2.data.rows[i][0]) {
 							return;
 						}
 					}
@@ -98,7 +98,7 @@ export default {
 		result.status = result.failed.length > 0 ? "error" : "healthy";
 
 		if (result.failed.length > 0) {
-			let pushed = (
+			const pushed = (
 				<span key="push1">
 					<span>Failed on: </span>
 					{result.failed.map((failedUser, index) => (
@@ -144,7 +144,7 @@ export default {
 				</span>
 			);
 
-			if (result.status == "healthy") {
+			if (result.status === "healthy") {
 				result.status = "warning";
 			}
 		}

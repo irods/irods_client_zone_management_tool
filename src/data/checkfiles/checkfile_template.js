@@ -7,17 +7,17 @@ export default {
     active: true,
     checker: function () {
         // default result object
-        let result = {
+        const result = {
             status: 'healthy', // <healthy, warning, error>
             message: '',
             success: 0, // optional
             failed: [] // optional
-        }
+        };
         // your code here
 
 
 
         // return
-        return result
+        return result;
     }
-}
+};

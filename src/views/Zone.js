@@ -1,22 +1,22 @@
-import React, { useState, Fragment, useEffect } from 'react'
-import { Button, Dialog, DialogTitle, DialogActions, DialogContent, LinearProgress, Table, TableCell, TableContainer, TableHead, TableRow, Paper, TableBody, Typography, IconButton, Input, Select, Snackbar, makeStyles, TableSortLabel } from '@material-ui/core';
-import MuiAlert from '@material-ui/lab/Alert';
-import { navigate } from '@reach/router';
+import React, { useState, Fragment, useEffect } from 'react';
+import { Alert, Button, Dialog, DialogTitle, DialogActions,
+    DialogContent, LinearProgress, Table, TableCell, TableContainer,
+    TableHead, TableRow, Paper, TableBody, Typography, IconButton,
+    Input, Select, Snackbar, TableSortLabel } from '@mui/material';
+import { navigate } from 'gatsby';
 import { useEnvironment, useServer } from '../contexts';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SaveIcon from '@material-ui/icons/Save';
-import CloseIcon from '@material-ui/icons/Close';
+import { Edit as EditIcon, Delete as DeleteIcon, Save as SaveIcon, Close as CloseIcon } from '@mui/icons-material';
 import { AddZoneController, DeleteZoneController, ModifyZoneController } from '../controllers/ZoneController';
+import { makeStyles } from '@mui/material/styles';
 
-let initialZoneState = {
+const initialZoneState = {
     name: '',
     type: 'remote',
     users: 0,
     hostname: '',
     port: '',
     comment: ''
-}
+};
 
 const useStyles = makeStyles(() => ({
     fontInherit: {
@@ -25,148 +25,150 @@ const useStyles = makeStyles(() => ({
     table_cell: {
         wordWrap: 'break-word'
     }
-}))
+}));
 
 export const Zone = () => {
     if (!localStorage.getItem('zmt-token')) navigate('/');
-    const { zones, loadZones, isLoadingZones } = useServer()
-    const [sortedZones, setSortedZones] = useState([])
-    const [status, setStatus] = useState('none')
-    const [currZone, setCurrZone] = useState(initialZoneState)
-    const [modifiedCurrZone, setModifiedCurrZone] = useState()
-    const [confirmationDialog, setConfirmationDialog] = useState({ state: '', visibility: false })
-    const [saveButtonIsDisabled, setSaveButtonIsDiabled] = useState(true)
-    const [order, setOrder] = useState('')
-    const [orderBy, setOrderBy] = useState('asc')
-    const classes = useStyles()
-    const environment = useEnvironment()
+    const { zones, loadZones, isLoadingZones } = useServer();
+    const [sortedZones, setSortedZones] = useState([]);
+    const [status, setStatus] = useState('none');
+    const [currZone, setCurrZone] = useState(initialZoneState);
+    const [modifiedCurrZone, setModifiedCurrZone] = useState();
+    const [confirmationDialog, setConfirmationDialog] = useState({ state: '', visibility: false });
+    const [saveButtonIsDisabled, setSaveButtonIsDisabled] = useState(true);
+    const [order, setOrder] = useState('');
+    const [orderBy, setOrderBy] = useState('asc');
+    const classes = useStyles();
+    const environment = useEnvironment();
 
     useEffect(() => {
         if (zones && zones.length > 0) {
-            setSortedZones(zones)
+            setSortedZones(zones);
         }
         environment.pageTitle = environment.zonesTitle;
-        document.title = `${environment.titleFormat()}`
-    }, [zones])
+        document.title = `${environment.titleFormat()}`;
+    }, [zones]);
 
     // sort rows if user clicks on the column arrows
     useEffect(() => {
         if (order !== '' && orderBy !== '') {
-            let newSortedZone = [...sortedZones]
-            newSortedZone.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[orderBy].localeCompare(b[orderBy])))
-            setSortedZones(newSortedZone)
+            const newSortedZone = [...sortedZones];
+            newSortedZone.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[orderBy].localeCompare(b[orderBy])));
+            setSortedZones(newSortedZone);
         }
-    }, [order, orderBy])
+    }, [order, orderBy]);
 
     // validate input and check if any inputs are changed
     useEffect(() => {
         if (status === 'edit-mode') {
-            setSaveButtonIsDiabled(!(validateEditModeInput() && checkIfChanged()))
+            setSaveButtonIsDisabled(!(validateEditModeInput() && checkIfChanged()));
         }
         else {
-            setSaveButtonIsDiabled(currZone.name === '' || currZone.hostname === '' || currZone.port === '')
+            setSaveButtonIsDisabled(currZone.name === '' || currZone.hostname === '' || currZone.port === '');
         }
-    }, [currZone, modifiedCurrZone])
+    }, [currZone, modifiedCurrZone]);
 
     const handleSort = (newOrderBy) => {
         const isAsc = orderBy === newOrderBy && order === 'desc';
         setOrder(isAsc ? 'asc' : 'desc');
-        setOrderBy(newOrderBy)
-    }
+        setOrderBy(newOrderBy);
+    };
 
     // insert new row into dom for zone creation
     const addNewZoneRow = () => {
-        setCurrZone(initialZoneState)
-        setStatus('creation')
-    }
+        setCurrZone(initialZoneState);
+        setStatus('creation');
+    };
 
     const addZoneHandler = async () => {
         try {
-            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, environment.httpApiLocation)
+            const res = await AddZoneController(currZone.name, currZone.type, currZone.hostname + ':' + currZone.port, currZone.comment, environment.httpApiLocation);
             if (res.status === 200) {
-                setStatus('add-success')
-                loadZones()
+                setStatus('add-success');
+                loadZones();
             }
         }
         catch (e) {
-            setStatus('add-failed')
+            console.error(e, e.stack);
+            setStatus('add-failed');
         }
-    }
+    };
 
     // popup for delete zone confirmation
     const deleteZonePopupHandler = (zone) => {
-        setCurrZone(zone)
-        setConfirmationDialog({ state: 'remove', visibility: true })
-    }
+        setCurrZone(zone);
+        setConfirmationDialog({ state: 'remove', visibility: true });
+    };
     const deleteZoneHandler = async () => {
-        const res = await DeleteZoneController(currZone.name, environment.httpApiLocation)
-        setConfirmationDialog({ state: 'remove', visibility: false })
+        const res = await DeleteZoneController(currZone.name, environment.httpApiLocation);
+        setConfirmationDialog({ state: 'remove', visibility: false });
         if (res.status === 200) {
-            setStatus('remove-success')
-            loadZones()
+            setStatus('remove-success');
+            loadZones();
         } else {
-            setStatus('remove-error')
+            setStatus('remove-error');
         }
-    }
+    };
 
     const editZoneModeHandler = (zone) => {
         setCurrZone(zone);
-        setModifiedCurrZone(zone)
-        setStatus('edit-mode')
-    }
+        setModifiedCurrZone(zone);
+        setStatus('edit-mode');
+    };
 
     const editZoneHandler = async () => {
-        let newZoneName = modifiedCurrZone.name
-        let newConnString = `${modifiedCurrZone.hostname}:${modifiedCurrZone.port}`
-        let newComment = modifiedCurrZone.comment
+        const newZoneName = modifiedCurrZone.name;
+        const newConnString = `${modifiedCurrZone.hostname}:${modifiedCurrZone.port}`;
+        const newComment = modifiedCurrZone.comment;
         try {
-            let updated = true
+            let updated = true;
             if (newZoneName !== currZone.name) {
-                let nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, environment.httpApiLocation)
-                if (nameModificationRes.status !== 200) updated = false
+                const nameModificationRes = await ModifyZoneController(currZone.name, 'name', newZoneName, environment.httpApiLocation);
+                if (nameModificationRes.status !== 200) updated = false;
             }
             if (newConnString !== (currZone.hostname + ":" + currZone.port)) {
-                let hostModificationRes = await ModifyZoneController(newZoneName, 'connection_info', newConnString, environment.httpApiLocation)
-                if (hostModificationRes.status !== 200) updated = false
+                const hostModificationRes = await ModifyZoneController(newZoneName, 'connection_info', newConnString, environment.httpApiLocation);
+                if (hostModificationRes.status !== 200) updated = false;
             }
             if (newComment !== currZone.comment) {
-                let commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, environment.httpApiLocation)
-                if (commentModificationRes.status !== 200) updated = false
+                const commentModificationRes = await ModifyZoneController(newZoneName, 'comment', newComment, environment.httpApiLocation);
+                if (commentModificationRes.status !== 200) updated = false;
             }
             if (updated) {
-                loadZones()
-                setStatus('edit-success')
+                loadZones();
+                setStatus('edit-success');
             }
         }
         catch (e) {
-            setStatus('edit-failed')
+            console.error(e, e.stack);
+            setStatus('edit-failed');
         }
         finally {
-            setConfirmationDialog({ state: 'modify', visibility: false })
+            setConfirmationDialog({ state: 'modify', visibility: false });
         }
-    }
+    };
 
     // return true if inputs are valid and not empty, return false otherwise
     const validateEditModeInput = () => {
-        return modifiedCurrZone.name !== '' && modifiedCurrZone.hostname !== '' && parseInt(modifiedCurrZone.port) > 0
-    }
+        return modifiedCurrZone.name !== '' && modifiedCurrZone.hostname !== '' && parseInt(modifiedCurrZone.port) > 0;
+    };
 
     // return true if any edit input has changed, return false otherwise
     const checkIfChanged = () => {
-        return !(modifiedCurrZone.name === currZone.name && modifiedCurrZone.hostname === currZone.hostname && modifiedCurrZone.port === currZone.port && modifiedCurrZone.comment === currZone.comment)
-    }
+        return !(modifiedCurrZone.name === currZone.name && modifiedCurrZone.hostname === currZone.hostname && modifiedCurrZone.port === currZone.port && modifiedCurrZone.comment === currZone.comment);
+    };
 
     const keyEventHandler = (event) => {
         // check if enter is pressed
         if (event.keyCode === 13) {
             if (status === 'creation') {
-                addZoneHandler()
+                addZoneHandler();
             }
             else {
-                setConfirmationDialog({ state: 'modify', visibility: true })
+                setConfirmationDialog({ state: 'modify', visibility: true });
             }
         }
-    }
+    };
 
     return (
         <Fragment>
@@ -198,7 +200,7 @@ export const Zone = () => {
                                 <TableCell><Input id="new_zone_comment_input" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, comment: e.target.value })} /></TableCell>
                                 <TableCell>
                                     <Fragment>
-                                        <IconButton size="small" aria-label="make-new-zone" value="save" disabled={saveButtonIsDisabled} onClick={() => { setCurrZone(initialZoneState); addZoneHandler() }}><SaveIcon /></IconButton>
+                                        <IconButton size="small" aria-label="make-new-zone" value="save" disabled={saveButtonIsDisabled} onClick={() => { setCurrZone(initialZoneState); addZoneHandler(); }}><SaveIcon /></IconButton>
                                         <IconButton size="small" aria-label="close-new-zone-row" value="close" onClick={() => setStatus('none')}><CloseIcon /></IconButton>
                                     </Fragment>
                                 </TableCell>
@@ -235,16 +237,16 @@ export const Zone = () => {
                     <Typography>{confirmationDialog.state === 'remove' ? 'Removing' : 'Modifying'} zone <b>{currZone.name}</b>?</Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => { confirmationDialog.state === 'remove' ? deleteZoneHandler() : editZoneHandler() }} color="secondary">{confirmationDialog.state === 'remove' ? 'Remove' : 'Modify'}</Button>
+                    <Button onClick={() => { confirmationDialog.state === 'remove' ? deleteZoneHandler() : editZoneHandler(); }} color="secondary">{confirmationDialog.state === 'remove' ? 'Remove' : 'Modify'}</Button>
                     <Button onClick={() => setConfirmationDialog({ state: '', visibility: false })} color="primary">Cancel</Button>
                 </DialogActions>
             </Dialog>
-            <Snackbar open={status === 'edit-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is updated.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'edit-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="error">Failed to modify zone {currZone.name}.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'remove-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is removed.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'remove-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="error">Failed to remove zone {currZone.name}.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is created.</MuiAlert></Snackbar>
-            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><MuiAlert elevation={6} variant="filled" severity="error">Failed to create zone {currZone.name}.</MuiAlert></Snackbar>
+            <Snackbar open={status === 'edit-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is updated.</Alert></Snackbar>
+            <Snackbar open={status === 'edit-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="error">Failed to modify zone {currZone.name}.</Alert></Snackbar>
+            <Snackbar open={status === 'remove-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is removed.</Alert></Snackbar>
+            <Snackbar open={status === 'remove-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="error">Failed to remove zone {currZone.name}.</Alert></Snackbar>
+            <Snackbar open={status === 'add-success'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="success">Success! Zone {currZone.name} is created.</Alert></Snackbar>
+            <Snackbar open={status === 'add-failed'} autoHideDuration={5000} onClose={() => setStatus('none')}><Alert elevation={6} variant="filled" severity="error">Failed to create zone {currZone.name}.</Alert></Snackbar>
         </Fragment>
-    )
-}
+    );
+};

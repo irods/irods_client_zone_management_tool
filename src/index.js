@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import createRoot from 'react-dom';
+import App from './App.js';
 import './index.css';
 
 import { ServerProvider, EnvironmentProvider, CheckProvider } from './contexts';
 
-ReactDOM.render(
+createRoot.render(
   <EnvironmentProvider>
       <ServerProvider>
         <CheckProvider>

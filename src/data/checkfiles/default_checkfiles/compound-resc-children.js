@@ -6,13 +6,13 @@ export default {
 	interval_in_seconds: 3600,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,
 			failed: [],
 		};
-		let compoundRescObj = this.rescAll.rows.reduce((prev, curr) => {
+		const compoundRescObj = this.rescAll.rows.reduce((prev, curr) => {
 			if (curr[1] === "compound")
 				prev[curr[11]] = {
 					name: curr[0],
@@ -28,7 +28,7 @@ export default {
 				compoundRescObj[resc[10]].children[resc[12]] += 1;
 			}
 		});
-		for (let compoundRescID in compoundRescObj) {
+		for (const compoundRescID in compoundRescObj) {
 			if (
 				compoundRescObj[compoundRescID].children["archive"] === 1 &&
 				compoundRescObj[compoundRescID].children["cache"] === 1

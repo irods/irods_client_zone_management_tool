@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Link, navigate, useLocation } from "@reach/router";
+import { Link, navigate, useLocation } from "gatsby";
 import {
 	AppBar,
 	CssBaseline,
@@ -13,9 +13,9 @@ import {
 	MenuItem,
 	Toolbar,
 	Typography,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import { Menu as MenuIcon } from "@mui/icons-material";
+import { makeStyles } from "@mui/material/styles";
 import { useEnvironment, useServer } from "../../contexts";
 
 const drawerWidth = "200px";

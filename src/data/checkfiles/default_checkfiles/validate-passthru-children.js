@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "@reach/router";
+import { Link } from "gatsby";
 
 export default {
 	name: "Each passthru resource has exactly one child",
@@ -9,7 +9,7 @@ export default {
 	interval_in_seconds: 86400,
 	active: true,
 	checker: function () {
-		let result = {
+		const result = {
 			status: "",
 			message: "",
 			success: 0,
@@ -18,7 +18,7 @@ export default {
 
 		// get the ids of all passthru resources, along with some other information: [name, zone, id, numChildren]
 		const passThruRescIds = this.rescAll.rows
-			.filter((resc) => resc[1] == "passthru")
+			.filter((resc) => resc[1] === "passthru")
 			.map((resc) => [resc[0], resc[2], resc[11], 0]);
 
 		this.rescAll.rows.forEach((resc) => {
@@ -26,7 +26,7 @@ export default {
 
 			if (parentId) {
 				const parentResc = passThruRescIds.find(
-					(resc) => resc[2] == parentId
+					(resc) => resc[2] === parentId
 				); // find the parent resource in the list of passthru resources
 				if (parentResc) {
 					parentResc[3] += 1; // increment the number of children on the parent passthru resource

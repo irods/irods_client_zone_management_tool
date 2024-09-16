@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react'
-import { Link } from '@reach/router';
-import { Container, Typography } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles';
-import { useLocation } from '@reach/router';
-import { useEnvironment } from '../contexts/EnvironmentContext';
+import React, { useEffect } from 'react';
+import { Link, useLocation} from 'gatsby';
+import { Container, Typography } from '@mui/material';
+import { makeStyles } from '@mui/material/styles';
+import { useEnvironment } from '../contexts';
 import { renderLayout, hideLayout } from '../utils';
 
 const useStyles = makeStyles(() => ({
@@ -27,7 +26,7 @@ const useStyles = makeStyles(() => ({
         width: '200px',
         margin: '5% auto'
     }
-}))
+}));
 
 export const NotFound = () => {
     const classes = useStyles();
@@ -37,7 +36,7 @@ export const NotFound = () => {
 
     useEffect(() => {
         hideLayout();
-    },[])
+    },[]);
 
     return (
         <Container className={classes.notFoundContainer}>
@@ -51,5 +50,5 @@ export const NotFound = () => {
                 <Typography className={classes.text}>{location.pathname}</Typography>
             </div>
         </Container>
-    )
-}
+    );
+};
