@@ -172,7 +172,7 @@ export const Tree = (props) => {
         expanded.push(nodeId);
         const handleDragEnd = (e) => {
             if (newParentNode !== undefined && e.target !== undefined && e.target.children[0] !== undefined && e.target.children[0].children[1] !== undefined && nodeName === e.target.children[0].children[1].innerHTML && node[11] !== newParentNode[11]) {
-                dragndropController(node, stagedDataMap.get(node[10])).then();
+                dragndropController(node, stagedDataMap.get(node[10]));
             }
         };
 

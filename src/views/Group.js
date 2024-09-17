@@ -139,7 +139,7 @@ export const Group = () => {
 	}
 
 	const handleKeyDown = (e) => {
-		if (e.keyCode === 13) addGroup().then();
+		if (e.keyCode === 13) addGroup();
 	};
 
 	const handleAddRowOpen = () => {

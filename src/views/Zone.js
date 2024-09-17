@@ -164,7 +164,7 @@ export const Zone = () => {
         // check if enter is pressed
         if (event.keyCode === 13) {
             if (status === 'creation') {
-                addZoneHandler().then();
+                addZoneHandler();
             }
             else {
                 setConfirmationDialog({ state: 'modify', visibility: true });
@@ -202,7 +202,7 @@ export const Zone = () => {
                                 <TableCell><Input id="new_zone_comment_input" className={classes.fontInherit} onKeyDown={(e) => keyEventHandler(e)} onChange={(e) => setCurrZone({ ...currZone, comment: e.target.value })} /></TableCell>
                                 <TableCell>
                                     <Fragment>
-                                        <IconButton size="small" aria-label="make-new-zone" value="save" disabled={saveButtonIsDisabled} onClick={() => { setCurrZone(initialZoneState); addZoneHandler().then(); }}><SaveIcon /></IconButton>
+                                        <IconButton size="small" aria-label="make-new-zone" value="save" disabled={saveButtonIsDisabled} onClick={() => { setCurrZone(initialZoneState); addZoneHandler(); }}><SaveIcon /></IconButton>
                                         <IconButton size="small" aria-label="close-new-zone-row" value="close" onClick={() => setStatus('none')}><CloseIcon /></IconButton>
                                     </Fragment>
                                 </TableCell>

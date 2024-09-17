@@ -84,7 +84,7 @@ function ResourceRows({ row, validServerHosts }) {
   const handleKeyDown = event => {
     // support key event if any field has been changed
     if (event.keyCode === 13 && checkIfChanged()) {
-      saveResource().then();
+      saveResource();
     }
   };
 
@@ -214,7 +214,7 @@ function ResourceRows({ row, validServerHosts }) {
       <Dialog open={removeFormOpen} onClose={removeFormClose} aria-labelledby="form-dialog-title">
         <DialogContent className={classes.dialog_content}>Are you sure to remove resource <b>{row[0]}</b>? </DialogContent>
         <DialogContentText className={classes.remove_result}>{removeErrorMsg}</DialogContentText>
-        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]).then(); }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
+        <DialogActions><Button color="secondary" onClick={() => { removeResource(row[0]); }}>Remove</Button><Button onClick={removeFormClose}>Cancel</Button></DialogActions>
       </Dialog>
       <Snackbar open={successNotification} autoHideDuration={5000} onClose={() => setSuccessNotification(false)}><Alert elevation={6} variant="filled" severity="success">Success! Resource {row[0]} updated.</Alert></Snackbar>
       <Snackbar open={failNotification} autoHideDuration={5000} onClose={() => setFailNotification(false)}><Alert elevation={6} variant="filled" severity="error">Failed to edit resource {row[0]}.</Alert></Snackbar>

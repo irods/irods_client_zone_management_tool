@@ -162,7 +162,7 @@ export const User = () => {
 	}
 
 	const handleKeyDown = (e) => {
-		if (e.keyCode === 13) addUser().then();
+		if (e.keyCode === 13) addUser();
 	};
 
 	const handleRemoveConfirmationOpen = (props) => {

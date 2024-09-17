@@ -169,7 +169,7 @@ export const EditGroup = (props) => {
                                 <TableCell component="th" scope="row">{thisUser[0]}</TableCell>
                                 <TableCell align="right">{thisUser[1]}</TableCell>
                                 <TableCell align="right">{checkUser(thisUser) ? `Member of ${currentGroup[0]}` : `Not in ${currentGroup[0]}`}</TableCell>
-                                <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser).then(); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser).then(); }}>Add</Button>}</TableCell>
+                                <TableCell align='right'>{checkUser(thisUser) ? <Button color="secondary" onClick={() => { removeUserFromGroup(thisUser); }}>Remove</Button> : <Button className={classes.add_button} onClick={() => { addUserToGroup(thisUser).then(); }}>Add</Button>}</TableCell>
                             </TableRow>)}
                         </TableBody>
                     </Table>}

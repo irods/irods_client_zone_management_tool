@@ -222,14 +222,14 @@ export const CheckProvider = ({ children }) => {
             localStorage.setItem('zmt-checkIntervals', JSON.stringify(prev));
             return prev;
         });
-        runOneCheck(checkObject[id]).then();
+        runOneCheck(checkObject[id]);
     };
 
     const modifyCheckActivity = (id) => {
         const newSet = new Set(inactiveChecks);
         if (inactiveChecks.has(id)) {
             newSet.delete(id);
-            runOneCheck(checkObject[id]).then();
+            runOneCheck(checkObject[id]);
         }
         else {
             // update check's status to 'inactive' and clear timeout
