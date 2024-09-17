@@ -1,5 +1,6 @@
 import React, { useState, Fragment } from 'react';
-import { Collapse, IconButton, Input, makeStyles, TableCell, TableRow, Tooltip } from '@mui/material';
+import { Collapse, IconButton, Input, TableCell, TableRow, Tooltip } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useCheck } from '../../contexts';
 import { Loop as LoopIcon, Check as CheckIcon, Error as ErrorIcon, ExpandMore as ExpandMoreIcon, Block as BlockIcon, BugReport as WarningIcon,
     ArrowRight as KeyboardArrowRightIcon, Highlight as HighlightOffIcon, Edit as EditIcon, Close as CloseIcon, Cancel as CancelIcon } from '@mui/icons-material';

@@ -28,7 +28,9 @@ const useStyles = makeStyles(() => ({
 }));
 
 export const Zone = () => {
-    if (!localStorage.getItem('zmt-token')) Navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
+
     const { zones, loadZones, isLoadingZones } = useServer();
     const [sortedZones, setSortedZones] = useState([]);
     const [status, setStatus] = useState('none');
@@ -47,7 +49,7 @@ export const Zone = () => {
         }
         environment.pageTitle = environment.zonesTitle;
         document.title = `${environment.titleFormat()}`;
-    }, [zones]);
+    }, [zones, environment]);
 
     // sort rows if user clicks on the column arrows
     useEffect(() => {
@@ -56,7 +58,7 @@ export const Zone = () => {
             newSortedZone.sort((a, b) => (order === 'asc' ? 1 : -1) * (a[orderBy].localeCompare(b[orderBy])));
             setSortedZones(newSortedZone);
         }
-    }, [order, orderBy]);
+    }, [order, orderBy, sortedZones]);
 
     // validate input and check if any inputs are changed
     useEffect(() => {
@@ -66,7 +68,7 @@ export const Zone = () => {
         else {
             setSaveButtonIsDisabled(currZone.name === '' || currZone.hostname === '' || currZone.port === '');
         }
-    }, [currZone, modifiedCurrZone]);
+    }, [currZone, modifiedCurrZone, status]);
 
     const handleSort = (newOrderBy) => {
         const isAsc = orderBy === newOrderBy && order === 'desc';

@@ -225,7 +225,7 @@ export const Tree = (props) => {
 
     useEffect(() => {
         renderTreeNode(stagedDataMap.get(""));
-    }, [stagedChildrenMap]);
+    }, [stagedChildrenMap, renderTreeNode, stagedDataMap]);
 
     return (
         <div>

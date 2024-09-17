@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, Collapse, Typography, makeStyles, CircularProgress, Dialog, DialogActions,
+  Button, Collapse, Typography, CircularProgress, Dialog, DialogActions,
   DialogContent, DialogContentText, Icon, IconButton, Table, TableBody, TableCell,
   TableRow, Tooltip, Snackbar, TextField, Alert } from '@mui/material';
+
+import { makeStyles} from '@mui/styles';
 
 import {
   SaveAs as SaveIcon, Delete as DeleteIcon, Cancel as CancelIcon, Edit as EditIcon, BugReport as WarningIcon,

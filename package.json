@@ -10,10 +10,15 @@
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "fade": "^0.2.0",
+    "globals": "^15.9.0",
     "install": "^0.13.0",
     "js-cookie": "^3.0.5",
     "npm": "^10.8.3",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^8.1.1",
+    "postcss-preset-env": "^10.0.3",
     "react": "^18.3.1",
+    "react-app": "^1.1.2",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
     "react-spring": "^9.7.4",
@@ -22,17 +27,14 @@
   },
   "scripts": {
     "start": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && CHOKIDAR_USEPOLLING=true react-scripts start",
-    "start-pc": "set CHOKIDAR_USEPOLLING=true && react-scripts start",
+    "start-pc": "react-scripts start",
     "build": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.js*"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": []
   },
   "browserslist": {
     "production": [
@@ -47,15 +49,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/eslint-parser": "^7.25.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-private-property-in-object": "^7.24.7",
-    "@babel/preset-env": "^7.25.4",
-    "@babel/preset-react": "^7.24.7",
     "@eslint/js": "^9.10.0",
-    "eslint": "^9.10.0",
     "eslint-plugin-react": "^7.36.1",
-    "globals": "^15.9.0"
+    "react-scripts": "^5.0.1"
   }
 }

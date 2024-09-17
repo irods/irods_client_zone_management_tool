@@ -2,29 +2,12 @@ import React, { Fragment, useState, useEffect } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import {
-	makeStyles,
-	Button,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
-	TextField,
-	Input,
-	Typography,
-	LinearProgress,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TablePagination,
-	TableRow,
-	TableSortLabel,
-	Paper,
-	ToggleButton,
-	ToggleButtonGroup
+	Button, Dialog, DialogActions, DialogContent, DialogContentText,
+	DialogTitle, TextField, Input, Typography, LinearProgress,
+	Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
+	TableRow, TableSortLabel, Paper, ToggleButton, ToggleButtonGroup
 } from "@mui/material";
+import { makeStyles } from '@mui/styles';
 import { Save as SaveIcon, Close as CloseIcon } from "@mui/icons-material";
 import { AddGroupController, RemoveGroupController } from "../controllers/GroupController";
 
@@ -62,7 +45,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Group = () => {
-	if (!localStorage.getItem("zmt-token")) Navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -96,7 +80,7 @@ export const Group = () => {
 			);
 			setPerPage(environment.defaultItemsPerPage);
 		}
-	}, []);
+	}, [environment.defaultItemsPerPage, groupsPerPageKey]);
 
 	// load group from context provider,
 	// pass in perPage, currentPage, filtername('' by default), order, orderBy
@@ -112,7 +96,7 @@ export const Group = () => {
 			);
 		environment.pageTitle = environment.groupsTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, filterGroupName, order, orderBy]);
+	}, [currPage, perPage, filterGroupName, order, orderBy, environment, isLoadingGroupContext, loadGroups, localZoneName]);
 
 	async function addGroup() {
 		try {

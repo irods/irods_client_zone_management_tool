@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useCheck, useServer, useEnvironment } from "../contexts";
 import { Navigate } from "react-router-dom";
 import { Check } from "../components";
-import { makeStyles, CircularProgress, Fade, Paper } from "@mui/material";
-import { Build as BuildIcon, Check as CheckIcon, Error as ErrorIcon, Block as BlockIcon, Warning as WarningIcon, Highlight as HighlightOffIcon, Cancel as CancelIcon } from "@mui/icons-material";
+import { CircularProgress, Fade, Paper } from "@mui/material";
+import { makeStyles } from '@mui/styles';
+import { Build as BuildIcon, Check as CheckIcon, Error as ErrorIcon, Block as BlockIcon,
+	Warning as WarningIcon, Highlight as HighlightOffIcon, Cancel as CancelIcon } from "@mui/icons-material";
 
 const useStyles = makeStyles({
 	root: {
@@ -40,7 +42,9 @@ const useStyles = makeStyles({
 });
 
 export const Home = () => {
-	if (!localStorage.getItem("zmt-token")) Navigate("/");
+	// if (!localStorage.getItem("zmt-token"))
+	// 	return <Navigate to='/' noThrow />;
+
 	const classes = useStyles();
 	const { statusResult } = useCheck();
 	const { loadData } = useServer();
@@ -52,7 +56,7 @@ export const Home = () => {
 		loadData();
 		environment.pageTitle = environment.homeTitle;
 		document.title = environment.titleFormat();
-	}, []);
+	}, [loadData, environment]);
 
 	useEffect(() => {
 		// check if there are any warnings or errors, if yes, health check dashboard will be open by default
@@ -62,7 +66,7 @@ export const Home = () => {
 		) {
 			setOpen("check");
 		}
-	}, [statusResult]);
+	}, [statusResult, open]);
 
 	return (
 		<div className={classes.root}>

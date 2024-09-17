@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Link, Navigate } from 'react-router-dom';
 import { useEnvironment } from '../contexts';
-import { makeStyles, Alert, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText, InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select, Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@mui/material';
+import { Alert, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, FormControl, FormHelperText,
+    InputLabel, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, TableContainer, Paper, Select,
+    Snackbar, InputAdornment, IconButton, Input, MenuItem } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ArrowBack as ArrowBackIcon, Visibility, VisibilityOff } from '@mui/icons-material';
 import { ModifyUserPasswordController, ModifyUserTypeController } from '../controllers/UserController';
 import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
@@ -38,12 +41,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const EditUser = () => {
+export const EditUser = (props) => {
     // navigate to the login page if no token is found
-    if (!localStorage.getItem('zmt-token')) Navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
+
     const auth = localStorage.getItem('zmt-token');
     const loggedUserName = localStorage.getItem('zmt-username');
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(props.location.search);
     const [currentUserName, currentUserZone] = params.get('user') ? params.get('user').split('#') : [undefined, undefined];
     const classes = useStyles();
     const [isLoading, setLoading] = useState(false);
@@ -68,7 +73,7 @@ export const EditUser = () => {
     useEffect(() => {
         // hide this interface for the current rodsadmin user or user that does not have a name or zone
         if ((loggedUserName === currentUserName) || !currentUserName || !currentUserZone) {
-            Navigate('/users');
+            return <Navigate to='/users' noThrow />;
         }
         axios({
             method: 'GET',
@@ -85,11 +90,11 @@ export const EditUser = () => {
             }
         }).then(res => {
             // navigate back to /user if the username provided does not exist
-            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : Navigate('/users');
+            res.data.rows.length > 0 ? setUserType({ ...userType, value: res.data.rows[0][0] }) : <Navigate to='/users' noThrow />;
         }).catch(() => {
-            Navigate('/users');
+            return <Navigate to='/users' noThrow />;
         });
-    }, [currentUserName]);
+    }, [currentUserName, auth, currentUserZone, httpApiLocation, loggedUserName, userType]);
 
     useEffect(() => {
         if (currentUserName) {
@@ -112,7 +117,7 @@ export const EditUser = () => {
                 setLoading(false);
             });
         }
-    }, [refresh]);
+    }, [auth, currentUserName, httpApiLocation]);
 
     useEffect(() => {
         if (currentUserName) {
@@ -133,7 +138,7 @@ export const EditUser = () => {
                 setFilterNameResult(res.data.rows);
             });
         }
-    }, [auth, httpApiLocation, filterGroupName]);
+    }, [auth, httpApiLocation, filterGroupName, currentUserName]);
 
     async function removeGroupFromUser(group) {
         try {

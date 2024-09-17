@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
 import {
-	makeStyles,
 	Button,
 	CircularProgress,
 	Input,
@@ -25,6 +24,7 @@ import {
 	IconButton,
 	ToggleButton,
 	ToggleButtonGroup } from "@mui/material";
+import { makeStyles } from '@mui/styles';
 import { useEnvironment, useServer } from "../../contexts";
 import "../../App.css";
 import ResourceRows from "../../components/ResourceRows";
@@ -66,7 +66,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const ResourceListView = () => {
-	if (!localStorage.getItem("zmt-token")) Navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -111,7 +112,7 @@ export const ResourceListView = () => {
 			);
 			setPerPage(environment.defaultItemsPerPage);
 		}
-	}, []);
+	}, [environment.defaultItemsPerPage, resourcesPageKey]);
 
 	useEffect(() => {
 		if (localZoneName) {
@@ -125,7 +126,7 @@ export const ResourceListView = () => {
 		}
 		environment.pageTitle = environment.resourcesTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, filterRescName, order, orderBy]);
+	}, [currPage, perPage, filterRescName, order, orderBy, environment, loadResources, localZoneName]);
 
 	useEffect(() => {
 		if (rescPanelStatus !== "creation") {
@@ -134,7 +135,7 @@ export const ResourceListView = () => {
 			setRescLocation("");
 			setRescVaultPath("");
 		}
-	}, [rescPanelStatus]);
+	}, [rescPanelStatus, environment, loadResources, localZoneName]);
 
 	// validate resource hostname and vault path
 	// return FALSE if one of two attributes is an empty string
@@ -249,14 +250,14 @@ export const ResourceListView = () => {
 						<ToggleButton
 							value="list"
 							aria-label="list"
-							onClick={() => Navigate("/resources")}
+							onClick={() => <Navigate to='/resources' noThrow />}
 						>
 							<ListIcon />
 						</ToggleButton>
 						<ToggleButton
 							value="tree"
 							aria-label="tree"
-							onClick={() => Navigate("/resources/tree")}
+							onClick={() => <Navigate to='/resources/tree' noThrow />}
 						>
 							<AccountTreeIcon />
 						</ToggleButton>

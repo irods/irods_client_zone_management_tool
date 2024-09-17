@@ -6,7 +6,8 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { List as ListIcon, AccountTree as AccountTreeIcon } from "@mui/icons-material";
 
 export const ResourceTreeView = () => {
-	if (!localStorage.getItem("zmt-token")) Navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const tab = "tree";
 	const { loadResources, rescContext } = useServer();
@@ -53,14 +54,14 @@ export const ResourceTreeView = () => {
 				<ToggleButton
 					value="list"
 					aria-label="list"
-					onClick={() => Navigate("/resources")}
+					onClick={() => <Navigate to='/resources' noThrow />}
 				>
 					<ListIcon />
 				</ToggleButton>
 				<ToggleButton
 					value="tree"
 					aria-label="tree"
-					onClick={() => Navigate("/resources/tree")}
+					onClick={() => <Navigate to='/resources/tree' noThrow />}
 				>
 					<AccountTreeIcon />
 				</ToggleButton>

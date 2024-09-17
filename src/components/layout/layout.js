@@ -90,7 +90,8 @@ export const Layout = ({ children }) => {
 		localStorage.removeItem("zmt-username");
 		localStorage.removeItem("zmt-inactiveChecks");
 		localStorage.removeItem("zmt-checkIntervals");
-		Navigate("/");
+
+		return <Navigate to='/' noThrow />;
 	};
 
 	const drawer = (

@@ -1,7 +1,9 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { TabPanel } from '../components';
 import { useEnvironment, useServer } from '../contexts';
-import { makeStyles, Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, Paper, Tab, Tabs, LinearProgress } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, TableSortLabel } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 
@@ -41,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Server = () => {
-    if (!localStorage.getItem('zmt-token')) Navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
 
     const classes = useStyles();
     const { isLoadingZoneContext, zoneContext, filteredServers, loadCurrServers } = useServer();
@@ -63,13 +66,13 @@ export const Server = () => {
             localStorage.setItem(serversPageKey, environment.defaultItemsPerPage);
             setPerPage(environment.defaultItemsPerPage);
         } 
-    }, []);
+    }, [environment.defaultItemsPerPage, serversPageKey]);
 
     useEffect(() => {
         loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
         environment.pageTitle = environment.serversTitle;
         document.title = `${environment.titleFormat()}`;
-    }, [perPage, currPage, order, orderBy]);
+    }, [perPage, currPage, order, orderBy, environment, loadCurrServers]);
 
     const handleSort = props => {
         const isAsc = orderBy === props && order === 'desc';

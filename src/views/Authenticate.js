@@ -34,7 +34,7 @@ export const Authenticate = () => {
 	const [incorrect, setIncorrect] = useState(false);
 	const [serverError, setServerError] = useState(false);
 
-	const classes = useStyles();
+	const classes = useStyles({ });
 	const navigate = useNavigate();
 
 	const { httpApiLocation, loginLogo, brandingName } = useEnvironment();

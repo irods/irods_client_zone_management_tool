@@ -2,26 +2,11 @@ import React, { Fragment, useState, useEffect, useRef } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import {
-	Button,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
-	LinearProgress,
-	TextField,
-	Typography,
-	Input,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	TablePagination,
-	TableSortLabel,
-	Select,
-	Paper,
+	Button, Dialog, DialogActions, DialogContent,
+	DialogContentText, DialogTitle, LinearProgress, TextField,
+	Typography, Input, Table, TableBody,
+	TableCell, TableContainer, TableHead, TableRow,
+	TablePagination, TableSortLabel, Select, Paper,
     ToggleButton,
 	ToggleButtonGroup } from "@mui/material";
 import { makeStyles, StylesProvider } from '@mui/styles';
@@ -68,7 +53,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const User = () => {
-	if (!localStorage.getItem("zmt-token")) Navigate("/");
+	if (!localStorage.getItem("zmt-token"))
+		return <Navigate to='/' noThrow />;
 
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -121,7 +107,7 @@ export const User = () => {
 			localStorage.setItem(usersPageKey, environment.defaultItemsPerPage);
 			setPerPage(environment.defaultItemsPerPage);
 		}
-	}, []);
+	}, [environment.defaultItemsPerPage, usersPageKey]);
 
 	useEffect(() => {
 		// timer for keystroke delay
@@ -237,7 +223,7 @@ export const User = () => {
 		);
 		environment.pageTitle = environment.usersTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, order, orderBy]);
+	}, [currPage, perPage, order, orderBy, environment, filterUsername, loadUsers]);
 
 	useEffect(() => {
 		if (!userContext || userContext.rows.length === 0) {
@@ -268,7 +254,7 @@ export const User = () => {
 			setTime(0);
 			setIsRunning(true);
 		}
-	}, [filterUsername]);
+	}, [filterUsername, currPage, isRunning, loadUsers, order, orderBy, perPage]);
 
 	useEffect(() => {
 		if (!userContext || userContext.rows.length === 0) return; // safety check
@@ -299,7 +285,7 @@ export const User = () => {
 			setTime(0);
 			setIsRunning(false);
 		}
-	}, [time]);
+	}, [time, currPage, delayTimeUse, filterUsername, loadUsers, order, orderBy, perPage, userContext]);
 
 	return (
 		<Fragment>
@@ -340,13 +326,12 @@ export const User = () => {
 						page={currPage - 1}
 						count={userTotal}
 						rowsPerPage={perPage}
-						onChangePage={handlePageChange}
+						onPageChange={handlePageChange}
 						onChangeRowsPerPage={(e) => {
 							setPerPage(e.target.value);
 							setCurrPage(1);
 							localStorage.setItem(usersPageKey, e.target.value);
-						}}
-					/>
+						}}/>
 					<TableContainer
 						className={classes.tableContainer}
 						component={Paper}
@@ -449,7 +434,7 @@ export const User = () => {
 												onKeyDown={(event) =>
 													handleKeyDown(event)
 												}
-											>
+											 	variant="">
 												{zones &&
 													zones.map((zone) => (
 														<option
@@ -471,6 +456,7 @@ export const User = () => {
 												onKeyDown={(event) =>
 													handleKeyDown(event)
 												}
+												variant=""
 											>
 												{userTypes.map((this_user_type) => (
 													<option

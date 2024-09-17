@@ -441,8 +441,7 @@ export const ServerProvider = ({ children }) => {
 			setZones([]);
 			setIsLoadingZones(false);
 			localStorage.removeItem("zmt-token");
-			Navigate("/", { replace: true });
-			window.location.reload();
+			return <Navigate to='/' noThrow />;
 		});
 
 		if (zoneData && zoneData.status === 200) {
@@ -743,7 +742,7 @@ export const ServerProvider = ({ children }) => {
 		) {
 			loadData();
 		}
-	}, []);
+	}, [loadData, localZoneName]);
 
 	return (
 		<ServerContext.Provider

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Link, Navigate } from 'react-router-dom';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import { makeStyles, Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Button, LinearProgress, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { useEnvironment, useServer } from '../contexts';
 import { AddUserToGroupController, RemoveUserFromGroupController } from '../controllers/GroupController';
 
@@ -21,9 +22,12 @@ const useStyles = makeStyles(() => ({
 
 export const EditGroup = (props) => {
     // navigate to a group page if no group info is passed along
-    if (!props.location.state) Navigate('/groups');
+    if (!props.location.state)
+       return <Navigate to='/groups' noThrow />;
+
     // navigate to the login page if no token is found
-    if (!localStorage.getItem('zmt-token')) Navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
     
     const auth = localStorage.getItem('zmt-token');
     const currentGroup = props.location.state ? props.location.state.groupInfo : new Array(2);
@@ -126,11 +130,11 @@ export const EditGroup = (props) => {
 
     useEffect(() => {
         if (currentGroup[0]) loadCurrentGroupInfo();
-    }, [refresh, loadCurrentGroupInfo]);
+    }, [refresh, loadCurrentGroupInfo, currentGroup]);
 
     useEffect(() => {
         if (currentGroup[0]) loadFilteredUsers();
-    }, [loadFilteredUsers]);
+    }, [loadFilteredUsers, currentGroup]);
 
     return (
         <Fragment>

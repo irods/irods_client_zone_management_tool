@@ -1,7 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useEnvironment, useServer } from '../contexts';
-import { Alert, makeStyles, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody, TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
+import { Alert, Button, LinearProgress, Table, TableContainer, Paper, TableHead, TableRow, TableCell, TableSortLabel, TableBody,
+    TextareaAutosize, TextField, Snackbar, IconButton, Input, Dialog, DialogTitle, DialogContent, DialogActions,
+    DialogContentText } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Delete as DeleteIcon, Close as CloseIcon, Save as SaveIcon }  from '@mui/icons-material';
 import { format } from 'sql-formatter';
 import { AddSpecificQueryController, DeleteSpecificQueryController } from '../controllers/SpecificQueryController';
@@ -29,7 +32,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const SpecificQuery = () => {
-    if (!localStorage.getItem('zmt-token')) Navigate('/');
+    if (!localStorage.getItem('zmt-token'))
+        return <Navigate to='/' noThrow />;
+
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const classes = useStyles();
@@ -67,7 +72,7 @@ export const SpecificQuery = () => {
         if (newAlias || newSqlStr) {
             setStatus('Adding');
         }
-    }, []);
+    }, [newAlias, newSqlStr]);
 
     const addSpecificQueryHandler = async () => {
         setConfirmationVisibility(false);
@@ -128,7 +133,7 @@ export const SpecificQuery = () => {
         }
         environment.pageTitle = environment.specificQueriesTitle;
         document.title = `${environment.titleFormat()}`;
-    }, [filterInput, specificQueryContext, order, orderBy]);
+    }, [filterInput, specificQueryContext, order, orderBy, environment]);
 
     return (
         <Fragment>

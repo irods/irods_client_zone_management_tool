@@ -1,3 +1,8 @@
+.App {
+  text-align: center;
+  margin: 0;
+}
+
 .app_body {
     min-height: 100vh;
     display: flex;

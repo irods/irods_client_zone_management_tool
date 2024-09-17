@@ -40,7 +40,7 @@ export const NotFound = () => {
 
     return (
         <Container className={classes.notFoundContainer}>
-            <Link to='/' onClick={() => renderLayout()}><img className={classes.irodsLogo} src={iRODSLogo}></img></Link>
+            <Link to='/' onClick={() => renderLayout()}><img alt="iRODS Logo" className={classes.irodsLogo} src={iRODSLogo}></img></Link>
             <div>
                 <br />
                 <Typography className={classes.text}>ERROR 404</Typography>

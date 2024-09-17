@@ -78,7 +78,7 @@ export const CheckProvider = ({ children }) => {
             // run checks only when data loading is complete
             runAllCheck();
         }
-    }, [zoneContext, rescAll, isLoadingZoneContext]);
+    }, [zoneContext, rescAll, isLoadingZoneContext, isChecking, statusResult]);
 
     const checkServerVersion = (check) => {
         if ('minimum_server_version' in check && 'maximum_server_version' in check) {
@@ -104,7 +104,6 @@ export const CheckProvider = ({ children }) => {
     };
 
     const runOneCheck = async (check) => {
-        const timerID = setTimeout(() => runOneCheck(check), 1000 * checkIntervals[check['id']]);
         const prevStatus = checkResults[check.id][1]['status'];
         let result = {};
 
@@ -138,6 +137,8 @@ export const CheckProvider = ({ children }) => {
                 prev[result.status] += 1;
                 return prev;
             });
+
+            const timerID = setTimeout(() => runOneCheck(check), 1000 * checkIntervals[check['id']]);
 
             setCheckTimers((prev) => {
                 prev[check.id] = timerID;
@@ -246,7 +247,7 @@ export const CheckProvider = ({ children }) => {
     useEffect(() => {
         // make the callback function gets access to the latest state
         callBackFn.current = runOneCheck;
-    }, [timeStamp]);
+    }, [timeStamp, runOneCheck]);
 
     return (
         <CheckContext.Provider value={{
