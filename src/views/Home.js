@@ -42,8 +42,8 @@ const useStyles = makeStyles({
 });
 
 export const Home = () => {
-	// if (!localStorage.getItem("zmt-token"))
-	// 	return <Navigate to='/' noThrow />;
+	if (!localStorage.getItem("zmt-token"))
+	 	return <Navigate to='/' noThrow />;
 
 	const classes = useStyles();
 	const { statusResult } = useCheck();

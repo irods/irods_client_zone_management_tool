@@ -40,7 +40,7 @@ export const Authenticate = () => {
 	const { httpApiLocation, loginLogo, brandingName } = useEnvironment();
 
 	const { loadData } = useServer();
-	const renderLogo = require(`../img/${loginLogo}`).default;
+	const renderLogo = require(`../img/${loginLogo}`);
 
 	const handleUsername = (event) => {
 		setUsername(event.target.value);
