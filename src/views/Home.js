@@ -56,7 +56,7 @@ export const Home = () => {
 		loadData();
 		environment.pageTitle = environment.homeTitle;
 		document.title = environment.titleFormat();
-	}, [loadData, environment]);
+	}, [environment]);
 
 	useEffect(() => {
 		// check if there are any warnings or errors, if yes, health check dashboard will be open by default
