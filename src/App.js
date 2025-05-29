@@ -39,7 +39,6 @@ const App = () => {
                                         <Route default element={ <NotFound /> }/>
                                     </Routes>
                                 </Layout>
-
                                 <Footer />
                             </ThemeProvider>
                         </CheckProvider>

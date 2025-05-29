@@ -75,7 +75,7 @@ export const Layout = ({ children }) => {
 	}));
 	const classes = useStyles();
 	const { localZoneName, zones } = useServer();
-	const AppBarLogo = require(`../../img/${environment.appbarLogo}`).default;
+	const AppBarLogo = require(`../../img/${environment.appbarLogo}`);
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const {
 		userTotal,

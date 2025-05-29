@@ -32,7 +32,7 @@ export const NotFound = () => {
     const classes = useStyles();
     const location = useLocation();
     const { loginLogo } = useEnvironment();
-    const iRODSLogo = require(`../img/${loginLogo}`).default;
+    const iRODSLogo = require(`../img/${loginLogo}`);
 
     useEffect(() => {
         hideLayout();
