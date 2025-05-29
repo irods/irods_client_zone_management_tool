@@ -99,7 +99,6 @@ export const Layout = ({ children }) => {
 			<Divider />
 			<List>
 				<MenuItem
-					button
 					selected={pathname === "home"}
 					component={Link}
 					to="/home"
@@ -108,7 +107,6 @@ export const Layout = ({ children }) => {
 					<ListItemText primary="Home" />
 				</MenuItem>
 				<MenuItem
-					button
 					selected={pathname === "zones"}
 					component={Link}
 					to="/zones"
@@ -119,7 +117,6 @@ export const Layout = ({ children }) => {
 					</ListItemText>
 				</MenuItem>
 				<MenuItem
-					button
 					selected={pathname === "servers"}
 					component={Link}
 					to="/servers"
@@ -130,7 +127,6 @@ export const Layout = ({ children }) => {
 					</ListItemText>
 				</MenuItem>
 				<MenuItem
-					button
 					selected={pathname === "resources"}
 					component={Link}
 					to="/resources"
@@ -140,7 +136,6 @@ export const Layout = ({ children }) => {
 				</MenuItem>
 
 				<MenuItem
-					button
 					selected={pathname === "users"}
 					component={Link}
 					to="/users"
@@ -149,7 +144,6 @@ export const Layout = ({ children }) => {
 					<ListItemText>Users ({userTotal})</ListItemText>
 				</MenuItem>
 				<MenuItem
-					button
 					selected={pathname === "groups"}
 					component={Link}
 					to="/groups"
@@ -158,7 +152,6 @@ export const Layout = ({ children }) => {
 					<ListItemText>Groups ({groupTotal})</ListItemText>
 				</MenuItem>
 				<MenuItem
-					button
 					selected={pathname === "specific-query"}
 					component={Link}
 					to="/specific-query"
@@ -171,7 +164,7 @@ export const Layout = ({ children }) => {
 			</List>
 			<Divider />
 			<List>
-				<MenuItem button onClick={() => logoutHandler()} key="logout">
+				<MenuItem onClick={() => logoutHandler()} key="logout">
 					<ListItemText primary="Logout" />
 				</MenuItem>
 			</List>
