@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import {
 	AppBar, CssBaseline, Drawer, Divider, IconButton,
@@ -53,7 +53,7 @@ export const Layout = ({ children }) => {
 		drawerPaper: {
 			width: drawerWidth,
 			marginTop: "64px",
-			height: `calc(100vh - 50px - 64px)`,
+			height: `calc(100vh - 50px - 64px) !important`,
 			borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
 		},
 		component: {
@@ -69,6 +69,7 @@ export const Layout = ({ children }) => {
 		},
 	}));
 	const classes = useStyles();
+  const navigate = useNavigate();
 	const { localZoneName, zones } = useServer();
 	const AppBarLogo = require(`../../img/${environment.appbarLogo}`);
 	const [mobileOpen, setMobileOpen] = useState(false);
@@ -85,8 +86,7 @@ export const Layout = ({ children }) => {
 		localStorage.removeItem("zmt-username");
 		localStorage.removeItem("zmt-inactiveChecks");
 		localStorage.removeItem("zmt-checkIntervals");
-
-		return <Navigate to='/' noThrow />;
+    navigate("/");
 	};
 
 	const drawer = (
