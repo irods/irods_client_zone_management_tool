@@ -96,7 +96,7 @@ export const Group = () => {
 			);
 		environment.pageTitle = environment.groupsTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, filterGroupName, order, orderBy, environment, isLoadingGroupContext, loadGroups, localZoneName]);
+	}, [currPage, perPage, filterGroupName, order, orderBy, environment, localZoneName]);
 
 	async function addGroup() {
 		try {
