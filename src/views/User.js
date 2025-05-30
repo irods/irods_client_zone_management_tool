@@ -223,7 +223,7 @@ export const User = () => {
 		);
 		environment.pageTitle = environment.usersTitle;
 		document.title = `${environment.titleFormat()}`;
-	}, [currPage, perPage, order, orderBy, environment, filterUsername, loadUsers]);
+	}, [currPage, perPage, order, orderBy, environment, filterUsername]);
 
 	useEffect(() => {
 		if (!userContext || userContext.rows.length === 0) {
@@ -254,7 +254,7 @@ export const User = () => {
 			setTime(0);
 			setIsRunning(true);
 		}
-	}, [filterUsername, currPage, isRunning, loadUsers, order, orderBy, perPage]);
+	}, [filterUsername, currPage, isRunning, order, orderBy, perPage]);
 
 	useEffect(() => {
 		if (!userContext || userContext.rows.length === 0) return; // safety check
@@ -285,7 +285,7 @@ export const User = () => {
 			setTime(0);
 			setIsRunning(false);
 		}
-	}, [time, currPage, delayTimeUse, filterUsername, loadUsers, order, orderBy, perPage, userContext]);
+	}, [time, currPage, delayTimeUse, filterUsername, order, orderBy, perPage, userContext]);
 
 	return (
 		<Fragment>
@@ -486,7 +486,7 @@ export const User = () => {
 										</TableCell>
 									</TableRow>
 								}
-								
+
 								{userData && userData.length === 0 ? (
 									<TableRow>
 										<TableCell colSpan={3}>
