@@ -26,12 +26,7 @@ export const Layout = ({ children }) => {
 		appBar: {
 			width: "100%",
 			height: "64px",
-			background: environment.primaryColor,
-		},
-		rightToolbar: {
-			marginLeft: "auto",
-			marginRight: -12,
-			fontSize: 18,
+			backgroundColor: `${environment.primaryColor} !important`,
 		},
 		sidebarContainer: {
 			[theme.breakpoints.up("sm")]: {
@@ -174,7 +169,7 @@ export const Layout = ({ children }) => {
 	return (
 		<div id="zmt-layout" className={classes.root}>
 			<CssBaseline />
-			<AppBar id="zmt-appbar" className={classes.appBar}>
+			<AppBar id="zmt-appbar" className={classes.appBar} >
 				<Toolbar>
 					<a href="/" className={classes.branding}>
 						<img
@@ -189,9 +184,13 @@ export const Layout = ({ children }) => {
 							{environment.brandingName}
 						</Typography>
 						<Typography
-							className={classes.rightToolbar}
+              sx = {{
+			marginLeft: "auto",
+			marginRight: "-12px",
+			fontSize: 18,
+              }}
 							variant="h6"
-							noWrap
+              noWrap
 						>
 							{" "}
 							{localZoneName}{" "}
