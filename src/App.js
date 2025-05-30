@@ -36,7 +36,7 @@ const App = () => {
                                         <Route path='/servers' element={ <Server /> }/>
                                         <Route path='/specific-query' element={ <SpecificQuery /> }/>
                                         <Route path='/zones' element={ <Zone /> }/>
-                                        <Route default element={ <NotFound /> }/>
+                                        <Route path='*' element={ <NotFound /> }/>
                                     </Routes>
                                 </Layout>
                                 <Footer />
