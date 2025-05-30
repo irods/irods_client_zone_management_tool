@@ -124,7 +124,7 @@ export const SpecificQuery = () => {
 
     useEffect(() => {
         if (specificQueryContext?.rows) {
-            // sort by column 
+            // sort by column
             const newSortedSpecificQueryContext = [...specificQueryContext.rows].sort((a, b) => {
                 return (order === 'asc' ? 1 : -1) * (orderBy === 'alias' ? a[0].localeCompare(b[0]) : a[1].localeCompare(b[1]));
             });
@@ -165,7 +165,7 @@ export const SpecificQuery = () => {
                         {!isLoadingSpecificQueryContext && (sortedSpecificQueryContext && sortedSpecificQueryContext.length > 0 ? sortedSpecificQueryContext.map(specificQuery =>
                             <TableRow key={`specific-query-${specificQuery[0]}`}>
                                 <TableCell style={{ width: '1em', whiteSpace: 'nowrap' }}>{specificQuery[0]}</TableCell>
-                                <TableCell className={classes.table_cell}><TextareaAutosize disabled value={format(specificQuery[1])} rowsMax={15} style={{ whiteSpace: 'pre', width: '100%' }} /></TableCell>
+                                <TableCell className={classes.table_cell}><TextareaAutosize disabled value={format(specificQuery[1])} rowsmax={15} style={{ whiteSpace: 'pre', width: '100%' }} /></TableCell>
                                 <TableCell align="center" className={classes.table_cell}><IconButton size="small" disabled={specificQuery[0] === 'ls'} onClick={() => deleteButtonEventHandler(specificQuery[0])}><DeleteIcon /></IconButton></TableCell>
                             </TableRow>
                         ) : <TableRow><TableCell colSpan={3}><div className="table_view_no_results_container">No results found for [{filterInput}].</div></TableCell></TableRow>)}
@@ -188,7 +188,7 @@ export const SpecificQuery = () => {
                             <Fragment>
                                 <Button color="secondary" onClick={deleteSpecificQueryHandler}>Confirm</Button>
                                 <Button color="primary" onClick={() => setConfirmationVisibility(false)}>Cancel</Button>
-                                
+
                             </Fragment>
                         )
                     }
