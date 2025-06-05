@@ -34,12 +34,7 @@ export const Layout = ({ children }) => {
     appBar: {
       width: "100%",
       height: "64px",
-      background: environment.primaryColor,
-    },
-    rightToolbar: {
-      marginLeft: "auto",
-      marginRight: -12,
-      fontSize: 18,
+      backgroundColor: `${environment.primaryColor} !important`,
     },
     sidebarContainer: {
       [theme.breakpoints.up("sm")]: {
@@ -66,7 +61,7 @@ export const Layout = ({ children }) => {
     drawerPaper: {
       width: drawerWidth,
       marginTop: "64px",
-      height: `calc(100vh - 50px - 64px)`,
+      height: `calc(100vh - 50px - 64px) !important`,
       borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
     },
     component: {
@@ -95,7 +90,7 @@ export const Layout = ({ children }) => {
     localStorage.removeItem("zmt-inactiveChecks");
     localStorage.removeItem("zmt-checkIntervals");
 
-    return navigate("/");
+    navigate("/");
   };
 
   const drawer = (
@@ -185,7 +180,15 @@ export const Layout = ({ children }) => {
           </a>
           <Hidden xsDown>
             <Typography variant="h6"> {environment.brandingName}</Typography>
-            <Typography className={classes.rightToolbar} variant="h6" noWrap>
+            <Typography
+              sx={{
+                marginLeft: "auto",
+                marginRight: "-12px",
+                fontSize: 18,
+              }}
+              variant="h6"
+              noWrap
+            >
               {" "}
               {localZoneName}{" "}
             </Typography>
