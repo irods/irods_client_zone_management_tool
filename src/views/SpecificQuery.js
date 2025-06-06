@@ -1,42 +1,19 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import {
-  Alert,
-  Button,
-  LinearProgress,
-  Table,
-  TableContainer,
-  Paper,
-  TableHead,
-  TableRow,
-  TableCell,
+  CloseIcon,
+  CheckIcon,
+  CancelIcon,
   TableSortLabel,
-  TableBody,
-  TextareaAutosize,
-  TextField,
-  Snackbar,
-  IconButton,
-  Input,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogContentText,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import {
-  Delete as DeleteIcon,
-  Close as CloseIcon,
-  Save as SaveIcon,
-} from "@mui/icons-material";
+} from "../components";
 import { format } from "sql-formatter";
 import {
   AddSpecificQueryController,
   DeleteSpecificQueryController,
 } from "../controllers/SpecificQueryController";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   fontInherit: {
     font: "inherit",
   },
@@ -46,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   filterGroup: {
     display: "flex",
     flexDirection: "row",
-    margin: theme.spacing(1),
+    margin: 8,
     justifyContent: "center",
   },
   add_button: {
@@ -56,26 +33,43 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 30,
     width: 300,
   },
-}));
+  sql_str: {
+    whiteSpace: "pre-wrap",
+    backgroundColor: "rgb(239, 239, 239)",
+    padding: "2px",
+    border: "1px solid rgb(150, 150, 150)",
+    borderRadius: "3px",
+    marginTop: 0,
+    marginBottom: 0,
+    display: "flex",
+    textAlign: "left",
+    position: "relative",
+  },
+  sql_str_button: {
+    cursor: "pointer",
+    padding: 0,
+    backgroundColor: "transparent",
+    border: "none",
+    width: "100%",
+  },
+  sql_str_collapsed: {
+    maxHeight: "5em",
+    overflow: "hidden",
+  },
+};
 
 export const SpecificQuery = () => {
-  if (!localStorage.getItem("zmt-token")) return <Navigate to="/" noThrow />;
-
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const classes = useStyles();
+  const [params, setParams] = useSearchParams();
   const [status, setStatus] = useState("none");
-  const [newAlias, setNewAlias] = useState(
-    params.get("alias") ? decodeURIComponent(params.get("alias")) : "",
-  );
-  const [newSqlStr, setNewSqlStr] = useState(
-    params.get("sqlStr") ? decodeURIComponent(params.get("sqlStr")) : "",
-  );
-  const [aliasToDelete, setAliasToDelete] = useState();
+  const [newAlias, setNewAlias] = useState("");
+  const [newSqlStr, setNewSqlStr] = useState("");
+  const [aliasToDelete, setAliasToDelete] = useState(-1);
   const [filterInput, setFilterInput] = useState("");
   const [confirmationVisibility, setConfirmationVisibility] = useState(false);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("alias");
+  const [expandedSqlStrings, setExpandedSqlStrings] = useState([]);
   const [sortedSpecificQueryContext, setSortedSpecificQueryContext] =
     useState();
   const environment = useEnvironment();
@@ -84,6 +78,15 @@ export const SpecificQuery = () => {
     isLoadingSpecificQueryContext,
     loadSpecificQueries,
   } = useServer();
+
+  useEffect(() => {
+    if (params.has("sqlStr") && params.has("alias")) {
+      setNewAlias(params.get("alias"));
+      setNewSqlStr(params.get("sqlStr"));
+      setConfirmationVisibility(true);
+      setParams();
+    }
+  }, []);
 
   const addButtonEventHandler = () => {
     setStatus("Adding");
@@ -95,18 +98,6 @@ export const SpecificQuery = () => {
   // everything after ? needs to be URL encoded
 
   useEffect(() => {
-    if (newAlias === "" && newSqlStr === "") {
-      window.history.replaceState("", "", "/specific-query");
-    } else {
-      window.history.replaceState(
-        "",
-        "",
-        `/specific-query?sqlStr=${encodeURIComponent(newSqlStr)}&alias=${encodeURIComponent(newAlias)}`,
-      );
-    }
-  }, [newAlias, newSqlStr]);
-
-  useEffect(() => {
     if (newAlias || newSqlStr) {
       setStatus("Adding");
     }
@@ -114,6 +105,7 @@ export const SpecificQuery = () => {
 
   const addSpecificQueryHandler = async () => {
     setConfirmationVisibility(false);
+    setStatus("");
     await AddSpecificQueryController(
       newAlias,
       newSqlStr,
@@ -122,6 +114,7 @@ export const SpecificQuery = () => {
       .then((res) => {
         if (res.status === 200) {
           loadSpecificQueries();
+          setNewAlias("");
           setNewSqlStr("");
           setStatus("add-success");
         } else setStatus("add-failed");
@@ -140,11 +133,17 @@ export const SpecificQuery = () => {
   const deleteSpecificQueryHandler = async () => {
     setConfirmationVisibility(false);
     await DeleteSpecificQueryController(
-      aliasToDelete,
+      sortedSpecificQueryContext[aliasToDelete][0],
       environment.httpApiLocation,
     )
       .then((res) => {
         if (res.status === 200) {
+          let newExpandedSqlStrings = [];
+          expandedSqlStrings.forEach((value) => {
+            if (value > index) newExpandedSqlStrings.push(value - 1);
+          });
+          setExpandedSqlStrings(newExpandedSqlStrings);
+          setAliasToDelete(-1);
           loadSpecificQueries();
           setStatus("delete-success");
         } else setStatus("delete-failed");
@@ -164,6 +163,20 @@ export const SpecificQuery = () => {
     // check if enter is pressed
     if (event.keyCode === 13 && status === "Adding") {
       setConfirmationVisibility(true);
+    }
+  };
+
+  const handleToggleExpanded = (index) => {
+    if (expandedSqlStrings.includes(index)) {
+      let newExpandedSqlStrings = [];
+      expandedSqlStrings.forEach((value) => {
+        if (value !== index) newExpandedSqlStrings.push(value);
+      });
+      setExpandedSqlStrings(newExpandedSqlStrings);
+    } else {
+      let newExpandedSqlStrings = expandedSqlStrings.slice();
+      newExpandedSqlStrings.push(index);
+      setExpandedSqlStrings(newExpandedSqlStrings);
     }
   };
 
@@ -193,35 +206,65 @@ export const SpecificQuery = () => {
     document.title = `${environment.titleFormat()}`;
   }, [filterInput, specificQueryContext, order, orderBy, environment]);
 
+  const CollapsedSqlStrOverlayStyling = () => (
+    <style>{`
+.sql_str_collapsed::before {
+  background: linear-gradient(transparent, 10%, rgba(220, 220, 220, 0.7), rgb(220, 220, 220));
+  content: '';
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  border-radius: ${styles.sql_str_borderRadius};
+}
+  `}</style>
+  );
+
+  useLayoutEffect(() => {
+    if (confirmationVisibility) document.getElementById("modal").showModal();
+    if (!confirmationVisibility && document.getElementById("modal").open)
+      document.getElementById("modal").close();
+  }, [confirmationVisibility]);
+
+  useEffect(() => {
+    if (status !== "none" && status !== "Adding") {
+      const id = setTimeout(() => {
+        setStatus("none");
+      }, 2000);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+  }, [status]);
+
   return (
     <Fragment>
-      {specificQueryContext === undefined || isLoadingSpecificQueryContext ? (
-        <LinearProgress />
-      ) : (
-        <div className="table_view_spinner_holder" />
-      )}
-      <div className={classes.filterGroup}>
-        <TextField
-          className={classes.filter}
-          label="Filter"
+      <div style={styles.filterGroup}>
+        <input
+          type="text"
+          placeholder="Filter by Alias or SQL String"
+          style={styles.filter}
           onChange={(e) => setFilterInput(e.target.value)}
         />
-        <Button
-          className={classes.add_button}
-          color="primary"
-          variant="outlined"
+        <button
+          className="outlined_button"
+          style={styles.add_button}
           onClick={addButtonEventHandler}
         >
           Add new Specific Query
-        </Button>
+        </button>
       </div>
       <br />
       <br />
-      <TableContainer component={Paper}>
-        <Table style={{ width: "100%" }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>
+      <div className="outlined_paper">
+        <table style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <td>
                 <TableSortLabel
                   active={orderBy === "alias"}
                   direction={orderBy === "alias" ? order : "asc"}
@@ -229,8 +272,8 @@ export const SpecificQuery = () => {
                 >
                   <b>Alias</b>
                 </TableSortLabel>
-              </TableCell>
-              <TableCell>
+              </td>
+              <td>
                 <TableSortLabel
                   active={orderBy === "sqlStr"}
                   direction={orderBy === "sqlStr" ? order : "asc"}
@@ -238,174 +281,181 @@ export const SpecificQuery = () => {
                 >
                   <b>SQL String</b>
                 </TableSortLabel>
-              </TableCell>
-              <TableCell style={{ width: "80px" }} align="center">
+              </td>
+              <td style={{ width: "80px" }} align="center">
                 <b>Actions</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
             {status === "Adding" && (
-              <TableRow>
-                <TableCell>
-                  <Input
-                    className={classes.fontInherit}
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    style={styles.fontInherit}
                     onKeyDown={(e) => keyEventHandler(e)}
                     onChange={(e) => setNewAlias(e.target.value)}
                     value={newAlias}
                   />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    fullWidth
-                    className={classes.fontInherit}
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    style={styles.fontInherit}
                     onKeyDown={(e) => keyEventHandler(e)}
                     onChange={(e) => setNewSqlStr(e.target.value)}
                     value={newSqlStr}
                   />
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    size="small"
+                </td>
+                <td align="center">
+                  <button
+                    className="icon_button"
                     disabled={!newAlias || !newSqlStr}
                     onClick={() => setConfirmationVisibility(true)}
                   >
-                    <SaveIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
+                    <CheckIcon />
+                  </button>
+                  <button
+                    className="icon_button"
                     onClick={() => {
                       setStatus("none");
                       setNewAlias("");
                       setNewSqlStr("");
                     }}
                   >
-                    <CloseIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                    <CancelIcon />
+                  </button>
+                </td>
+              </tr>
             )}
+            <CollapsedSqlStrOverlayStyling />
             {!isLoadingSpecificQueryContext &&
               (sortedSpecificQueryContext &&
               sortedSpecificQueryContext.length > 0 ? (
-                sortedSpecificQueryContext.map((specificQuery) => (
-                  <TableRow key={`specific-query-${specificQuery[0]}`}>
-                    <TableCell style={{ width: "1em", whiteSpace: "nowrap" }}>
+                sortedSpecificQueryContext.map((specificQuery, index) => (
+                  <tr key={`specific-query-${specificQuery[0]}`}>
+                    <td style={{ width: "1em", whiteSpace: "nowrap" }}>
                       {specificQuery[0]}
-                    </TableCell>
-                    <TableCell className={classes.table_cell}>
-                      <TextareaAutosize
-                        disabled
-                        value={format(specificQuery[1])}
-                        style={{ whiteSpace: "pre", width: "100%" }}
-                      />
-                    </TableCell>
-                    <TableCell align="center" className={classes.table_cell}>
-                      <IconButton
-                        size="small"
-                        disabled={specificQuery[0] === "ls"}
-                        onClick={() =>
-                          deleteButtonEventHandler(specificQuery[0])
-                        }
+                    </td>
+                    <td style={styles.table_cell}>
+                      <button
+                        style={styles.sql_str_button}
+                        onClick={() => handleToggleExpanded(index)}
                       >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
+                        <pre
+                          className={
+                            expandedSqlStrings.includes(index)
+                              ? ""
+                              : "sql_str_collapsed"
+                          }
+                          style={
+                            expandedSqlStrings.includes(index)
+                              ? styles.sql_str
+                              : {
+                                  ...styles.sql_str,
+                                  ...styles.sql_str_collapsed,
+                                }
+                          }
+                        >
+                          {format(specificQuery[1])}
+                        </pre>
+                      </button>
+                    </td>
+                    <td align="right" style={styles.table_cell}>
+                      <button
+                        className="icon_button"
+                        disabled={specificQuery[0] === "ls"}
+                        onClick={() => deleteButtonEventHandler(index)}
+                      >
+                        <CloseIcon />
+                      </button>
+                    </td>
+                  </tr>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={3}>
+                <tr>
+                  <td colSpan={3}>
                     <div className="table_view_no_results_container">
                       No results found for [{filterInput}].
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Dialog open={confirmationVisibility}>
-        <DialogTitle>Confirmation</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
+          </tbody>
+        </table>
+      </div>
+      <dialog id="modal">
+        <h2>Confirmation</h2>
+        <div>
+          <p>
             {status} specific query &apos;
-            {status === "Adding" ? newAlias : aliasToDelete}&apos;?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
+            {status === "Adding"
+              ? newAlias
+              : aliasToDelete >= 0 &&
+                sortedSpecificQueryContext[aliasToDelete][0]}
+            &apos;?
+          </p>
+        </div>
+        <div>
           {status === "Adding" ? (
             <Fragment>
-              <Button
-                color="secondary"
-                onClick={() => setConfirmationVisibility(false)}
-              >
+              <button onClick={() => setConfirmationVisibility(false)}>
                 Cancel
-              </Button>
-              <Button color="primary" onClick={addSpecificQueryHandler}>
-                Confirm
-              </Button>
+              </button>
+              <button onClick={addSpecificQueryHandler}>Confirm</button>
             </Fragment>
           ) : (
             <Fragment>
-              <Button color="secondary" onClick={deleteSpecificQueryHandler}>
-                Confirm
-              </Button>
-              <Button
-                color="primary"
-                onClick={() => setConfirmationVisibility(false)}
-              >
+              <button onClick={deleteSpecificQueryHandler}>Confirm</button>
+              <button onClick={() => setConfirmationVisibility(false)}>
                 Cancel
-              </Button>
+              </button>
             </Fragment>
           )}
-        </DialogActions>
-      </Dialog>
-      <Snackbar
+        </div>
+      </dialog>
+      <dialog
+        className="alert success"
         open={status === "add-success"}
-        autoHideDuration={5000}
         onClose={() => {
           setStatus("none");
           setNewAlias("");
         }}
       >
-        <Alert elevation={6} variant="filled" severity="success">
-          Success! Specific query &apos;{newAlias}&apos; is added.
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        Success! Specific query &apos;{newAlias}&apos; is added.
+      </dialog>
+      <dialog
+        className="alert error"
         open={status === "add-failed"}
-        autoHideDuration={5000}
         onClose={() => {
           setStatus("none");
         }}
       >
-        <Alert elevation={6} variant="filled" severity="error">
-          Failed to add specific query &apos;{newAlias}&apos;.
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        Failed to add specific query &apos;{newAlias}&apos;.
+      </dialog>
+      <dialog
+        className="alert success"
         open={status === "delete-success"}
-        autoHideDuration={5000}
         onClose={() => {
           setStatus("none");
         }}
       >
-        <Alert elevation={6} variant="filled" severity="success">
-          Success! Specific query &apos;{aliasToDelete}&apos; is deleted.
-        </Alert>
-      </Snackbar>
-      <Snackbar
+        Success! Specific query &apos;
+        {aliasToDelete >= 0 && sortedSpecificQueryContext[aliasToDelete][0]}
+        &apos; is deleted.
+      </dialog>
+      <dialog
+        className="alert error"
         open={status === "delete-failed"}
-        autoHideDuration={5000}
         onClose={() => {
           setStatus("none");
         }}
       >
-        <Alert elevation={6} variant="filled" severity="error">
-          Failed to delete specific query &apos;{aliasToDelete}&apos;.
-        </Alert>
-      </Snackbar>
+        Failed to delete specific query &apos;
+        {aliasToDelete >= 0 && sortedSpecificQueryContext[aliasToDelete][0]}
+        &apos;.
+      </dialog>
     </Fragment>
   );
 };

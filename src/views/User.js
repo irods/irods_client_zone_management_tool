@@ -2,37 +2,17 @@ import React, { Fragment, useState, useEffect, useRef } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { useEnvironment, useServer } from "../contexts";
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  LinearProgress,
-  TextField,
-  Typography,
-  Input,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  CheckIcon,
+  CloseIcon,
   TablePagination,
   TableSortLabel,
-  Select,
-  Paper,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
-import { makeStyles, StylesProvider } from "@mui/styles";
-import { Save as SaveIcon, Close as CloseIcon } from "@mui/icons-material";
+} from "../components";
 import {
   AddUserController,
   RemoveUserController,
 } from "../controllers/UserController";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   tableContainer: {
     marginTop: 20,
   },
@@ -50,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   filterGroup: {
     display: "flex",
     flexDirection: "row",
-    margin: theme.spacing(1),
+    margin: 8,
     justifyContent: "center",
   },
   filter: {
@@ -69,17 +49,12 @@ const useStyles = makeStyles((theme) => ({
   table_cell: {
     wordWrap: "break-word",
   },
-}));
+};
 
 export const User = () => {
-  if (!localStorage.getItem("zmt-token")) return <Navigate to="/" noThrow />;
-
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
   const environment = useEnvironment();
   const usersPageKey = environment.usersPageKey;
   const loggedUserName = localStorage.getItem("zmt-username");
-  const classes = useStyles();
   const [currUser, setCurrUser] = useState([]);
   const [addFormOpen, setAddFormOpen] = useState(false);
   const [addErrorMsg, setAddErrorMsg] = useState();
@@ -90,9 +65,7 @@ export const User = () => {
   const [perPage, setPerPage] = useState(
     parseInt(localStorage.getItem(usersPageKey), 10),
   );
-  const [filterUsername, setFilterName] = useState(
-    params.get("filter") ? decodeURIComponent(params.get("filter")) : "",
-  );
+  const [filterUsername, setFilterName] = useState("");
   const {
     isLoadingUserContext,
     userContext,
@@ -215,17 +188,7 @@ export const User = () => {
   };
 
   const handleFilterChange = (e) => {
-    if (!filterUsername) setIsRunning(!isRunning);
     setFilterName(e.target.value);
-    // setUserData([]);
-    // update the path without reload, filter is also encoded
-    if (e.target.value === "") window.history.replaceState("", "", "/users");
-    else
-      window.history.replaceState(
-        "",
-        "",
-        `/users?filter=${encodeURIComponent(e.target.value)}`,
-      );
   };
 
   useEffect(() => {
@@ -309,7 +272,6 @@ export const User = () => {
     currPage,
     delayTimeUse,
     filterUsername,
-    loadUsers,
     order,
     orderBy,
     perPage,
@@ -318,12 +280,6 @@ export const User = () => {
 
   return (
     <Fragment>
-      {isLoadingUserContext ? (
-        <LinearProgress />
-      ) : (
-        <div className="table_view_spinner_holder" />
-      )}
-      <br />
       {!userContext || (userContext && userContext.rows.length === 0) ? (
         <div>
           Cannot load user data. Please check your iRODS Client HTTP API
@@ -331,27 +287,25 @@ export const User = () => {
         </div>
       ) : (
         <Fragment>
-          <div className={classes.filterGroup}>
-            <TextField
-              className={classes.filter}
+          <div style={styles.filterGroup}>
+            <input
+              type="text"
+              style={styles.filter}
               id="filter-term"
-              label="Filter"
               placeholder="Filter by User Name, Zone, or Type"
               onChange={handleFilterChange}
               value={filterUsername}
             />
-            <Button
-              className={classes.add_button}
-              variant="outlined"
-              color="primary"
+            <button
+              className="outlined_button"
+              style={styles.add_button}
               onClick={() => setAddRowOpen(true)}
             >
               Add New User
-            </Button>
+            </button>
           </div>
           <TablePagination
-            component="div"
-            className={classes.pagination}
+            style={styles.pagination}
             page={currPage - 1}
             count={userTotal}
             rowsPerPage={perPage}
@@ -362,75 +316,65 @@ export const User = () => {
               localStorage.setItem(usersPageKey, e.target.value);
             }}
           />
-          <TableContainer className={classes.tableContainer} component={Paper}>
-            <Table
+          <div className="outlined_paper" style={styles.tableContainer}>
+            <table
               style={{ width: "100%", tableLayout: "fixed" }}
               aria-label="User table"
             >
-              <TableHead>
-                <StylesProvider injectFirst>
-                  <TableRow>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "40%" }}
+              <thead>
+                <tr>
+                  <td style={styles.table_cell} style={{ width: "40%" }}>
+                    <TableSortLabel
+                      active={orderBy === "USER_NAME"}
+                      direction={orderBy === "USER_NAME" ? order : "asc"}
+                      onClick={() => {
+                        handleSort("USER_NAME");
+                      }}
                     >
-                      <TableSortLabel
-                        active={orderBy === "USER_NAME"}
-                        direction={orderBy === "USER_NAME" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_NAME");
-                        }}
-                      >
-                        <b>User Name</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
+                      <b>User Name</b>
+                    </TableSortLabel>
+                  </td>
+                  <td style={styles.table_cell} style={{ width: "20%" }}>
+                    <TableSortLabel
+                      active={orderBy === "USER_ZONE"}
+                      direction={orderBy === "USER_ZONE" ? order : "asc"}
+                      onClick={() => {
+                        handleSort("USER_ZONE");
+                      }}
                     >
-                      <TableSortLabel
-                        active={orderBy === "USER_ZONE"}
-                        direction={orderBy === "USER_ZONE" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_ZONE");
-                        }}
-                      >
-                        <b>Zone</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
+                      <b>Zone</b>
+                    </TableSortLabel>
+                  </td>
+                  <td style={styles.table_cell} style={{ width: "20%" }}>
+                    <TableSortLabel
+                      active={orderBy === "USER_TYPE"}
+                      direction={orderBy === "USER_TYPE" ? order : "asc"}
+                      onClick={() => {
+                        handleSort("USER_TYPE");
+                      }}
                     >
-                      <TableSortLabel
-                        active={orderBy === "USER_TYPE"}
-                        direction={orderBy === "USER_TYPE" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_TYPE");
-                        }}
-                      >
-                        <b>Type</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
-                      align="right"
-                    >
-                      <b>Action</b>
-                    </TableCell>
-                  </TableRow>
-                </StylesProvider>
-              </TableHead>
-              <TableBody>
+                      <b>Type</b>
+                    </TableSortLabel>
+                  </td>
+                  <td
+                    style={styles.table_cell}
+                    style={{ width: "20%" }}
+                    align="right"
+                  >
+                    <b>Action</b>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
                 {addRowOpen && (
-                  <TableRow id="add-user-row">
-                    <TableCell>
-                      <Input
-                        className={[
-                          classes.add_user_name,
-                          classes.fontInherit,
-                        ].join(" ")}
+                  <tr id="add-user-row">
+                    <td>
+                      <input
+                        type="text"
+                        style={{
+                          ...styles.add_user_name,
+                          ...styles.fontInherit,
+                        }}
                         id="add-user-name"
                         placeholder="Enter new User Name"
                         value={newUserData.name}
@@ -442,309 +386,10 @@ export const User = () => {
                         }}
                         onKeyDown={(event) => handleKeyDown(event)}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        native
-                        className={classes.fontInherit}
-                        id="add-user-zone"
-                        value={newUserData.zone}
-                        onChange={(e) => {
-                          setNewUserData({
-                            ...newUserData,
-                            zone: e.target.value,
-                          });
-                        }}
-                        onKeyDown={(event) => handleKeyDown(event)}
-                        variant=""
-                      >
-                        {zones &&
-                          zones.map((zone) => (
-                            <option
-                              key={`zone-option-${zone.name}`}
-                              value={zone.name}
-                            >
-                              {zone.name}
-                            </option>
-                          ))}
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        native
-                        className={classes.fontInherit}
-                        id="add-user-type"
-                        value={newUserData.type}
-                        onChange={(e) => {
-                          setNewUserData({
-                            ...newUserData,
-                            type: e.target.value,
-                          });
-                        }}
-                        onKeyDown={(event) => handleKeyDown(event)}
-                        variant=""
-                      >
-                        {userTypes.map((this_user_type) => (
-                          <option key={this_user_type} value={this_user_type}>
-                            {this_user_type}
-                          </option>
-                        ))}
-                      </Select>
-                    </TableCell>
-                    <TableCell align="right">
-                      <ToggleButtonGroup size="small">
-                        <ToggleButton value="save" onClick={addUser}>
-                          <SaveIcon />
-                        </ToggleButton>
-                        <ToggleButton value="close" onClick={handleAddRowClose}>
-                          <CloseIcon />
-                        </ToggleButton>
-                      </ToggleButtonGroup>
-                    </TableCell>
-                  </TableRow>
-                )}
-
-                {userData && userData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3}>
-                      <div className="table_view_no_results_container">
-                        No results found for [{filterUsername}].
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  userData &&
-                  userData.map((this_user, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "40%" }}
-                        component="th"
-                        scope="row"
-                      >
-                        {this_user[0]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "20%" }}
-                      >
-                        {this_user[2]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "20%" }}
-                      >
-                        {this_user[1]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "20%" }}
-                        align="right"
-                      >
-                        {" "}
-                        {this_user[0] === loggedUserName ||
-                        this_user[0] === "public" ? (
-                          <p></p>
-                        ) : (
-                          <span>
-                            <Link
-                              className={classes.link_button}
-                              to={`/users/edit?user=${encodeURIComponent(
-                                this_user[0] + "#" + this_user[2],
-                              )}`}
-                            >
-                              <Button color="primary">Edit</Button>
-                            </Link>
-                            <Button
-                              color="secondary"
-                              onClick={() => {
-                                handleRemoveConfirmationOpen(this_user);
-                              }}
-                            >
-                              Remove
-                            </Button>
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Dialog
-            open={addFormOpen}
-            onClose={handleAddFormClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle>Adding New User</DialogTitle>
-            <DialogContent>
-              <DialogContentText>Error Message:</DialogContentText>
-              <p className={classes.errorMsg}>{addErrorMsg}</p>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleAddFormClose} color="primary">
-                Close
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <Dialog
-            open={removeConfirmation}
-            onClose={handleRemoveConfirmationClose}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle>Warning</DialogTitle>
-            <DialogContent>
-              <Typography>
-                Are you sure to remove <b>{currUser[0]}</b>?
-              </Typography>
-              <p className={classes.errorMsg}>{removeErrorMsg}</p>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={removeUser} color="secondary">
-                Remove
-              </Button>
-              <Button onClick={handleRemoveConfirmationClose} color="primary">
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Fragment>
-      )}
-    </Fragment>
-  );
-
-  return (
-    <Fragment>
-      {isLoadingUserContext ? (
-        <LinearProgress />
-      ) : (
-        <div className="table_view_spinner_holder" />
-      )}
-      <br />
-      {!userContext || (userContext && userContext.rows.length === 0) ? (
-        <div>
-          Cannot load user data. Please check your iRODS Client HTTP API
-          endpoint connection.
-        </div>
-      ) : (
-        <Fragment>
-          <div className={classes.filterGroup}>
-            <TextField
-              className={classes.filter}
-              id="filter-term"
-              label="Filter"
-              placeholder="Filter by User Name, Zone, or Type"
-              onChange={handleFilterChange}
-              value={filterUsername}
-            />
-            <Button
-              className={classes.add_button}
-              variant="outlined"
-              color="primary"
-              onClick={() => setAddRowOpen(true)}
-            >
-              Add New User
-            </Button>
-          </div>
-          <TablePagination
-            component="div"
-            className={classes.pagination}
-            page={currPage - 1}
-            count={userTotal}
-            rowsPerPage={perPage}
-            onPageChange={handlePageChange}
-            onChangeRowsPerPage={(e) => {
-              setPerPage(e.target.value);
-              setCurrPage(1);
-              localStorage.setItem(usersPageKey, e.target.value);
-            }}
-          />
-          <TableContainer className={classes.tableContainer} component={Paper}>
-            <Table
-              style={{ width: "100%", tableLayout: "fixed" }}
-              aria-label="User table"
-            >
-              <TableHead>
-                <StylesProvider injectFirst>
-                  <TableRow>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "40%" }}
-                    >
-                      <TableSortLabel
-                        active={orderBy === "USER_NAME"}
-                        direction={orderBy === "USER_NAME" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_NAME");
-                        }}
-                      >
-                        <b>User Name</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
-                    >
-                      <TableSortLabel
-                        active={orderBy === "USER_ZONE"}
-                        direction={orderBy === "USER_ZONE" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_ZONE");
-                        }}
-                      >
-                        <b>Zone</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
-                    >
-                      <TableSortLabel
-                        active={orderBy === "USER_TYPE"}
-                        direction={orderBy === "USER_TYPE" ? order : "asc"}
-                        onClick={() => {
-                          handleSort("USER_TYPE");
-                        }}
-                      >
-                        <b>Type</b>
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell
-                      className={classes.table_cell}
-                      style={{ width: "20%" }}
-                      align="right"
-                    >
-                      <b>Action</b>
-                    </TableCell>
-                  </TableRow>
-                </StylesProvider>
-              </TableHead>
-              <TableBody>
-                {addRowOpen && (
-                  <TableRow id="add-user-row">
-                    <TableCell>
-                      <Input
-                        className={[
-                          classes.add_user_name,
-                          classes.fontInherit,
-                        ].join(" ")}
-                        id="add-user-name"
-                        placeholder="Enter new User Name"
-                        value={newUserData.name}
-                        onChange={(e) => {
-                          setNewUserData({
-                            ...newUserData,
-                            name: e.target.value,
-                          });
-                        }}
-                        onKeyDown={(event) => handleKeyDown(event)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        native
-                        className={classes.fontInherit}
+                    </td>
+                    <td>
+                      <select
+                        style={styles.fontInherit}
                         id="add-user-zone"
                         value={newUserData.zone}
                         onChange={(e) => {
@@ -764,12 +409,11 @@ export const User = () => {
                               {zone.name}
                             </option>
                           ))}
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        native
-                        className={classes.fontInherit}
+                      </select>
+                    </td>
+                    <td>
+                      <select
+                        style={styles.fontInherit}
                         id="add-user-type"
                         value={newUserData.type}
                         onChange={(e) => {
@@ -785,55 +429,64 @@ export const User = () => {
                             {this_user_type}
                           </option>
                         ))}
-                      </Select>
-                    </TableCell>
-                    <TableCell align="right">
-                      <ToggleButtonGroup size="small">
-                        <ToggleButton value="save" onClick={addUser}>
-                          <SaveIcon />
-                        </ToggleButton>
-                        <ToggleButton value="close" onClick={handleAddRowClose}>
+                      </select>
+                    </td>
+                    <td align="right">
+                      <span
+                        style={{
+                          float: "right",
+                          display: "flex",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <button
+                          className="icon_button"
+                          value="save"
+                          onClick={addUser}
+                          disabled={newUserData.name === ""}
+                        >
+                          <CheckIcon />
+                        </button>
+                        <button
+                          className="icon_button"
+                          value="close"
+                          onClick={handleAddRowClose}
+                        >
                           <CloseIcon />
-                        </ToggleButton>
-                      </ToggleButtonGroup>
-                    </TableCell>
-                  </TableRow>
+                        </button>
+                      </span>
+                    </td>
+                  </tr>
                 )}
 
                 {userData && userData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={3}>
+                  <tr>
+                    <td colSpan={3}>
                       <div className="table_view_no_results_container">
                         No results found for [{filterUsername}].
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ) : (
                   userData &&
                   userData.map((this_user, index) => (
-                    <TableRow key={index}>
-                      <TableCell
-                        className={classes.table_cell}
+                    <tr key={index}>
+                      <td
+                        style={styles.table_cell}
                         style={{ width: "40%" }}
                         component="th"
                         scope="row"
                       >
                         {this_user[0]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "20%" }}
-                      >
+                      </td>
+                      <td style={styles.table_cell} style={{ width: "20%" }}>
                         {this_user[2]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
-                        style={{ width: "20%" }}
-                      >
+                      </td>
+                      <td style={styles.table_cell} style={{ width: "20%" }}>
                         {this_user[1]}
-                      </TableCell>
-                      <TableCell
-                        className={classes.table_cell}
+                      </td>
+                      <td
+                        style={styles.table_cell}
                         style={{ width: "20%" }}
                         align="right"
                       >
@@ -844,67 +497,62 @@ export const User = () => {
                         ) : (
                           <span>
                             <Link
-                              className={classes.link_button}
-                              to={`/users/edit?user=${encodeURIComponent(
-                                this_user[0] + "#" + this_user[2],
-                              )}`}
+                              style={styles.link_button}
+                              to="/users/edit"
+                              state={{
+                                username: this_user[0],
+                                userzone: this_user[2],
+                              }}
                             >
-                              <Button color="primary">Edit</Button>
+                              <button>Edit</button>
                             </Link>
-                            <Button
-                              color="secondary"
+                            <button
                               onClick={() => {
                                 handleRemoveConfirmationOpen(this_user);
                               }}
                             >
                               Remove
-                            </Button>
+                            </button>
                           </span>
                         )}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))
                 )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Dialog
+              </tbody>
+            </table>
+          </div>
+          <dialog
             open={addFormOpen}
             onClose={handleAddFormClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle>Adding New User</DialogTitle>
-            <DialogContent>
-              <DialogContentText>Error Message:</DialogContentText>
-              <p className={classes.errorMsg}>{addErrorMsg}</p>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleAddFormClose} color="primary">
-                Close
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <Dialog
+            <h2>Adding New User</h2>
+            <div>
+              <b>Error Message:</b>
+              <p style={styles.errorMsg}>{addErrorMsg}</p>
+            </div>
+            <div>
+              <button onClick={handleAddFormClose}>Close</button>
+            </div>
+          </dialog>
+          <dialog
             open={removeConfirmation}
             onClose={handleRemoveConfirmationClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle>Warning</DialogTitle>
-            <DialogContent>
-              <Typography>
+            <h2>Warning</h2>
+            <div>
+              <p>
                 Are you sure to remove <b>{currUser[0]}</b>?
-              </Typography>
-              <p className={classes.errorMsg}>{removeErrorMsg}</p>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={removeUser} color="secondary">
-                Remove
-              </Button>
-              <Button onClick={handleRemoveConfirmationClose} color="primary">
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
+              </p>
+              <p style={styles.errorMsg}>{removeErrorMsg}</p>
+            </div>
+            <div>
+              <button onClick={removeUser}>Remove</button>
+              <button onClick={handleRemoveConfirmationClose}>Cancel</button>
+            </div>
+          </dialog>
         </Fragment>
       )}
     </Fragment>
