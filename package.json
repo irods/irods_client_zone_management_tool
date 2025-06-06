@@ -6,10 +6,6 @@
     "-": "^0.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.1.0",
-    "@mui/material": "^6.1.0",
-    "@mui/styles": "^6.1.0",
-    "@mui/x-tree-view": "^7.17.0",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "fade": "^0.2.0",
@@ -30,8 +26,8 @@
     "sql-formatter": "^15.4.2"
   },
   "scripts": {
-    "start": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && CHOKIDAR_USEPOLLING=true react-scripts start",
-    "build": "export REACT_APP_GIT_SHA=$(git rev-parse HEAD) && react-scripts build",
+    "start": "export REACT_APP_VERSION=$(npm version | sed -rn 's/^ +irods_client_zone_management_tool: .(.*).,$/\\1/p') REACT_APP_GIT_SHA=$(git rev-parse HEAD) CHOKIDAR_USEPOLLING=true && react-scripts start",
+    "build": "export REACT_APP_VERSION=$(npm version) REACT_APP_GIT_SHA=$(git rev-parse HEAD) && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },

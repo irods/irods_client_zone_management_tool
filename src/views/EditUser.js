@@ -1,42 +1,9 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Link, Navigate } from "react-router-dom";
+import { useLocation, Link, Navigate } from "react-router-dom";
 import { useEnvironment } from "../contexts";
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  DialogActions,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  LinearProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-  TableContainer,
-  Paper,
-  Select,
-  Snackbar,
-  InputAdornment,
-  IconButton,
-  Input,
-  MenuItem,
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import {
-  ArrowBack as ArrowBackIcon,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { ArrowLeftIcon } from "../components";
 import {
   ModifyUserPasswordController,
   ModifyUserTypeController,
@@ -46,7 +13,7 @@ import {
   RemoveUserFromGroupController,
 } from "../controllers/GroupController";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   link_button: {
     textDecoration: "none",
   },
@@ -71,23 +38,23 @@ const useStyles = makeStyles((theme) => ({
     maxHeight: "100%",
     overflowY: "auto",
   },
-  margin: {
-    margin: theme.spacing(1),
+  user_table: {
+    width: "100%",
+    overflowY: "auto",
   },
-}));
+  margin: {
+    margin: 8,
+  },
+};
 
 export const EditUser = (props) => {
-  // navigate to the login page if no token is found
-  if (!localStorage.getItem("zmt-token")) return <Navigate to="/" noThrow />;
-
   const auth = localStorage.getItem("zmt-token");
   const loggedUserName = localStorage.getItem("zmt-username");
-  console.log(props);
-  const params = new URLSearchParams(location.search);
-  const [currentUserName, currentUserZone] = params.get("user")
-    ? params.get("user").split("#")
-    : [undefined, undefined];
-  const classes = useStyles();
+  const state = useLocation().state;
+  const [currentUserName, currentUserZone] =
+    state && state.username && state.userzone
+      ? [state.username, state.userzone]
+      : [undefined, undefined];
   const [isLoading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const { httpApiLocation } = useEnvironment();
@@ -106,6 +73,9 @@ export const EditUser = (props) => {
     showConfirmPassword: false,
     status: "",
   });
+
+  if (!currentUserName || !currentUserZone)
+    return <Navigate to="/users" noThrow />;
 
   useEffect(() => {
     // hide this interface for the current rodsadmin user or user that does not have a name or zone
@@ -141,14 +111,7 @@ export const EditUser = (props) => {
       .catch(() => {
         return <Navigate to="/users" noThrow />;
       });
-  }, [
-    currentUserName,
-    auth,
-    currentUserZone,
-    httpApiLocation,
-    loggedUserName,
-    userType,
-  ]);
+  }, [userType.value, userType.status]);
 
   useEffect(() => {
     if (currentUserName) {
@@ -171,7 +134,7 @@ export const EditUser = (props) => {
         setLoading(false);
       });
     }
-  }, [auth, currentUserName, httpApiLocation]);
+  }, []);
 
   useEffect(() => {
     if (currentUserName) {
@@ -192,7 +155,7 @@ export const EditUser = (props) => {
         setFilterNameResult(res.data.rows);
       });
     }
-  }, [auth, httpApiLocation, filterGroupName, currentUserName]);
+  }, []);
 
   async function removeGroupFromUser(group) {
     try {
@@ -286,281 +249,262 @@ export const EditUser = (props) => {
     return false;
   };
 
+  useLayoutEffect(() => {
+    if (passwordConfirmation) document.getElementById("modal").showModal();
+    if (!passwordConfirmation && document.getElementById("modal").open)
+      document.getElementById("modal").close();
+  }, [passwordConfirmation]);
+
+  useEffect(() => {
+    if (password.status === "success" || password.status !== "failure") {
+      const id = setTimeout(() => {
+        setPassword({ ...password, status: "" });
+      }, 2000);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+  }, [password.status]);
+
+  useEffect(() => {
+    if (userType.status === "success" || userType.status !== "failure") {
+      const id = setTimeout(() => {
+        setUserType({ ...userType, status: "" });
+      }, 2000);
+      return () => {
+        clearTimeout(id);
+      };
+    }
+  }, [userType.status]);
+
   return (
     <Fragment>
-      {isLoading === true ? (
-        <div>
-          <LinearProgress />
-        </div>
-      ) : (
-        <div className="table_view_spinner_holder" />
-      )}
       <div>
-        <Link to="/users" className={classes.link_button}>
-          <Button>
-            <ArrowBackIcon />
-          </Button>
+        <Link to="/users" style={styles.link_button}>
+          <button className="icon_button">
+            <ArrowLeftIcon />
+          </button>
         </Link>
       </div>
-      <div className={classes.user_info_container}>
+      <div style={styles.user_info_container}>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <Paper className={classes.user_info}>
+          <div className="outlined_paper" style={styles.user_info}>
             <h2>Basic Information</h2>
             <div style={{ wordWrap: "break-word" }}>
-              <Typography>
+              <p>
                 User: {currentUserName}#{currentUserZone}
-              </Typography>
+              </p>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
-              <Typography>User Type: </Typography>
-              <Select
+              <label htmlFor="select-user-type" style={{ width: "65%" }}>
+                User Type:{" "}
+              </label>
+              <select
+                id="select-user-type"
                 style={{ marginLeft: "10px" }}
                 value={userType.value}
                 onChange={(e) => updateUserType(e.target.value)}
               >
-                <MenuItem value="rodsuser">rodsuser</MenuItem>
-                <MenuItem value="rodsadmin">rodsadmin</MenuItem>
-                <MenuItem value="groupadmin">groupadmin</MenuItem>
-              </Select>
+                <option value="rodsuser">rodsuser</option>
+                <option value="rodsadmin">rodsadmin</option>
+                <option value="groupadmin">groupadmin</option>
+              </select>
             </div>
-          </Paper>
+          </div>
           <br />
-          <Paper className={classes.user_info}>
+          <div className="outlined_paper" style={styles.user_info}>
             <h2>Password Management</h2>
-            <FormControl className={classes.margin}>
-              <InputLabel htmlFor="user-new-password">
-                Create New Password
-              </InputLabel>
-              <Input
-                id="user-new-password"
-                type={password.showPassword ? "text" : "password"}
-                value={password.newPassword}
-                onChange={(e) =>
-                  setPassword({ ...password, newPassword: e.target.value })
-                }
-                endAdornment={
-                  password.newPassword !== "" && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={() =>
-                          setPassword({
-                            ...password,
-                            showPassword: !password.showPassword,
-                          })
-                        }
-                      >
-                        {password.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  )
+            <label htmlFor="user-new-password">Create New Password</label>
+            <input
+              id="user-new-password"
+              type={password.showPassword ? "text" : "password"}
+              placeholder="Enter new password here"
+              autocomplete="new-password"
+              value={password.newPassword}
+              onChange={(e) =>
+                setPassword({ ...password, newPassword: e.target.value })
+              }
+            />
+            <span style={{ display: "flex", float: "left" }}>
+              <input
+                id="show-new-password-toggle"
+                style={{ cursor: "pointer", width: "5%" }}
+                defaultChecked={password.showPassword}
+                type="checkbox"
+                onClick={() =>
+                  setPassword({
+                    ...password,
+                    showPassword: !password.showPassword,
+                  })
                 }
               />
-            </FormControl>
+              <label htmlFor="show-new-password-toggle">
+                toggle visibility
+              </label>
+            </span>
             <br />
-            <FormControl
-              error={password.status === "Passwords do not match."}
-              className={classes.margin}
-            >
-              <InputLabel htmlFor="confirm-new-password">
-                Confirm New Password
-              </InputLabel>
-              <Input
-                id="confirm-new-password"
-                type={password.showConfirmPassword ? "text" : "password"}
-                value={password.confirmPassword}
-                onChange={(e) =>
-                  setPassword({ ...password, confirmPassword: e.target.value })
-                }
-                endAdornment={
-                  password.confirmPassword !== "" && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle confirm password visibility"
-                        onClick={() =>
-                          setPassword({
-                            ...password,
-                            showConfirmPassword: !password.showConfirmPassword,
-                          })
-                        }
-                      >
-                        {password.showConfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  )
+            <label htmlFor="confirm-new-password">Confirm New Password</label>
+            <input
+              id="confirm-new-password"
+              autocomplete="new-password"
+              placeholder="Confirm new password here"
+              type={password.showConfirmPassword ? "text" : "password"}
+              value={password.confirmPassword}
+              onChange={(e) =>
+                setPassword({
+                  ...password,
+                  confirmPassword: e.target.value,
+                  status: "",
+                })
+              }
+            />
+            <span style={{ display: "flex", float: "left" }}>
+              <input
+                id="show-confirm-new-password-toggle"
+                style={{ cursor: "pointer", width: "5%" }}
+                defaultChecked={password.showConfirmPassword}
+                type="checkbox"
+                onClick={() =>
+                  setPassword({
+                    ...password,
+                    showConfirmPassword: !password.showConfirmPassword,
+                    status: "",
+                  })
                 }
               />
-              <FormHelperText id="confirm-new-password-error">
-                {password.status === "Passwords do not match."
-                  ? password.status
-                  : ""}
-              </FormHelperText>
-            </FormControl>
+              <label htmlFor="show-confirm-new-password-toggle">
+                toggle visibility
+              </label>
+            </span>
+            <p id="confirm-new-password-error" style={{ color: "red" }}>
+              {password.status === "Passwords do not match."
+                ? password.status
+                : ""}
+            </p>
             <br />
-            <Button
-              variant="outlined"
-              color="primary"
+            <button
               style={{ textTransform: "none" }}
               onClick={() => resetPwdHandler()}
             >
               Set Password
-            </Button>
-          </Paper>
+            </button>
+          </div>
         </div>
         <div>
-          <Paper className={classes.user_info}>
+          <div className="outlined_paper" style={styles.user_info}>
             <h2>User Group Management</h2>
             <div className="edit_filter_bar">
-              <Typography>Find Group</Typography>
-              <TextField
+              <label htmlFor="filterGroupName" style={{ width: "35%" }}>
+                Find Group
+              </label>
+              <input
+                type="text"
                 id="filterGroupName"
                 label="Filter"
                 placeholder="Filter by Group Name"
-                className={classes.filter_textfield}
+                style={styles.filter_textfield}
                 onChange={(e) => setFilterName(e.target.value)}
               />
             </div>
             <br />
             <div className="edit_container">
               {filterGroupNameResult && (
-                <TableContainer component={Paper}>
-                  <Table
-                    className={classes.user_table}
-                    aria-label="simple table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>
+                <div className="paper">
+                  <table style={styles.user_table} aria-label="simple table">
+                    <thead>
+                      <tr>
+                        <td>
                           <b>Group Name</b>
-                        </TableCell>
-                        <TableCell align="right">
+                        </td>
+                        <td align="right">
                           <b>Status</b>
-                        </TableCell>
-                        <TableCell align="right">
+                        </td>
+                        <td align="right">
                           <b>Action</b>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
                       {filterGroupNameResult.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={3}>
+                        <tr>
+                          <td colSpan={3}>
                             <div className="table_view_no_results_container">
                               No results found for [{filterGroupName}].
                             </div>
-                          </TableCell>
-                        </TableRow>
+                          </td>
+                        </tr>
                       ) : (
                         filterGroupNameResult.map((thisGroup) => (
-                          <TableRow key={thisGroup[0]}>
-                            <TableCell component="th" scope="row">
+                          <tr key={thisGroup[0]}>
+                            <td component="th" scope="row">
                               {thisGroup[0]}
-                            </TableCell>
-                            <TableCell align="right">
+                            </td>
+                            <td align="right">
                               {checkGroup(thisGroup)
                                 ? "In group"
                                 : "Not in group"}
-                            </TableCell>
-                            <TableCell align="right">
+                            </td>
+                            <td align="right">
                               {checkGroup(thisGroup) ? (
-                                <Button
+                                <button
                                   color="secondary"
                                   onClick={() => {
                                     removeGroupFromUser(thisGroup);
                                   }}
                                 >
                                   Remove
-                                </Button>
+                                </button>
                               ) : (
-                                <Button
-                                  className={classes.add_button}
+                                <button
+                                  style={styles.add_button}
                                   onClick={() => {
                                     addGroupToUser(thisGroup).then();
                                   }}
                                 >
                                   Add
-                                </Button>
+                                </button>
                               )}
-                            </TableCell>
-                          </TableRow>
+                            </td>
+                          </tr>
                         ))
                       )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
-          </Paper>
+          </div>
         </div>
       </div>
-      <Snackbar
-        open={userType.status === "changed"}
-        autoHideDuration={5000}
-        onClose={() => setUserType({ ...userType, status: "" })}
-      >
-        <Alert elevation={6} variant="filled" severity="success">
-          Success! User type changed to {userType.value}.
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={userType.status === "failed"}
-        autoHideDuration={5000}
-        onClose={() => setUserType({ ...userType, status: "" })}
-      >
-        <Alert elevation={6} variant="filled" severity="error">
-          Failed to change user type.
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={password.status === "changed"}
-        autoHideDuration={5000}
-        onClose={() => setPassword({ ...password, status: "" })}
-      >
-        <Alert elevation={6} variant="filled" severity="success">
-          Success! Password changed.
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        open={password.status === "failed"}
-        autoHideDuration={5000}
-        onClose={() => setPassword({ ...password, status: "" })}
-      >
-        <Alert elevation={6} variant="filled" severity="error">
-          Failed to change password.
-        </Alert>
-      </Snackbar>
-      <Dialog
-        open={passwordConfirmation}
+      <dialog className="alert success" open={userType.status === "changed"}>
+        Success! User type changed to {userType.value}.
+      </dialog>
+      <dialog className="alert error" open={userType.status === "failed"}>
+        Failed to change user type.
+      </dialog>
+      <dialog className="alert success" open={password.status === "changed"}>
+        Success! Password changed.
+      </dialog>
+      <dialog className="alert error" open={password.status === "failed"}>
+        Failed to change password.
+      </dialog>
+      <dialog
+        id="modal"
         onClose={() => setPasswordConfirmation(false)}
         aria-labelledby="password-confirmation-dialog-title"
         aria-describedby="password-confirmation-dialog"
       >
-        <DialogTitle>WARNING: </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <div>Passwords are empty.</div>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            color="secondary"
-            onClick={() => setPasswordConfirmation(false)}
-          >
-            Cancel
-          </Button>
-          <Button color="primary" onClick={() => resetPwd()} autoFocus>
+        <h2>WARNING: </h2>
+        <div>
+          <div>Passwords are empty.</div>
+        </div>
+        <div>
+          <button onClick={() => setPasswordConfirmation(false)}>Cancel</button>
+          <button onClick={resetPwd} autoFocus>
             Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </button>
+        </div>
+      </dialog>
     </Fragment>
   );
 };
@@ -568,4 +512,3 @@ export const EditUser = (props) => {
 EditUser.propTypes = {
   location: PropTypes.any,
 };
-

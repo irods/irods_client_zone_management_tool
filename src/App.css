@@ -4,172 +4,308 @@
 }
 
 .app_body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.app_footer {
-    position: relative;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
-    height: 50px;
-    color: #224;
-    background-color: white;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    padding-bottom: 0.5vh;
-    font-size: 0.8rem;
-}
-
-.app_footer_logo {
-    width: 3vw;
-    margin-right: 10px;
-}
-
-.app_footer_item {
-    padding: 10px;
-}
-
-.app_footer_text {
-    text-decoration: none;
-}
-
-.app_footer_text:visited {
-    color: black;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .app_wrap {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .check_result_link {
-    color: #146af5;
+  color: #146af5;
 }
 
 .check_result_link:hover {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 .connection_container {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 10px;
-    font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  font-size: 1rem;
 }
 
 .connection_text_status {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .connection_title {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .connection_timestamp {
-    padding: 5px;
+  padding: 5px;
 }
 
 .green_dot {
-    height: 15px;
-    width: 15px;
-    background-color: #00ff00;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 5px;
+  height: 15px;
+  width: 15px;
+  background-color: #00ff00;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
 }
 
 .green {
-    color: #04d1c2
+  color: #04d1c2;
 }
 
 .red {
-    color: #ff0000
+  color: #ff0000;
 }
 
 .grey_out {
-    opacity: 0.4;
+  opacity: 0.4;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .red_dot {
-    height: 15px;
-    width: 15px;
-    background-color: #ff0000;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 5px;
+  height: 15px;
+  width: 15px;
+  background-color: #ff0000;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
 }
 
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .main_wrapper {
-    padding: 15px;
+  padding: 15px;
+  overflow-y: auto;
+  width: 100%;
 }
 
 .edit_container {
-    overflow-y: scroll;
+  overflow-y: scroll;
 }
 
 .edit_filter_bar {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
 }
 
 .resource_tree_header {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 10px;
 }
 
 .resource_tree_parent_info {
-    display: flex;
-    padding-left: 10px;
-    justify-content: space-between;
+  display: flex;
+  padding-left: 10px;
+  justify-content: space-between;
 }
 
 .resource_tree_status {
-    padding-left: 15px;
+  padding-left: 15px;
 }
 
 .resource_tree_container {
-    display: flex;
-    height: max-content;
+  display: flex;
+  height: max-content;
 }
 
 .resource_tree {
-    flex: 1 0 80%;
-    margin: 10px;
-    min-height: 100%;
-    overflow: scroll;
+  flex: 1 0 80%;
+  margin: 10px;
+  min-height: 100%;
+  overflow: scroll;
 }
 
 .resource_tree_notifcations {
-    width: 400px;
-    font-size: 14px;
+  width: 400px;
+  font-size: 14px;
 }
 
 .resource_tree_status {
-    text-align: center;
+  text-align: center;
 }
 
 .table_view_spinner_holder {
-    height: 4px;
+  height: 4px;
 }
 
 .table_view_no_results_container {
-    text-align: center;
+  text-align: center;
 }
 
 /*  Hide the error overlay so healthcheck dashboard can gracefully show possible syntax error  */
 body > iframe {
-    display: none;
+  display: none;
+}
+
+.paper,
+.outlined_paper {
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow:
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.outlined_paper {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.infinite_spinning {
+  animation: spin 2s linear infinite;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  padding: 16px;
+}
+
+tr:not(:has(+ tr.dropdown)) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+tr.dropdown {
+  border-top: 1px dotted rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.rotate_180 {
+  transform: rotate(180deg);
+  display: flex;
+}
+
+.rotate_90 {
+  transform: rotate(90deg);
+  display: flex;
+}
+
+.rotate_270 {
+  transform: rotate(270deg);
+  display: flex;
+}
+
+.hoverableTableRow:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.icon_button {
+  background-color: transparent;
+  border: 0px solid transparent;
+  border-radius: 50%;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+.icon_button:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.icon_button:not(:disabled):active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.chip {
+  margin: 5px;
+  text-align: center;
+  line-height: 100%;
+  height: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background-color: white;
+  padding: 5px;
+}
+
+.chip:not(:disabled):hover {
+  background-color: rgb(240, 240, 240);
+}
+
+.chip:disabled {
+  border: none;
+  color: inherit;
+  background-color: rgb(230, 230, 230);
+}
+
+.table_sort_label {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: inherit;
+}
+
+.table_sort_label:hover {
+  color: rgb(50, 50, 50);
+}
+
+button.outlined_button {
+  padding: 5px 15px;
+  background-color: transparent;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+input,
+select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid;
+}
+
+.alert {
+  bottom: 80px;
+  z-index: 2;
+}
+
+.alert.success {
+  background-color: green;
+}
+
+.alert.error {
+  background-color: red;
+}
+
+.verticalTab {
+  max-width: 250px;
+  width: 100%;
+  margin-top: 20px;
+  text-transform: none;
+  font-size: 15px;
+  background-color: transparent;
+  border: none;
+  padding: 12px;
+}
+
+.verticalTab:disabled {
+  color: inherit;
+  border-right: 1px solid;
+}
+
+.verticalTabs {
+  max-width: 250px;
 }

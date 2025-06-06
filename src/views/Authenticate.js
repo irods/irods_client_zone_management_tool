@@ -1,150 +1,179 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Button, Container, TextField, Typography } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-import { useNavigate } from "react-router-dom";
-import { useEnvironment, useServer } from "../contexts";
-import { renderLayout, hideLayout } from "../utils";
+import React, { useEffect, useState, useRef } from "react";
+import { useEnvironment, useAuthHook } from "../contexts";
 
-const useStyles = makeStyles((theme) => ({
-	mainForm: {
-		marginTop: theme.spacing(15),
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-	},
-	logo: {
-		maxWidth: theme.spacing(35),
-		marginBottom: theme.spacing(5),
-	},
-	error: {
-		color: "red",
-		fontSize: 15,
-		padding: "10px 10px",
-	},
-	login_button: {
-		background: "#18bc9c",
-	},
-}));
+export const Authenticate = ({ onAuthenticated }) => {
+  const {
+    httpApiLocation,
+    loginLogo,
+    brandingName,
+    primaryColor,
+    footerHeight,
+  } = useEnvironment();
 
-export const Authenticate = () => {
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
+  const { setAuth } = useAuthHook();
 
-	const [incorrect, setIncorrect] = useState(false);
-	const [serverError, setServerError] = useState(false);
+  const [incorrect, setIncorrect] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
-	const classes = useStyles({ });
-	const navigate = useNavigate();
+  const styles = {
+    container: {
+      maxWidth: "CALC(444em / 14)",
+      padding: "0 CALC(24em / 14)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      margin: "0 auto",
+      minHeight: `CALC(100vh - ${footerHeight})`,
+    },
 
-	const { httpApiLocation, loginLogo, brandingName } = useEnvironment();
+    main: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+    },
 
-	const { loadData } = useServer();
-	const renderLogo = require(`../img/${loginLogo}`);
+    logo: {
+      maxWidth: "20em",
+      marginBottom: "CALC(40em / 14)",
+    },
 
-	const handleUsername = (event) => {
-		setUsername(event.target.value);
-	};
+    brandingName: {
+      fontSize: "1.5rem",
+      fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"',
+      fontWeight: "400",
+      margin: 0,
+    },
 
-	const handlePassword = (event) => {
-		setPassword(event.target.value);
-	};
+    form: {
+      width: "100%",
+    },
 
-	const handleKeyDown = (event) => {
-		if (event.keyCode === 13) {
-			handleAuthenticate();
-		}
-	};
+    input: {
+      width: "100%",
+      margin: "CALC(16em/14) 0 CALC(8em/14) 0",
+      padding: "CALC(18.5em/14) 1em",
+      boxSizing: "border-box",
+      border: "1px solid rgba(0, 0, 0, 0.25)",
+      borderRadius: "4px",
+    },
 
-	async function handleAuthenticate() {
-		try {
-			setServerError(false);
-			setIncorrect(false);
-			await axios
-				.post(`${httpApiLocation}/authenticate`, null, {
-					headers: {
-						Authorization: `Basic ${btoa(
-							username + ":" + password
-						)}`,
-					},
-				})
-				.then((res) => {
-					if (res.status === 200) {
-						localStorage.setItem("zmt-token", res.data);
-						localStorage.setItem("zmt-username", username);
-						navigate("/home", { replace: true });
-						renderLayout();
-						loadData();
-					}
-				});
-		} catch (err) {
-			if (err.response.status >= 500) setServerError(true);
-			else setIncorrect(true);
-		}
-	}
+    error: {
+      color: "red",
+      fontSize: 13,
+    },
 
-	useEffect(() => {
-		hideLayout();
-	}, []);
+    warningsArea: {
+      flexGrow: 1,
+      paddingTop: `${((incorrect === false ? 1 : 0) + (serverError === false ? 1 : 0)) * 1.25}em`,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      paddingBottom: ".75em",
+    },
+  };
 
-	return (
-		<Container component="main" maxWidth="xs">
-			<div className={classes.mainForm}>
-				<img
-					alt="iRODS Logo"
-					className={classes.logo}
-					src={renderLogo}
-				></img>
-				<br />
-				<Typography component="h4" variant="h5">
-					{brandingName}
-				</Typography>
-				<TextField
-					variant="outlined"
-					margin="normal"
-					label="Username"
-					fullWidth
-					required
-					onKeyDown={handleKeyDown}
-					onChange={handleUsername}
-				/>
-				<TextField
-					variant="outlined"
-					margin="normal"
-					label="Password"
-					type="password"
-					fullWidth
-					required
-					onKeyDown={handleKeyDown}
-					onChange={handlePassword}
-				/>
-				{serverError === false ? (
-					<br />
-				) : (
-					<Typography className={classes.error}>
-						Server error. Please check the Client HTTP API
-						Connection.
-					</Typography>
-				)}
-				{incorrect === false ? (
-					<br />
-				) : (
-					<Typography className={classes.error}>
-						Incorrect username or password. Please try again.
-					</Typography>
-				)}
-				<Button
-					variant="contained"
-					color="primary"
-					size="large"
-					fullWidth
-					className={classes.login_button}
-					onClick={handleAuthenticate}
-				>
-					Login
-				</Button>
-				<br />
-			</div>
-		</Container>
-	);
+  const LoginButtonStyling = () => {
+    return (
+      <style>
+        {`
+.loginButton {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: ${primaryColor};
+  padding: CALC(8em/14) CALC(22em/14);
+  line-height: 1.75;
+  border: 1px solid white;
+  color: white;
+  border-radius: 4px;
+  }
+.loginButton:hover {
+  background-color: color-mix(in srgb, black, ${primaryColor} 90%);
+}
+.loginButton:active {
+  background-color: color-mix(in srgb, black, ${primaryColor} 80%);
+}
+.loginButtonStyling {
+  marginTop: 2.5em;
+}
+      `}
+      </style>
+    );
+  };
+
+  const usernameRef = React.useRef();
+  const passwordRef = React.useRef();
+
+  async function handleAuthenticate(e) {
+    e.preventDefault();
+    setServerError(false);
+    setIncorrect(false);
+
+    let resStatus = 0;
+    fetch(`${httpApiLocation}/authenticate`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${btoa(usernameRef.current.value + ":" + passwordRef.current.value)}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok && res.status === 200) {
+          res.text().then((token) => {
+            setAuth({
+              username: usernameRef.current.value,
+              token: token,
+            });
+          });
+        } else if (res.status === 401) {
+          setIncorrect(true);
+        }
+      })
+      .catch((err) => {
+        setServerError(true);
+      });
+  }
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.main}>
+        <img alt="iRODS Logo" style={styles.logo} src={loginLogo} />
+        <h4 style={styles.brandingName}>{brandingName}</h4>
+        <form style={styles.form} onSubmit={handleAuthenticate}>
+          <input
+            style={styles.input}
+            type="text"
+            placeholder="Username *"
+            ref={usernameRef}
+            autoComplete="username"
+            required
+          />
+          <input
+            style={styles.input}
+            type="password"
+            placeholder="Password *"
+            ref={passwordRef}
+            autoComplete="current-password"
+            required
+          />
+
+          <div style={styles.warningsArea}>
+            {serverError === false ? null : (
+              <span style={styles.error}>
+                Server error. Please check the Client HTTP API Connection.
+              </span>
+            )}
+            {incorrect === false ? null : (
+              <span style={styles.error}>
+                Incorrect username or password. Please try again.
+              </span>
+            )}
+          </div>
+
+          <LoginButtonStyling />
+          <button className="loginButton" type="submit">
+            LOGIN
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };

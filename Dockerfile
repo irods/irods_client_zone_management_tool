@@ -1,11 +1,14 @@
 # build phase one, create the build
-FROM node:20-alpine3.19 as build
+FROM node:20-alpine3.19 AS build
 
 # get some credit
 LABEL maintainer="powen@renci.org"
 
-# Create and set the working directory
-RUN mkdir -p /usr/src/app/
+# install git
+RUN apk --no-cache add git
+
+# Create and set the working directory & fix dubious git path
+RUN mkdir -p /usr/src/app/ && git config --global --add safe.directory /usr/src/app
 WORKDIR /usr/src/app/
 
 # Add `.../node_modules/.bin` to $PATH
@@ -20,12 +23,6 @@ COPY package.json ./
 RUN npm install
 
 COPY . .
-
-# get the common build arguments
-ARG APP_VERSION=$(APP_VERSION)
-ENV REACT_APP_VERSION=$APP_VERSION
-
-# EXPOSE 3000
 
 # start the web server
 CMD ["npm", "start"]
