@@ -1,29 +1,19 @@
 {
   "name": "irods_client_zone_management_tool",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "dependencies": {
     "-": "^0.0.1",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "axios": "^1.7.7",
+    "axios": "^1.10.0",
     "cors": "^2.8.5",
-    "fade": "^0.2.0",
-    "globals": "^15.9.0",
     "install": "^0.13.0",
-    "js-cookie": "^3.0.5",
-    "npm": "^10.8.3",
-    "postcss": "^8.4.47",
-    "postcss-loader": "^8.1.1",
-    "postcss-preset-env": "^10.0.3",
-    "react": "^18.3.1",
-    "react-app": "^1.1.2",
-    "react-dom": "^18.3.1",
-    "react-refresh": "^0.11.0",
-    "react-router-dom": "^6.26.2",
-    "react-spring": "^9.7.4",
-    "react-timeago": "^7.2.0",
-    "sql-formatter": "^15.4.2"
+    "npm": "^11.4.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router": "^7.6.2",
+    "react-scripts": "5.0.1",
+    "react-timeago": "^8.2.0",
+    "sql-formatter": "^15.6.5"
   },
   "scripts": {
     "start": "export REACT_APP_VERSION=$(npm version | sed -rn 's/^ +irods_client_zone_management_tool: .(.*).,$/\\1/p') REACT_APP_GIT_SHA=$(git rev-parse HEAD) CHOKIDAR_USEPOLLING=true && react-scripts start",
@@ -32,7 +22,9 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": []
+    "extends": [
+      "react-app"
+    ]
   },
   "browserslist": {
     "production": [
@@ -45,12 +37,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
-    "@eslint/js": "^9.10.0",
-    "eslint-plugin-react": "^7.36.1",
-    "react-scripts": "^5.0.1"
   }
 }

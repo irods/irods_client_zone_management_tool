@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useCheck, useServer, useEnvironment } from "../contexts";
-import { Navigate } from "react-router-dom";
 import {
   Check,
   WrenchIcon,
@@ -52,11 +51,12 @@ export const Home = () => {
   const environment = useEnvironment();
 
   useEffect(() => {
-    // load data every time the user visits /home, so all checks can get access to the latest server data
-    loadData();
+    if (!statusResult)
+      // load data every time the user visits /home, so all checks can get access to the latest server data
+      loadData();
     environment.pageTitle = environment.homeTitle;
     document.title = environment.titleFormat();
-  }, [loadData, environment]);
+  }, [environment, loadData, statusResult]);
 
   useEffect(() => {
     // check if there are any warnings or errors, if yes, health check dashboard will be open by default

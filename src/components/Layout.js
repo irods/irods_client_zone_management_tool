@@ -1,12 +1,5 @@
-import { useState, useEffect } from "react";
 import { useEnvironment, useAuthHook, useServer } from "../contexts";
-import {
-  Link,
-  Navigate,
-  NavLink,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink } from "react-router";
 import PropTypes from "prop-types";
 
 export const Layout = ({ children }) => {
@@ -21,8 +14,6 @@ export const Layout = ({ children }) => {
     zones,
   } = useServer();
   const { logout } = useAuthHook();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const styles = {
     root: {

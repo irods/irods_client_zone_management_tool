@@ -57,7 +57,7 @@ export const EnvironmentProvider = ({ children }) => {
         usersPerPageKey: "zmt-perpage-users",
         defaultItemsPerPage: 25,
 
-        pageTitle: "", // placeholder that gets filled on each page
+        pageTitle: "",
         titleFormat: function () {
           return `${this.pageTitle} - ${this.brandingName}`;
         },

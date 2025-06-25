@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import { useEnvironment, useAuthHook } from "./";
 import { irodsVersionComparator } from "../utils";
 
@@ -26,7 +26,7 @@ const queryGenerator = (_query, order, orderBy) => {
 
 export const ServerProvider = ({ children }) => {
   const environment = useEnvironment();
-  const { auth, setAuth, logout } = useAuthHook();
+  const { auth, logout } = useAuthHook();
 
   const [zoneContext, setZoneContext] = useState([]);
   const [localZoneName, setLocalZoneName] = useState();
@@ -56,15 +56,202 @@ export const ServerProvider = ({ children }) => {
     useState(initialState);
   const [specificQueryTotal, setSpecificQueryTotal] = useState(0);
 
-  const loadUsers = async (offset, limit, order, orderBy, name) => {
-    setIsLoadingUserContext(true);
+  const loadUsers = useCallback(
+    async (offset, limit, order, orderBy, name) => {
+      setIsLoadingUserContext(true);
 
-    if (!name || name === "USER_NAME") {
-      let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
+      if (!name || name === "USER_NAME") {
+        let _query = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'RODSGROUP'`;
 
+        _query = queryGenerator(_query, order, orderBy);
+
+        return axios({
+          method: "GET",
+          url: `${environment.httpApiLocation}/query`,
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          params: {
+            op: "execute_genquery",
+            query: _query,
+            count: limit,
+            offset: offset,
+            "case-sensitive": 0,
+          },
+        })
+          .then((res) => {
+            if (name === "") setUserTotal(res.data.rows.length);
+            setUserTotal(res.data.rows.length);
+            const newUserContext = {
+              rows: res.data.rows,
+              count: Math.min(25, res.data.rows.length),
+              total: res.data.rows.length,
+            };
+            setUserContext(newUserContext);
+            setIsLoadingUserContext(false);
+          })
+          .catch(() => {
+            setUserContext(undefined);
+            setIsLoadingUserContext(false);
+          });
+      } else {
+        let totalData = [];
+
+        const queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`;
+        const q1 = queryGenerator(queryTry1, order, orderBy);
+
+        const queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`;
+        const q2 = queryGenerator(queryTry2, order, orderBy);
+
+        const queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`;
+        const q3 = queryGenerator(queryTry3, order, orderBy);
+
+        const resp1 = await axios({
+          method: "GET",
+          url: `${environment.httpApiLocation}/query`,
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          params: {
+            op: "execute_genquery",
+            query: q1,
+            count: limit,
+            offset: offset,
+            "case-sensitive": 0,
+          },
+        });
+
+        const resp2 = await axios({
+          method: "GET",
+          url: `${environment.httpApiLocation}/query`,
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          params: {
+            op: "execute_genquery",
+            query: q2,
+            count: limit,
+            offset: offset,
+            "case-sensitive": 0,
+          },
+        });
+
+        const resp3 = await axios({
+          method: "GET",
+          url: `${environment.httpApiLocation}/query`,
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          params: {
+            op: "execute_genquery",
+            query: q3,
+            count: limit,
+            offset: offset,
+            "case-sensitive": 0,
+          },
+        });
+
+        const pushOnlyNewData = (totalData, newArr) => {
+          // if totalData already has anything in resp2.data.rows, don't push it again
+          // this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
+          // there will at most be 100 items in each array, so it won't take too long
+          newArr.forEach((item) => {
+            let found = false;
+            totalData.forEach((item2) => {
+              if (item[0] === item2[0]) {
+                found = true;
+                return;
+              }
+            });
+            if (!found) {
+              totalData.push(item);
+            }
+          });
+
+          return totalData;
+        };
+
+        let userTotal = 0;
+        if (resp1 && resp1.data.rows.length > 0) {
+          totalData.push(...resp1.data.rows);
+          userTotal = parseInt(resp1.data.rows.length);
+        }
+        if (resp2 && resp2.data.rows.length > 0) {
+          totalData = pushOnlyNewData(totalData, resp2.data.rows);
+          userTotal = parseInt(resp2.data.rows.length);
+        }
+        if (resp3 && resp3.data.rows.length > 0) {
+          totalData = pushOnlyNewData(totalData, resp3.data.rows);
+          userTotal = parseInt(resp3.data.rows.length);
+        }
+
+        setUserTotal(userTotal);
+        setUserContext({
+          rows: totalData,
+          count: userTotal,
+          total: userTotal,
+        });
+        setIsLoadingUserContext(false);
+      }
+    },
+    [auth.token, environment.httpApiLocation],
+  );
+
+  // iterate through group results and load user counts
+  const loadGroupUserCounts = useCallback(
+    async (inputArray, offset, limit, order, orderBy) => {
+      const groupUserCountPromises = inputArray.rows.map((group) =>
+        axios({
+          method: "GET",
+          url: `${environment.httpApiLocation}/query`,
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          params: {
+            op: "execute_genquery",
+            query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
+            count: 100,
+          },
+        }),
+      );
+
+      // wait until all promises are resolved so we can get all user counts
+      await Promise.all(groupUserCountPromises)
+        .then((resolvedPromises) => {
+          resolvedPromises.forEach((resolvedPromise, index) => {
+            inputArray.rows[index].push(resolvedPromise.data.rows.length);
+          });
+        })
+        .catch(() => {
+          setGroupContext(undefined);
+          setIsLoadingGroupContext(false);
+        });
+
+      if (orderBy === "USER_COUNT") {
+        inputArray.rows = inputArray.rows
+          .sort((a, b) => (order === "asc" ? 1 : -1) * (a[1] - b[1]))
+          .slice(offset, offset + limit);
+      }
+      const newGroupContext = {
+        rows: inputArray.rows,
+        count: inputArray.rows.length,
+        total: inputArray.rows.length,
+      };
+      setGroupContext(newGroupContext);
+      setIsLoadingGroupContext(false);
+    },
+    [auth.token, environment.httpApiLocation],
+  );
+
+  const loadGroups = useCallback(
+    async (offset, limit, name, order, orderBy) => {
+      setIsLoadingGroupContext(true);
+      let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
+      if (name !== "") {
+        _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`;
+      }
       _query = queryGenerator(_query, order, orderBy);
-
-      return axios({
+      await axios({
         method: "GET",
         url: `${environment.httpApiLocation}/query`,
         headers: {
@@ -73,206 +260,22 @@ export const ServerProvider = ({ children }) => {
         params: {
           op: "execute_genquery",
           query: _query,
-          count: limit,
-          offset: offset,
+          count: orderBy === "USER_COUNT" ? 0 : limit,
+          offset: orderBy === "USER_COUNT" ? 0 : offset,
           "case-sensitive": 0,
         },
       })
         .then((res) => {
-          if (name === "") setUserTotal(res.data.rows.length);
-          setUserTotal(res.data.rows.length);
-          const newUserContext = {
-            rows: res.data.rows,
-            count: Math.min(25, res.data.rows.length),
-            total: res.data.rows.length,
-          };
-          setUserContext(newUserContext);
-          setIsLoadingUserContext(false);
+          if (name === "") setGroupTotal(res.data.rows.length);
+          loadGroupUserCounts(res.data, offset, limit, order, orderBy);
         })
         .catch(() => {
-          setUserContext(undefined);
-          setIsLoadingUserContext(false);
+          setGroupContext(undefined);
+          setIsLoadingGroupContext(false);
         });
-    } else {
-      let totalData = [];
-
-      const queryTry1 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_NAME LIKE '%${name}%'`;
-      const q1 = queryGenerator(queryTry1, order, orderBy);
-
-      const queryTry2 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_ZONE LIKE '%${name}%'`;
-      const q2 = queryGenerator(queryTry2, order, orderBy);
-
-      const queryTry3 = `SELECT USER_NAME, USER_TYPE, USER_ZONE WHERE USER_TYPE != 'rodsgroup' AND USER_TYPE LIKE '%${name}%'`;
-      const q3 = queryGenerator(queryTry3, order, orderBy);
-
-      const resp1 = await axios({
-        method: "GET",
-        url: `${environment.httpApiLocation}/query`,
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        params: {
-          op: "execute_genquery",
-          query: q1,
-          count: limit,
-          offset: offset,
-          "case-sensitive": 0,
-        },
-      });
-
-      const resp2 = await axios({
-        method: "GET",
-        url: `${environment.httpApiLocation}/query`,
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        params: {
-          op: "execute_genquery",
-          query: q2,
-          count: limit,
-          offset: offset,
-          "case-sensitive": 0,
-        },
-      });
-
-      const resp3 = await axios({
-        method: "GET",
-        url: `${environment.httpApiLocation}/query`,
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        params: {
-          op: "execute_genquery",
-          query: q3,
-          count: limit,
-          offset: offset,
-          "case-sensitive": 0,
-        },
-      });
-
-      const pushOnlyNewData = (totalData, newArr) => {
-        // if totalData already has anything in resp2.data.rows, don't push it again
-        // this can happen if two queries return the same data (like `rods` will match both the `rods` username and the `rodsadmin` user type, so both queries will return the same data)
-        // there will at most be 100 items in each array, so it won't take too long
-        newArr.forEach((item) => {
-          let found = false;
-          totalData.forEach((item2) => {
-            if (item[0] === item2[0]) {
-              found = true;
-              return;
-            }
-          });
-          if (!found) {
-            totalData.push(item);
-          }
-        });
-
-        return totalData;
-      };
-
-      let userTotal = 0;
-      if (resp1 && resp1.data.rows.length > 0) {
-        totalData.push(...resp1.data.rows);
-        userTotal = parseInt(resp1.data.rows.length);
-      }
-      if (resp2 && resp2.data.rows.length > 0) {
-        totalData = pushOnlyNewData(totalData, resp2.data.rows);
-        userTotal = parseInt(resp2.data.rows.length);
-      }
-      if (resp3 && resp3.data.rows.length > 0) {
-        totalData = pushOnlyNewData(totalData, resp3.data.rows);
-        userTotal = parseInt(resp3.data.rows.length);
-      }
-
-      setUserTotal(userTotal);
-      setUserContext({
-        rows: totalData,
-        count: userTotal,
-        total: userTotal,
-      });
-      setIsLoadingUserContext(false);
-    }
-  };
-
-  // iterate through group results and load user counts
-  const loadGroupUserCounts = async (
-    inputArray,
-    offset,
-    limit,
-    order,
-    orderBy,
-  ) => {
-    const groupUserCountPromises = inputArray.rows.map((group) =>
-      axios({
-        method: "GET",
-        url: `${environment.httpApiLocation}/query`,
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-        params: {
-          op: "execute_genquery",
-          query: `SELECT USER_NAME WHERE USER_GROUP_NAME = '${group[0]}' AND USER_TYPE != 'rodsgroup'`,
-          count: 100,
-        },
-      }),
-    );
-
-    // wait until all promises are resolved so we can get all user counts
-    await Promise.all(groupUserCountPromises)
-      .then((resolvedPromises) => {
-        resolvedPromises.forEach((resolvedPromise, index) => {
-          inputArray.rows[index].push(resolvedPromise.data.rows.length);
-        });
-      })
-      .catch(() => {
-        setGroupContext(undefined);
-        setIsLoadingGroupContext(false);
-      });
-
-    if (orderBy === "USER_COUNT") {
-      inputArray.rows = inputArray.rows
-        .sort((a, b) => (order === "asc" ? 1 : -1) * (a[1] - b[1]))
-        .slice(offset, offset + limit);
-    }
-    const newGroupContext = {
-      rows: inputArray.rows,
-      count: inputArray.rows.length,
-      total: inputArray.rows.length,
-    };
-    setGroupContext(newGroupContext);
-    setIsLoadingGroupContext(false);
-  };
-
-  const loadGroups = async (offset, limit, name, order, orderBy) => {
-    setIsLoadingGroupContext(true);
-    let _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP'`;
-    if (name !== "") {
-      _query = `SELECT USER_NAME WHERE USER_TYPE = 'RODSGROUP' and USER_NAME LIKE '%${name.toUpperCase()}%'`;
-    }
-    _query = queryGenerator(_query, order, orderBy);
-    await axios({
-      method: "GET",
-      url: `${environment.httpApiLocation}/query`,
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-      },
-      params: {
-        op: "execute_genquery",
-        query: _query,
-        count: orderBy === "USER_COUNT" ? 0 : limit,
-        offset: orderBy === "USER_COUNT" ? 0 : offset,
-        "case-sensitive": 0,
-      },
-    })
-      .then((res) => {
-        if (name === "") setGroupTotal(res.data.rows.length);
-        loadGroupUserCounts(res.data, offset, limit, order, orderBy);
-      })
-      .catch(() => {
-        setGroupContext(undefined);
-        setIsLoadingGroupContext(false);
-      });
-  };
+    },
+    [auth.token, environment.httpApiLocation, loadGroupUserCounts],
+  );
 
   // sort and remove duplicate resources
   const resourceSortRemoveDuplicatesHelper = (
@@ -398,7 +401,7 @@ export const ServerProvider = ({ children }) => {
           });
       }
     },
-    [environment.httpApiLocation],
+    [environment.httpApiLocation, auth.token],
   );
 
   const updatingRescPanelStatus = (text) => {
@@ -407,7 +410,7 @@ export const ServerProvider = ({ children }) => {
 
   // First api request sent out when user lands after authentication, check if 502 bad gateway occurs
   // 	- 502 bad gateway => auth token is expired, so remove from local storage and re-login
-  const loadZones = async () => {
+  const loadZones = useCallback(async () => {
     setIsLoadingZones(true);
     let zonesRes = [];
     const zoneData = await axios({
@@ -461,14 +464,12 @@ export const ServerProvider = ({ children }) => {
       });
     });
     const zoneUserData = await Promise.all(zoneUserDataPromises);
-    zonesRes.forEach(
-      (zone, index) => (zone.users = zoneUserData[index].data.rows.length),
-    );
+    zonesRes.map((zone, index) => zoneUserData[index].data.rows.length);
     setZones(zonesRes);
     setIsLoadingZones(false);
-  };
+  }, [auth.token, environment.httpApiLocation, logout]);
 
-  const loadZoneReport = () => {
+  const loadZoneReport = useCallback(() => {
     return axios({
       method: "GET",
       url: `${environment.httpApiLocation}/zones`,
@@ -482,26 +483,29 @@ export const ServerProvider = ({ children }) => {
       setZoneContext(undefined);
       setIsLoadingZoneContext(false);
     });
-  };
+  }, [auth.token, environment.httpApiLocation]);
 
   // to query all resources that live on a specific hostname
-  const fetchServerResources = (server_hostname) => {
-    return axios({
-      method: "GET",
-      url: `${environment.httpApiLocation}/query`,
-      headers: {
-        Authorization: `Bearer ${auth.token}`,
-      },
-      params: {
-        op: "execute_genquery",
-        query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
-        count: 100,
-      },
-    });
-  };
+  const fetchServerResources = useCallback(
+    (server_hostname) => {
+      return axios({
+        method: "GET",
+        url: `${environment.httpApiLocation}/query`,
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+        params: {
+          op: "execute_genquery",
+          query: `SELECT RESC_NAME WHERE RESC_LOC = '${server_hostname}'`,
+          count: 100,
+        },
+      });
+    },
+    [auth.token, environment.httpApiLocation],
+  );
 
   // load all servers at each render, and iterate through the server list to fetch resources which have the same hostname
-  const loadServers = async () => {
+  const loadServers = useCallback(async () => {
     setIsLoadingZoneContext(true);
     const zone_report = await loadZoneReport();
 
@@ -568,66 +572,74 @@ export const ServerProvider = ({ children }) => {
       );
       setIsLoadingZoneContext(false);
     }
-  };
+  }, [
+    environment.defaultItemsPerPage,
+    environment.serversPageKey,
+    fetchServerResources,
+    loadZoneReport,
+  ]);
 
   // handle servers page pagination and sorting
-  const loadCurrServers = async (offset, perPage, order, orderBy) => {
-    if (zoneContext !== undefined && zoneContext.length !== 0) {
-      let tem_servers = zoneContext;
-      const orderSyntax = order === "asc" ? 1 : -1;
-      const server_sort_comparator = (a, b) => {
-        switch (orderBy) {
-          case "hostname":
-            return (
-              orderSyntax *
-              a["host_system_information"]["hostname"].localeCompare(
-                b["host_system_information"]["hostname"],
-              )
-            );
-          case "role":
-            return (
-              orderSyntax *
-              a["server_config"]["catalog_service_role"].localeCompare(
-                b["server_config"]["catalog_service_role"],
-              )
-            );
-          case "os":
-            return (
-              orderSyntax *
-              (
-                a["host_system_information"]["os_distribution_name"] +
-                a["host_system_information"]["os_distribution_version"]
-              ).localeCompare(
-                b["host_system_information"]["os_distribution_name"] +
-                  b["host_system_information"]["os_distribution_version"],
-              )
-            );
-          case "resources":
-            return orderSyntax * (a["resources"] - b["resources"]);
-          case "irods-version":
-            return (
-              orderSyntax *
-              irodsVersionComparator(
-                a["version"]["irods_version"],
-                b["version"]["irods_version"],
-              )
-            );
-          default:
-            return (
-              orderSyntax *
-              a["server_config"]["catalog_service_role"].localeCompare(
-                b["server_config"]["catalog_service_role"],
-              )
-            );
-        }
-      };
-      tem_servers.sort(server_sort_comparator);
-      tem_servers = tem_servers.slice(offset, offset + perPage);
-      setFilteredServers(tem_servers);
-    }
-  };
+  const loadCurrServers = useCallback(
+    async (offset, perPage, order, orderBy) => {
+      if (zoneContext !== undefined && zoneContext.length !== 0) {
+        let tem_servers = zoneContext;
+        const orderSyntax = order === "asc" ? 1 : -1;
+        const server_sort_comparator = (a, b) => {
+          switch (orderBy) {
+            case "hostname":
+              return (
+                orderSyntax *
+                a["host_system_information"]["hostname"].localeCompare(
+                  b["host_system_information"]["hostname"],
+                )
+              );
+            case "role":
+              return (
+                orderSyntax *
+                a["server_config"]["catalog_service_role"].localeCompare(
+                  b["server_config"]["catalog_service_role"],
+                )
+              );
+            case "os":
+              return (
+                orderSyntax *
+                (
+                  a["host_system_information"]["os_distribution_name"] +
+                  a["host_system_information"]["os_distribution_version"]
+                ).localeCompare(
+                  b["host_system_information"]["os_distribution_name"] +
+                    b["host_system_information"]["os_distribution_version"],
+                )
+              );
+            case "resources":
+              return orderSyntax * (a["resources"] - b["resources"]);
+            case "irods-version":
+              return (
+                orderSyntax *
+                irodsVersionComparator(
+                  a["version"]["irods_version"],
+                  b["version"]["irods_version"],
+                )
+              );
+            default:
+              return (
+                orderSyntax *
+                a["server_config"]["catalog_service_role"].localeCompare(
+                  b["server_config"]["catalog_service_role"],
+                )
+              );
+          }
+        };
+        tem_servers.sort(server_sort_comparator);
+        tem_servers = tem_servers.slice(offset, offset + perPage);
+        setFilteredServers(tem_servers);
+      }
+    },
+    [zoneContext],
+  );
 
-  const loadSpecificQueries = () => {
+  const loadSpecificQueries = useCallback(() => {
     setIsLoadingSpecificQueryContext(true);
     axios({
       method: "GET",
@@ -652,9 +664,9 @@ export const ServerProvider = ({ children }) => {
         setSpecificQueryContext(undefined);
         setIsLoadingSpecificQueryContext(false);
       });
-  };
+  }, [auth.token, environment.httpApiLocation]);
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     // not including servers key because we don't need to set default load amount here for it
     const pageKeys = ["groupsPerPageKey", "resourcesPageKey", "usersPageKey"];
 
@@ -685,14 +697,28 @@ export const ServerProvider = ({ children }) => {
       loadResources(0, rescPerPage, "", "asc", "RESC_NAME");
     !isLoadingUserContext && loadUsers(0, usersPerPage, "", "asc", "USER_NAME");
     !isLoadingSpecificQueryContext && loadSpecificQueries();
-  };
+  }, [
+    environment,
+    isLoadingGroupContext,
+    isLoadingRescContext,
+    isLoadingSpecificQueryContext,
+    isLoadingUserContext,
+    isLoadingZoneContext,
+    isLoadingZones,
+    loadGroups,
+    loadResources,
+    loadServers,
+    loadSpecificQueries,
+    loadUsers,
+    loadZones,
+  ]);
 
   // load all zone data at each render if user is logged in
   useEffect(() => {
     if (localZoneName === undefined && auth.token !== null) {
       loadData();
     }
-  }, [loadData, localZoneName]);
+  }, [loadData, localZoneName, auth.token]);
 
   return (
     <ServerContext.Provider

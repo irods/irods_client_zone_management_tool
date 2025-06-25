@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 import { useEnvironment } from "../contexts";
 
 export const NotFound = () => {
-  const { loginLogo, footerHeight, sidebarWidth } = useEnvironment();
+  const { loginLogo, footerHeight } = useEnvironment();
 
   const styles = {
     notFoundContainer: {

@@ -23,7 +23,7 @@ const InfoListItem = (props) => {
             alt="appbarLogo"
             src={value}
           ></img>
-        ) : /^\#[0-9a-fA-F]{6}/.test(value) ? (
+        ) : /^#[0-9a-fA-F]{6}/.test(value) ? (
           <span
             style={{
               aspectRatio: 1,
@@ -36,7 +36,7 @@ const InfoListItem = (props) => {
           "undefined"
         ) : typeof value == "number" ? (
           value.toString()
-        ) : value == "" ? (
+        ) : value === "" ? (
           '""'
         ) : !Number.isNaN(Number(value)) ? (
           value

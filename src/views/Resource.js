@@ -9,7 +9,7 @@ import {
   TablePagination,
   TableSortLabel,
 } from "../components";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 
 import { AddResourceController } from "../controllers/ResourceController";
 
@@ -74,7 +74,7 @@ export const Resource = () => {
       setFilterName(params.get("filter"));
       setParams();
     }
-  }, []);
+  }, [params, setParams]);
 
   useEffect(() => {
     // runs on initial render
@@ -229,7 +229,6 @@ export const Resource = () => {
           </div>
           <Fragment>
             <TablePagination
-              component="div"
               style={styles.pagination}
               page={currPage - 1}
               count={parseInt(rescContext.total)}

@@ -1,4 +1,10 @@
-import { useEffect, useState, createContext, useContext } from "react";
+import {
+  useEffect,
+  useState,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
 import { Authenticate } from "../views";
 import PropTypes from "prop-types";
 
@@ -15,13 +21,13 @@ export const AuthHookProvider = ({ children }) => {
     localStorage.setItem("zmt-token", auth.token);
   }, [auth]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("zmt-username");
     localStorage.removeItem("zmt-token");
     localStorage.removeItem("zmt-inactiveChecks");
     localStorage.removeItem("zmt-checkIntervals");
     setAuth({ username: null, token: null });
-  };
+  }, [setAuth]);
 
   if (!auth.token || auth.token === "null") {
     window.history.pushState(null, null, "/");

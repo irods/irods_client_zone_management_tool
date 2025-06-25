@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useLayoutEffect } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 import { useEnvironment, useServer } from "../contexts";
 import {
   TableSortLabel,
@@ -84,7 +84,7 @@ export const Group = () => {
   // pass in perPage, currentPage, filtername('' by default), order, orderBy
 
   useEffect(() => {
-    if (localZoneName && !isLoadingGroupContext)
+    if (!localZoneName && !isLoadingGroupContext)
       loadGroups(
         (currPage - 1) * perPage,
         perPage,
@@ -95,6 +95,7 @@ export const Group = () => {
     environment.pageTitle = environment.groupsTitle;
     document.title = `${environment.titleFormat()}`;
   }, [
+    loadGroups,
     currPage,
     perPage,
     filterGroupName,
@@ -102,6 +103,7 @@ export const Group = () => {
     orderBy,
     environment,
     localZoneName,
+    isLoadingGroupContext,
   ]);
 
   async function addGroup() {
@@ -326,8 +328,6 @@ export const Group = () => {
                             style={{
                               width: "30%",
                             }}
-                            component="th"
-                            scope="row"
                           >
                             {group[0]}
                           </td>
@@ -335,8 +335,6 @@ export const Group = () => {
                             style={{
                               width: "30%",
                             }}
-                            component="th"
-                            scope="row"
                           >
                             {group[1]}
                           </td>

@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import React from "react";
 
 const minimum_size_in_gb = 10;
 
-export default {
+const check = {
   name: `unixfilesystem resources have at least ${minimum_size_in_gb} GB of free space`,
   description: `Checks if all unixfilesystem resources have at least ${minimum_size_in_gb} GB of free space`,
   minimum_server_version: "4.2.0",
@@ -135,3 +135,5 @@ export default {
     return result;
   },
 };
+
+export default check;

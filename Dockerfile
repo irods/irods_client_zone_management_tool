@@ -1,9 +1,6 @@
 # build phase one, create the build
 FROM node:20-alpine3.19 AS build
 
-# get some credit
-LABEL maintainer="powen@renci.org"
-
 # install git
 RUN apk --no-cache add git
 

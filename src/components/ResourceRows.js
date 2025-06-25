@@ -1,11 +1,10 @@
-import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   DoubleArrowDownIcon,
   DoubleArrowUpIcon,
   WarningIcon,
   EditIcon,
-  UndoIcon,
   CloseIcon,
   CancelIcon,
   CheckIcon,
@@ -221,7 +220,7 @@ function ResourceRows({ row, validServerHosts }) {
     updatingRescPanelStatus("idle");
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (open && removeFormOpen)
       document.getElementById(`${resc[0]}-modal`).showModal();
     if (
@@ -230,7 +229,7 @@ function ResourceRows({ row, validServerHosts }) {
       document.getElementById(`${resc[0]}-modal`).open
     )
       document.getElementById(`${resc[0]}-modal`).close();
-  }, [removeFormOpen]);
+  }, [removeFormOpen, open, resc]);
 
   useEffect(() => {
     if (failNotification) {
@@ -283,7 +282,7 @@ function ResourceRows({ row, validServerHosts }) {
           {open && (
             <React.Fragment>
               <div style={styles.resource_container}>
-                <h2 style={styles.row} variant="h6" component="div">
+                <h2 style={styles.row}>
                   Resource Details
                   <span style={styles.remove_button}>
                     {isEditing ? (
@@ -568,4 +567,3 @@ ResourceRows.propTypes = {
   row: PropTypes.array,
   validServerHosts: PropTypes.object,
 };
-

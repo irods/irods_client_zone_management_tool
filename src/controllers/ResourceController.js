@@ -9,9 +9,9 @@ export const AddResourceController = (
 ) => {
   const params = new URLSearchParams({
     op: "create",
-    name: name,
-    type: type,
-    host: host,
+    name,
+    type,
+    host,
     "vault-path": vaultPath,
   });
 
@@ -26,9 +26,9 @@ export const AddResourceController = (
 export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
   const params = new URLSearchParams({
     op: "modify",
-    name: name,
+    name,
     property: arg,
-    value: value,
+    value,
   });
 
   return axios.post(`${httpApiLocation}/resources`, params, {
@@ -41,7 +41,7 @@ export const ModifyResourceController = (name, arg, value, httpApiLocation) => {
 export const RemoveResourceController = async (name, httpApiLocation) => {
   const params = new URLSearchParams({
     op: "remove",
-    name: name,
+    name,
   });
 
   return axios.post(`${httpApiLocation}/resources`, params, {

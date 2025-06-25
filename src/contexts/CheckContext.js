@@ -1,8 +1,10 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
+  useMemo,
   useRef,
 } from "react";
 import PropTypes from "prop-types";
@@ -124,55 +126,46 @@ export const CheckProvider = ({ children }) => {
   );
 
   // zmt context that can be accessed in a check file e.g., this.zoneContext
-  const context = {
-    rescAll,
-    httpApiLocation,
-    httpApiTimeout,
-    validServerHosts,
-    zoneContext,
-  };
+  const context = useMemo(
+    () => ({
+      rescAll,
+      httpApiLocation,
+      httpApiTimeout,
+      validServerHosts,
+      zoneContext,
+    }),
+    [httpApiLocation, httpApiTimeout, rescAll, validServerHosts, zoneContext],
+  );
   const callBackFn = useRef(null);
 
-  useEffect(() => {
-    const keys = Object.keys(statusResult);
-    if (
-      localStorage.getItem("zmt-token") &&
-      keys.length === 0 &&
-      zoneContext &&
-      zoneContext.length > 0 &&
-      !isChecking &&
-      !isLoadingZoneContext
-    ) {
-      // run checks only when data loading is complete
-      runAllCheck();
-    }
-  }, [zoneContext, rescAll, isLoadingZoneContext, isChecking, statusResult]);
-
-  const checkServerVersion = (check) => {
-    if (
-      "minimum_server_version" in check &&
-      "maximum_server_version" in check
-    ) {
-      // compare min and max server version if specified in checkfile
+  const checkServerVersion = useCallback(
+    (check) => {
       if (
-        check["minimum_server_version"] !== "" &&
-        irodsVersionComparator(
-          check["minimum_server_version"],
-          serverVersions[0],
-        ) > 0
-      )
-        return serverVersions[0];
-      if (
-        check["maximum_server_version"] !== "" &&
-        irodsVersionComparator(
-          check["maximum_server_version"],
-          serverVersions[serverVersions.length - 1],
-        ) < 0
-      )
-        return serverVersions[serverVersions.length - 1];
-      return true;
-    }
-  };
+        "minimum_server_version" in check &&
+        "maximum_server_version" in check
+      ) {
+        // compare min and max server version if specified in checkfile
+        if (
+          check["minimum_server_version"] !== "" &&
+          irodsVersionComparator(
+            check["minimum_server_version"],
+            serverVersions[0],
+          ) > 0
+        )
+          return serverVersions[0];
+        if (
+          check["maximum_server_version"] !== "" &&
+          irodsVersionComparator(
+            check["maximum_server_version"],
+            serverVersions[serverVersions.length - 1],
+          ) < 0
+        )
+          return serverVersions[serverVersions.length - 1];
+        return true;
+      }
+    },
+    [serverVersions],
+  );
 
   const removePrevStatus = (check) => {
     const prevStatus = checkResults[check["id"]][1]["status"];
@@ -191,70 +184,73 @@ export const CheckProvider = ({ children }) => {
     setTimeStamp(new Date());
   };
 
-  const runOneCheck = async (check) => {
-    const prevStatus = checkResults[check.id][1]["status"];
-    let result = {};
+  const runOneCheck = useCallback(
+    async (check) => {
+      const prevStatus = checkResults[check.id][1]["status"];
+      let result = {};
 
-    try {
-      if (checkTimers[check.id]) {
-        // reset timer if needed
-        clearTimeout(checkTimers[check.id]);
-      }
-      // run check if server requirements are met
-      if (checkServerVersion(check) === true) {
-        result = await check.checker.apply(context);
-        result.timestamp = new Date();
-        if (
-          !result.status ||
-          (result.status !== "healthy" &&
-            result.status !== "warning" &&
-            result.status !== "error")
-        ) {
+      try {
+        if (checkTimers[check.id]) {
+          // reset timer if needed
+          clearTimeout(checkTimers[check.id]);
+        }
+        // run check if server requirements are met
+        if (checkServerVersion(check) === true) {
+          result = await check.checker.apply(context);
+          result.timestamp = new Date();
+          if (
+            !result.status ||
+            (result.status !== "healthy" &&
+              result.status !== "warning" &&
+              result.status !== "error")
+          ) {
+            result = {
+              status: "error",
+              message: `Error - this check returned an invalid result object.`,
+              timestamp: new Date(),
+            };
+          }
+        } else {
           result = {
-            status: "error",
-            message: `Error - this check returned an invalid result object.`,
+            status: "unavailable",
+            message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.minimum_server_version} - ${check.maximum_server_version}).`,
             timestamp: new Date(),
           };
         }
-      } else {
+      } catch (e) {
+        console.error(e, e.stack);
         result = {
-          status: "unavailable",
-          message: `This check is unavailable because the iRODS Server version (${checkServerVersion(check)}) is out of range (${check.minimum_server_version} - ${check.maximum_server_version}).`,
+          status: "error",
+          message: "Error when running the check.",
           timestamp: new Date(),
         };
+      } finally {
+        setCheckResults((prev) => {
+          prev[check.id] = [check, result];
+          return prev;
+        });
+        setStatusResult((prev) => {
+          prev[prevStatus] -= 1;
+          prev[result.status] += 1;
+          return prev;
+        });
+
+        const timerID = setTimeout(
+          () => runOneCheck(check),
+          1000 * checkIntervals[check["id"]],
+        );
+
+        setCheckTimers((prev) => {
+          prev[check.id] = timerID;
+          return prev;
+        });
+        setTimeStamp(new Date());
       }
-    } catch (e) {
-      console.error(e, e.stack);
-      result = {
-        status: "error",
-        message: "Error when running the check.",
-        timestamp: new Date(),
-      };
-    } finally {
-      setCheckResults((prev) => {
-        prev[check.id] = [check, result];
-        return prev;
-      });
-      setStatusResult((prev) => {
-        prev[prevStatus] -= 1;
-        prev[result.status] += 1;
-        return prev;
-      });
+    },
+    [checkTimers, checkIntervals, checkResults, checkServerVersion, context],
+  );
 
-      const timerID = setTimeout(
-        () => runOneCheck(check),
-        1000 * checkIntervals[check["id"]],
-      );
-
-      setCheckTimers((prev) => {
-        prev[check.id] = timerID;
-        return prev;
-      });
-      setTimeStamp(new Date());
-    }
-  };
-
-  const runAllCheck = () => {
+  const runAllCheck = useCallback(() => {
     // before running all checks, reset all timers
     for (const key in checkTimers) {
       clearTimeout(checkTimers[key]);
@@ -369,7 +365,14 @@ export const CheckProvider = ({ children }) => {
         }
       })();
     });
-  };
+  }, [
+    checkIntervals,
+    checkServerVersion,
+    checkTimers,
+    checks,
+    context,
+    inactiveChecks,
+  ]);
 
   const modifyCheckInterval = (id, newInterval) => {
     // update intervals, run check again and reset timer
@@ -398,6 +401,28 @@ export const CheckProvider = ({ children }) => {
     setInactiveChecks(newSet);
     localStorage.setItem("zmt-inactiveChecks", JSON.stringify([...newSet]));
   };
+
+  useEffect(() => {
+    const keys = Object.keys(statusResult);
+    if (
+      localStorage.getItem("zmt-token") &&
+      keys.length === 0 &&
+      zoneContext &&
+      zoneContext.length > 0 &&
+      !isChecking &&
+      !isLoadingZoneContext
+    ) {
+      // run checks only when data loading is complete
+      runAllCheck();
+    }
+  }, [
+    zoneContext,
+    rescAll,
+    isLoadingZoneContext,
+    isChecking,
+    statusResult,
+    runAllCheck,
+  ]);
 
   useEffect(() => {
     // make the callback function gets access to the latest state
@@ -431,4 +456,3 @@ CheckProvider.propTypes = {
 };
 
 export const useCheck = () => useContext(CheckContext);
-
