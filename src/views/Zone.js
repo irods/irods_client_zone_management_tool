@@ -1,5 +1,10 @@
-import React, { useState, Fragment, useEffect, useLayoutEffect } from "react";
-import { Navigate } from "react-router-dom";
+import React, {
+  useCallback,
+  useState,
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import { useEnvironment, useServer } from "../contexts";
 import { EditIcon, CloseIcon, CheckIcon, TableSortLabel } from "../components";
 import {
@@ -60,19 +65,6 @@ export const Zone = () => {
       setSortedZones(newSortedZone);
     }
   }, [order, orderBy, sortedZones]);
-
-  // validate input and check if any inputs are changed
-  useEffect(() => {
-    if (status === "edit-mode") {
-      setSaveButtonIsDisabled(!(validateEditModeInput() && checkIfChanged()));
-    } else {
-      setSaveButtonIsDisabled(
-        currZone.name === "" ||
-          currZone.hostname === "" ||
-          currZone.port === "",
-      );
-    }
-  }, [currZone, modifiedCurrZone, status]);
 
   const handleSort = (newOrderBy) => {
     const isAsc = orderBy === newOrderBy && order === "desc";
@@ -176,23 +168,23 @@ export const Zone = () => {
   };
 
   // return true if inputs are valid and not empty, return false otherwise
-  const validateEditModeInput = () => {
+  const validateEditModeInput = useCallback(() => {
     return (
       modifiedCurrZone.name !== "" &&
       modifiedCurrZone.hostname !== "" &&
       parseInt(modifiedCurrZone.port) > 0
     );
-  };
+  }, [modifiedCurrZone]);
 
   // return true if any edit input has changed, return false otherwise
-  const checkIfChanged = () => {
+  const checkIfChanged = useCallback(() => {
     return !(
       modifiedCurrZone.name === currZone.name &&
       modifiedCurrZone.hostname === currZone.hostname &&
       modifiedCurrZone.port === currZone.port &&
       modifiedCurrZone.comment === currZone.comment
     );
-  };
+  }, [modifiedCurrZone, currZone]);
 
   const keyEventHandler = (event) => {
     // check if enter is pressed
@@ -205,12 +197,50 @@ export const Zone = () => {
     }
   };
 
+  // validate input and check if any inputs are changed
+  useEffect(() => {
+    if (status === "edit-mode") {
+      setSaveButtonIsDisabled(!(validateEditModeInput() && checkIfChanged()));
+    } else {
+      setSaveButtonIsDisabled(
+        currZone.name === "" ||
+          currZone.hostname === "" ||
+          currZone.port === "",
+      );
+    }
+  }, [
+    currZone,
+    modifiedCurrZone,
+    status,
+    checkIfChanged,
+    validateEditModeInput,
+  ]);
+
   useLayoutEffect(() => {
     if (confirmationDialog.visibility)
       document.getElementById("modal").showModal();
     if (!confirmationDialog.visibility && document.getElementById("modal").open)
       document.getElementById("modal").close();
   }, [confirmationDialog]);
+
+  // validate input and check if any inputs are changed
+  useEffect(() => {
+    if (status === "edit-mode") {
+      setSaveButtonIsDisabled(!(validateEditModeInput() && checkIfChanged()));
+    } else {
+      setSaveButtonIsDisabled(
+        currZone.name === "" ||
+          currZone.hostname === "" ||
+          currZone.port === "",
+      );
+    }
+  }, [
+    currZone,
+    modifiedCurrZone,
+    status,
+    checkIfChanged,
+    validateEditModeInput,
+  ]);
 
   useEffect(() => {
     if (status !== "none" && status !== "edit-mode" && status !== "creation") {
@@ -383,8 +413,8 @@ export const Zone = () => {
               sortedZones.map((zone) => (
                 <tr key={`zone-${zone.name}`}>
                   <td
-                    style={styles.table_cell}
                     style={{
+                      ...styles.table_cell,
                       borderLeft: `25px solid ${zone.type === "local" ? "#04d1c2" : "#808080"}`,
                     }}
                   >

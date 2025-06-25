@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import { useEnvironment, useAuthHook } from "../contexts";
 
 export const Authenticate = ({ onAuthenticated }) => {
@@ -108,7 +108,6 @@ export const Authenticate = ({ onAuthenticated }) => {
     setServerError(false);
     setIncorrect(false);
 
-    let resStatus = 0;
     fetch(`${httpApiLocation}/authenticate`, {
       method: "POST",
       headers: {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Footer, Layout } from "./components";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router";
 import {
   Home,
   NotFound,

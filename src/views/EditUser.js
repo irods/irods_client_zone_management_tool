@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { useLocation, Link, Navigate } from "react-router-dom";
+import { useLocation, Link, Navigate } from "react-router";
 import { useEnvironment } from "../contexts";
 import { ArrowLeftIcon } from "../components";
 import {
@@ -55,7 +55,6 @@ export const EditUser = (props) => {
     state && state.username && state.userzone
       ? [state.username, state.userzone]
       : [undefined, undefined];
-  const [isLoading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const { httpApiLocation } = useEnvironment();
   const [groupsOfUser, setGroupsOfUser] = useState([]);
@@ -73,9 +72,6 @@ export const EditUser = (props) => {
     showConfirmPassword: false,
     status: "",
   });
-
-  if (!currentUserName || !currentUserZone)
-    return <Navigate to="/users" noThrow />;
 
   useEffect(() => {
     // hide this interface for the current rodsadmin user or user that does not have a name or zone
@@ -103,7 +99,7 @@ export const EditUser = (props) => {
       .then((res) => {
         // navigate back to /user if the username provided does not exist
         res.data.rows.length > 0 ? (
-          setUserType({ ...userType, value: res.data.rows[0][0] })
+          setUserType({ status: userType.status, value: res.data.rows[0][0] })
         ) : (
           <Navigate to="/users" noThrow />
         );
@@ -111,11 +107,18 @@ export const EditUser = (props) => {
       .catch(() => {
         return <Navigate to="/users" noThrow />;
       });
-  }, [userType.value, userType.status]);
+  }, [
+    currentUserName,
+    currentUserZone,
+    httpApiLocation,
+    loggedUserName,
+    auth,
+    userType.value,
+    userType.status,
+  ]);
 
   useEffect(() => {
     if (currentUserName) {
-      setLoading(true);
       axios({
         method: "GET",
         url: `${httpApiLocation}/query`,
@@ -131,10 +134,9 @@ export const EditUser = (props) => {
         },
       }).then((res) => {
         setGroupsOfUser(res.data.rows);
-        setLoading(false);
       });
     }
-  }, []);
+  }, [currentUserName, httpApiLocation, auth]);
 
   useEffect(() => {
     if (currentUserName) {
@@ -155,7 +157,7 @@ export const EditUser = (props) => {
         setFilterNameResult(res.data.rows);
       });
     }
-  }, []);
+  }, [auth, currentUserName, filterGroupName, httpApiLocation]);
 
   async function removeGroupFromUser(group) {
     try {
@@ -264,7 +266,7 @@ export const EditUser = (props) => {
         clearTimeout(id);
       };
     }
-  }, [password.status]);
+  }, [password]);
 
   useEffect(() => {
     if (userType.status === "success" || userType.status !== "failure") {
@@ -275,7 +277,11 @@ export const EditUser = (props) => {
         clearTimeout(id);
       };
     }
-  }, [userType.status]);
+  }, [userType]);
+
+  if (!currentUserName || !currentUserZone) {
+    return <Navigate to="/users" noThrow />;
+  }
 
   return (
     <Fragment>
@@ -436,9 +442,7 @@ export const EditUser = (props) => {
                       ) : (
                         filterGroupNameResult.map((thisGroup) => (
                           <tr key={thisGroup[0]}>
-                            <td component="th" scope="row">
-                              {thisGroup[0]}
-                            </td>
+                            <td>{thisGroup[0]}</td>
                             <td align="right">
                               {checkGroup(thisGroup)
                                 ? "In group"

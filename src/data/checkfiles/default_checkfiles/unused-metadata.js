@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AVUThresholdBeforeWarningForNoSpecificQuery = 100000;
 
-export default {
+const check = {
   name: "All metadata is used",
   description: `Checks if every piece of metadata is associated with a user, resource, data object, or collection. If there are more than ${AVUThresholdBeforeWarningForNoSpecificQuery} metadata entries, this check will require you to add a specific query.`,
   minimum_server_version: "4.2.0",
@@ -192,3 +192,5 @@ export default {
     return result;
   },
 };
+
+export default check;

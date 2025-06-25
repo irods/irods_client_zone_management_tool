@@ -1,7 +1,6 @@
-import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { TabPanel, TableSortLabel, TablePagination } from "../components";
 import { useEnvironment, useServer } from "../contexts";
-import { Navigate } from "react-router-dom";
 
 const styles = {
   pagination: {
@@ -56,13 +55,13 @@ export const Server = () => {
       localStorage.setItem(serversPageKey, environment.defaultItemsPerPage);
       setPerPage(environment.defaultItemsPerPage);
     }
-  }, []);
+  }, [environment.defaultItemsPerPage, serversPageKey]);
 
   useEffect(() => {
     loadCurrServers(perPage * (currPage - 1), perPage, order, orderBy);
     environment.pageTitle = environment.serversTitle;
     document.title = `${environment.titleFormat()}`;
-  }, [perPage, currPage, order, orderBy]);
+  }, [perPage, currPage, order, orderBy, loadCurrServers, environment]);
 
   const handleSort = (props) => {
     const isAsc = orderBy === props && order === "desc";
@@ -82,7 +81,7 @@ export const Server = () => {
     };
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (currServer !== undefined && openDetails)
       document.getElementById("modal").showModal();
     if (
@@ -91,7 +90,7 @@ export const Server = () => {
       document.getElementById("modal").open
     )
       document.getElementById("modal").close();
-  }, [openDetails]);
+  }, [openDetails, currServer]);
 
   return (
     <Fragment>

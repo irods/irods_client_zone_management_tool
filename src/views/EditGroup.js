@@ -1,7 +1,13 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router";
 import { useEnvironment, useServer, useAuthHook } from "../contexts";
 import { ArrowLeftIcon } from "../components";
 import {
@@ -24,12 +30,13 @@ const styles = {
 export const EditGroup = (props) => {
   const location = useLocation();
   // navigate to a group page if no group info is passed along
-  if (!location.state) return <Navigate to="/groups" noThrow />;
 
   const auth = localStorage.getItem("zmt-token");
-  const currentGroup = location.state ? location.state.groupInfo : new Array(2);
+  const currentGroup = useMemo(
+    () => (location.state ? location.state.groupInfo : new Array(2)),
+    [location.state],
+  );
   const { localZoneName } = useServer();
-  const [isLoading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const { httpApiLocation } = useEnvironment();
   const { logout } = useAuthHook();
@@ -38,7 +45,6 @@ export const EditGroup = (props) => {
   const [filterUserNameResult, setFilterNameResult] = useState();
 
   const loadCurrentGroupInfo = useCallback(() => {
-    setLoading(true);
     axios({
       method: "GET",
       url: `${httpApiLocation}/query`,
@@ -55,12 +61,10 @@ export const EditGroup = (props) => {
     }).then((res) => {
       if (res.status === 401) logout();
       setUsersInGroup(res.data.rows);
-      setLoading(false);
     });
-  }, [auth, currentGroup, httpApiLocation]);
+  }, [auth, currentGroup, httpApiLocation, logout]);
 
   const loadFilteredUsers = useCallback(() => {
-    setLoading(true);
     axios({
       method: "GET",
       url: `${httpApiLocation}/query`,
@@ -77,9 +81,8 @@ export const EditGroup = (props) => {
     }).then((res) => {
       if (res.status === 401) logout();
       setFilterNameResult(res.data.rows);
-      setLoading(false);
     });
-  }, [auth, httpApiLocation, filterUserName]);
+  }, [auth, httpApiLocation, filterUserName, logout]);
 
   async function removeUserFromGroup(user) {
     try {
@@ -131,6 +134,8 @@ export const EditGroup = (props) => {
   useEffect(() => {
     if (currentGroup[0]) loadFilteredUsers();
   }, [loadFilteredUsers, currentGroup]);
+
+  if (!location.state) return <Navigate to="/groups" noThrow />;
 
   return (
     <Fragment>
@@ -187,9 +192,7 @@ export const EditGroup = (props) => {
               ) : (
                 filterUserNameResult.map((thisUser) => (
                   <tr key={thisUser[0]}>
-                    <td component="th" scope="row">
-                      {thisUser[0]}
-                    </td>
+                    <td>{thisUser[0]}</td>
                     <td align="right">{thisUser[1]}</td>
                     <td align="right">
                       {checkUser(thisUser)
@@ -230,4 +233,3 @@ export const EditGroup = (props) => {
 EditGroup.propTypes = {
   location: PropTypes.any,
 };
-

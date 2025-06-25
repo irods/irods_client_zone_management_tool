@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import axios from "axios";
 
 const check = {
@@ -51,9 +51,7 @@ const check = {
       ) {
         resultsArr = resp.data.rows;
         if (resultsArr.length > 0) {
-          resultsArr.map((user) => {
-            result.failed.push([user[0], user[1]]);
-          });
+          resultsArr.map((user) => result.failed.push([user[0], user[1]]));
         }
       } else {
         warningAboutSpecificQuery = true;
@@ -92,7 +90,7 @@ const check = {
         });
 
         if (resp1 && resp1.data && resp2 && resp2.data) {
-          resp1.data.rows.map((user) => {
+          resp1.data.rows.forEach((user) => {
             for (let i = 0; i < resp2.data.rows.length; i++) {
               if (user[1] === resp2.data.rows[i][0]) {
                 return;
@@ -158,3 +156,5 @@ const check = {
     return result;
   },
 };
+
+export default check;

@@ -1,4 +1,3 @@
-import React, { Fragment } from "react";
 import { ArrowDownIcon, ArrowUpIcon } from ".";
 
 export const TableSortLabel = ({ children, active, direction, onClick }) => (

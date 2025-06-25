@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useRef } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Link } from "react-router";
 import { useEnvironment, useServer } from "../contexts";
 import {
   CheckIcon,
@@ -66,14 +66,8 @@ export const User = () => {
     parseInt(localStorage.getItem(usersPageKey), 10),
   );
   const [filterUsername, setFilterName] = useState("");
-  const {
-    isLoadingUserContext,
-    userContext,
-    userTotal,
-    localZoneName,
-    loadUsers,
-    zones,
-  } = useServer();
+  const { userContext, userTotal, localZoneName, loadUsers, zones } =
+    useServer();
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("USER_NAME");
   const [userData, setUserData] = useState([]);
@@ -240,7 +234,7 @@ export const User = () => {
       setTime(0);
       setIsRunning(true);
     }
-  }, [filterUsername, currPage, isRunning, loadUsers, order, orderBy, perPage]);
+  }, [filterUsername, currPage, isRunning, order, orderBy, perPage, loadUsers]);
 
   useEffect(() => {
     if (!userContext || userContext.rows.length === 0) return; // safety check
@@ -268,6 +262,7 @@ export const User = () => {
       setIsRunning(false);
     }
   }, [
+    loadUsers,
     time,
     currPage,
     delayTimeUse,
@@ -323,7 +318,7 @@ export const User = () => {
             >
               <thead>
                 <tr>
-                  <td style={styles.table_cell} style={{ width: "40%" }}>
+                  <td style={{ ...styles.table_cell, width: "40%" }}>
                     <TableSortLabel
                       active={orderBy === "USER_NAME"}
                       direction={orderBy === "USER_NAME" ? order : "asc"}
@@ -334,7 +329,7 @@ export const User = () => {
                       <b>User Name</b>
                     </TableSortLabel>
                   </td>
-                  <td style={styles.table_cell} style={{ width: "20%" }}>
+                  <td style={{ ...styles.table_cell, width: "20%" }}>
                     <TableSortLabel
                       active={orderBy === "USER_ZONE"}
                       direction={orderBy === "USER_ZONE" ? order : "asc"}
@@ -345,7 +340,7 @@ export const User = () => {
                       <b>Zone</b>
                     </TableSortLabel>
                   </td>
-                  <td style={styles.table_cell} style={{ width: "20%" }}>
+                  <td style={{ ...styles.table_cell, width: "20%" }}>
                     <TableSortLabel
                       active={orderBy === "USER_TYPE"}
                       direction={orderBy === "USER_TYPE" ? order : "asc"}
@@ -357,8 +352,7 @@ export const User = () => {
                     </TableSortLabel>
                   </td>
                   <td
-                    style={styles.table_cell}
-                    style={{ width: "20%" }}
+                    style={{ ...styles.table_cell, width: "20%" }}
                     align="right"
                   >
                     <b>Action</b>
@@ -471,23 +465,17 @@ export const User = () => {
                   userData &&
                   userData.map((this_user, index) => (
                     <tr key={index}>
-                      <td
-                        style={styles.table_cell}
-                        style={{ width: "40%" }}
-                        component="th"
-                        scope="row"
-                      >
+                      <td style={{ ...styles.table_cell, width: "40%" }}>
                         {this_user[0]}
                       </td>
-                      <td style={styles.table_cell} style={{ width: "20%" }}>
+                      <td style={{ ...styles.table_cell, width: "20%" }}>
                         {this_user[2]}
                       </td>
-                      <td style={styles.table_cell} style={{ width: "20%" }}>
+                      <td style={{ ...styles.table_cell, width: "20%" }}>
                         {this_user[1]}
                       </td>
                       <td
-                        style={styles.table_cell}
-                        style={{ width: "20%" }}
+                        style={{ ...styles.table_cell, width: "20%" }}
                         align="right"
                       >
                         {" "}

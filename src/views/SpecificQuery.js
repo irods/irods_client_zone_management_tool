@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState, useLayoutEffect } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import { useEnvironment, useServer } from "../contexts";
 import {
   CloseIcon,
@@ -59,7 +59,6 @@ const styles = {
 };
 
 export const SpecificQuery = () => {
-  const location = useLocation();
   const [params, setParams] = useSearchParams();
   const [status, setStatus] = useState("none");
   const [newAlias, setNewAlias] = useState("");
@@ -86,7 +85,7 @@ export const SpecificQuery = () => {
       setConfirmationVisibility(true);
       setParams();
     }
-  }, []);
+  }, [params, setParams]);
 
   const addButtonEventHandler = () => {
     setStatus("Adding");
@@ -139,7 +138,7 @@ export const SpecificQuery = () => {
       .then((res) => {
         if (res.status === 200) {
           let newExpandedSqlStrings = [];
-          expandedSqlStrings.forEach((value) => {
+          expandedSqlStrings.forEach((value, index) => {
             if (value > index) newExpandedSqlStrings.push(value - 1);
           });
           setExpandedSqlStrings(newExpandedSqlStrings);
