@@ -10,7 +10,7 @@
     "npm": "^11.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.6.2",
+    "react-router": "^7.12.0",
     "react-scripts": "5.0.1",
     "react-timeago": "^8.2.0",
     "sql-formatter": "^15.6.5"
