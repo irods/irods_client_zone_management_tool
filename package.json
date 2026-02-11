@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "-": "^0.0.1",
-    "axios": "^1.10.0",
+    "axios": "^1.13.5",
     "cors": "^2.8.5",
     "install": "^0.13.0",
     "npm": "^11.4.2",
